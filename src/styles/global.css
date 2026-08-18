@@ -1,0 +1,700 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode (Tailwind v4 defaults to OS-level
+   prefers-color-scheme unless told otherwise). This makes every
+   `dark:` utility respond to the `.dark` class on <html>, which is
+   what Navbar.astro / Layout.astro toggle via JS + localStorage. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    background: #faf8f5;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #faf8f5;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #0d9488, #059669);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #0f766e, #047857);
+  }
+
+  /* Smooth Transitions - scoped to properties that actually need it.
+     `transition: all` forces the browser to watch every animatable
+     property on every element (layout, transform, filter, etc.),
+     which gets janky fast, especially with dark-mode toggling. */
+  * {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-timing-function: ease;
+    transition-duration: 0.2s;
+  }
+}
+
+@layer components {
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, #0d9488 0%, #059669 40%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-simple {
+    background: linear-gradient(135deg, #0d9488, #059669);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, #0d9488, #059669);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: #0d9488;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    border: 2px solid #0d9488;
+    transition: all 0.3s ease;
+  }
+  .btn-secondary:hover {
+    background: #0d9488;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Card Hover Effects */
+  .card-hover {
+    transition: all 0.3s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Floating Animation */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+  }
+
+  /* Pulse Animation - color driven by --calc-glow-a / --calc-glow-b,
+     set from JS so the glow shifts hue with what the calculator is doing */
+  .pulse-glow {
+    --calc-glow-a: rgba(13, 148, 136, 0.12);
+    --calc-glow-b: rgba(13, 148, 136, 0.28);
+    animation: pulseGlow 2.4s ease-in-out infinite;
+    transition: --calc-glow-a 0.4s, --calc-glow-b 0.4s;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 22px var(--calc-glow-a); }
+    50% { box-shadow: 0 0 42px var(--calc-glow-b); }
+  }
+
+  /* LCD scanline texture for the calculator display */
+  .calc-lcd {
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+
+  .calc-mono {
+    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  }
+
+  /* Fade In Animation */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
+  .fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
+  .fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
+  .fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
+
+  /* Back to Top Button */
+  .back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(100px);
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Search Bar */
+  .search-input {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 1rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+  .search-input:focus {
+    outline: none;
+    border-color: #0d9488;
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  }
+  .dark .search-input {
+    background: #1f2937;
+    border-color: #374151;
+    color: white;
+  }
+  .dark .search-input:focus {
+    border-color: #0d9488;
+  }
+
+  /* Floating Shapes for Hero */
+  .floating-shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+}
+
+/* Responsive SVG Container */
+@media (max-width: 640px) {
+  .aspect-square {
+    max-width: 100%;
+  }
+  
+  .unit-btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Input Number Arrows - Hide for cleaner look */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Slider Thumb Customization */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d9488, #059669);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.5);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0d9488, #059669);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.4);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  /* Text sizes */
+  h1 {
+    font-size: 2rem !important;
+  }
+  h2 {
+    font-size: 1.5rem !important;
+  }
+  
+  /* Cards */
+  .rounded-2xl {
+    border-radius: 1rem !important;
+  }
+  
+  /* Calculator buttons */
+  .calc-btn {
+    padding: 0.75rem 0.5rem !important;
+    font-size: 1rem !important;
+  }
+  
+  /* SVG container */
+  .aspect-square {
+    max-width: 100% !important;
+  }
+  
+  /* Results */
+  #resultValue {
+    font-size: 2rem !important;
+  }
+  
+  /* Touch targets - minimum 44px */
+  button, 
+  a,
+  input[type="range"] {
+    min-height: 44px !important;
+  }
+  
+  /* Unit and Pi buttons */
+  .unit-btn, .pi-btn {
+    padding: 0.4rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    min-height: 36px !important;
+  }
+  
+  /* Grid */
+  .grid {
+    gap: 0.75rem !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid-cols-1 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Safe area for notch phones */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ============================================ */
+/* DARK MODE OVERRIDES - FIXED VERSION */
+/* ============================================ */
+
+/* Dark mode base */
+.dark {
+  color-scheme: dark;
+}
+
+.dark body {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+/* Dark mode - Cards and Containers */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+/* Dark mode - Text */
+.dark .text-gray-900 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-800 {
+  color: #e5e7eb !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.dark .text-gray-400 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-300 {
+  color: #d1d5db !important;
+}
+
+/* Dark mode - Borders */
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+.dark .border-gray-100 {
+  border-color: #374151 !important;
+}
+
+/* Dark mode - Shadows */
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Dark mode - Cards */
+.dark .trust-badge {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Dark mode - Inputs */
+.dark input[type="text"],
+.dark input[type="number"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark textarea,
+.dark select {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Dark mode - Search bar */
+.dark .search-input {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark .search-input:focus {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2) !important;
+}
+
+.dark .search-input::placeholder {
+  color: #6b7280 !important;
+}
+
+/* Dark mode - Scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937 !important;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #0d9488, #059669) !important;
+}
+
+/* Dark mode - Toast notifications */
+.dark #toastContainer div {
+  background: #1f2937 !important;
+  border: 1px solid #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+/* Dark mode - Footer */
+.dark footer {
+  background: #0f172a !important;
+}
+
+.dark footer .border-t {
+  border-color: #1e293b !important;
+}
+
+/* Dark mode - Calculator specific */
+.dark .bg-gray-700 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-gray-800 {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-900 {
+  background-color: #111827 !important;
+}
+
+/* Dark mode - Category cards */
+.dark .bg-emerald-50 {
+  background-color: rgba(13, 148, 136, 0.1) !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.dark .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.1) !important;
+}
+
+.dark .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+}
+
+.dark .bg-pink-50 {
+  background-color: rgba(236, 72, 153, 0.1) !important;
+}
+
+.dark .border-emerald-200 {
+  border-color: rgba(13, 148, 136, 0.3) !important;
+}
+
+.dark .border-red-200 {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+.dark .border-blue-200 {
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark .border-orange-200 {
+  border-color: rgba(249, 115, 22, 0.3) !important;
+}
+
+.dark .border-purple-200 {
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+.dark .border-pink-200 {
+  border-color: rgba(236, 72, 153, 0.3) !important;
+}
+
+/* Dark mode - Step by step */
+.dark .bg-gray-50 {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+/* Dark mode - Slider */
+.dark input[type="range"] {
+  background: #374151 !important;
+}
+
+.dark input[type="range"]::-webkit-slider-thumb {
+  background: linear-gradient(135deg, #0d9488, #059669) !important;
+}
+
+.dark input[type="range"]::-moz-range-thumb {
+  background: linear-gradient(135deg, #0d9488, #059669) !important;
+}
+
+/* Dark mode - Unit & Pi buttons */
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: #4b5563 !important;
+}
+
+/* Dark mode - Floating shapes */
+.dark .floating-shape {
+  opacity: 0.05 !important;
+}
+
+/* Dark mode - Gradient backgrounds */
+.dark .from-gray-50 {
+  --tw-gradient-from: #1f2937 !important;
+}
+
+.dark .to-white {
+  --tw-gradient-to: #1f2937 !important;
+}
+
+.dark .to-gray-900 {
+  --tw-gradient-to: #111827 !important;
+}
+
+/* Dark mode fixes for calculator pages */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+.dark .text-gray-900 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.dark .text-gray-500 {
+  color: #6b7280 !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .bg-gradient-to-r {
+  --tw-gradient-from: transparent !important;
+}
+
+.dark .from-emerald-50 {
+  --tw-gradient-from: rgba(13, 148, 136, 0.1) !important;
+}
+
+.dark .to-teal-50 {
+  --tw-gradient-to: rgba(13, 148, 136, 0.05) !important;
+}
+
+.dark .from-amber-50 {
+  --tw-gradient-from: rgba(245, 158, 11, 0.1) !important;
+}
+
+.dark .to-orange-50 {
+  --tw-gradient-to: rgba(249, 115, 22, 0.05) !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(13, 148, 136, 0.15) !important;
+}
+
+.dark .border-emerald-200 {
+  border-color: rgba(13, 148, 136, 0.3) !important;
+}
+
+.dark .border-amber-200 {
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.dark .text-emerald-600 {
+  color: #0d9488 !important;
+}
+
+.dark .text-emerald-400 {
+  color: #2dd4bf !important;
+}
+
+.dark .btn-primary {
+  background: linear-gradient(135deg, #0d9488, #059669) !important;
+}
+
+.dark input[type="text"],
+.dark input[type="number"] {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f3f4f6 !important;
+}
+
+.dark input:focus {
+  border-color: #0d9488 !important;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2) !important;
+}
+
+.dark input[type="range"] {
+  background: #374151 !important;
+}
+
+.dark input[type="range"]::-webkit-slider-thumb {
+  background: linear-gradient(135deg, #0d9488, #059669) !important;
+}

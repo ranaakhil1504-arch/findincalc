@@ -1,0 +1,1126 @@
+---
+// src/pages/math/trapezoid-area.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Trapezoid Calculator - Interactive Math Tool">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">⏢</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Trapezoid Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate area, find height, or find a missing base
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Interactive Visualization -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeAreaTrap"
+                  class="trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📐 Find Area
+                </button>
+                <button 
+                  id="modeHeightTrap"
+                  class="trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📏 Find Height
+                </button>
+                <button 
+                  id="modeBaseTrap"
+                  class="trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📐 Find Base
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Trapezoid Visualization -->
+            <div class="relative w-full max-w-lg mx-auto aspect-square">
+              <svg viewBox="0 0 500 500" class="w-full h-full">
+                <defs>
+                  <pattern id="gridTrap" width="25" height="25" patternUnits="userSpaceOnUse">
+                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5" class="dark:stroke-gray-700"/>
+                  </pattern>
+                  <linearGradient id="trapGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#0d9488" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+                  </linearGradient>
+                </defs>
+                
+                <rect width="500" height="500" fill="url(#gridTrap)"/>
+                
+                <polygon 
+                  id="trapVisual"
+                  points="150,150 350,150 400,350 100,350"
+                  fill="url(#trapGradient)"
+                  stroke="#0d9488"
+                  stroke-width="3"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <text 
+                  id="topBaseLabel"
+                  x="250" 
+                  y="140" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  Top Base = <tspan id="topBaseLabelValue">8</tspan> cm
+                </text>
+                
+                <text 
+                  id="bottomBaseLabel"
+                  x="250" 
+                  y="375" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  Bottom Base = <tspan id="bottomBaseLabelValue">12</tspan> cm
+                </text>
+                
+                <text 
+                  id="heightLabelTrap"
+                  x="50" 
+                  y="250" 
+                  fill="#ef4444" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  Height = <tspan id="heightLabelTrapValue">6</tspan> cm
+                </text>
+
+                <line 
+                  id="heightLineTrap"
+                  x1="100" 
+                  y1="150" 
+                  x2="100" 
+                  y2="350"
+                  stroke="#ef4444"
+                  stroke-width="2"
+                  stroke-dasharray="6,4"
+                />
+                
+                <text 
+                  id="areaLabelTrap"
+                  x="250" 
+                  y="430" 
+                  fill="#0d9488" 
+                  font-size="18" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  A = <tspan id="areaLabelTrapValue">60</tspan> cm²
+                </text>
+              </svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 space-y-4">
+              <!-- Unit Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  Unit System
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  {['cm', 'm', 'in', 'ft'].map((unit) => (
+                    <button 
+                      class={`trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        unit === 'cm' 
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-unit={unit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Dynamic Input Section -->
+              <div id="trapInputSection">
+                <!-- Find Area Mode (Default) -->
+                <div id="trapAreaModeInputs">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Top Base (a) = <span id="topBaseDisplay" class="text-emerald-600 font-bold">8</span> <span id="topBaseUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="topBaseSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="8"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Bottom Base (b) = <span id="bottomBaseDisplay" class="text-emerald-600 font-bold">12</span> <span id="bottomBaseUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="bottomBaseSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="12"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Height (h) = <span id="heightDisplayTrap" class="text-emerald-600 font-bold">6</span> <span id="heightUnitDisplayTrap">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="heightSliderTrap"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="6"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="topBaseInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Top Base (a)"
+                        value="8"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="bottomBaseInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Bottom Base (b)"
+                        value="12"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="heightInputTrap"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Height (h)"
+                        value="6"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="trapCalculateBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Calculate
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Height Mode -->
+                <div id="trapHeightModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaForHeightDisplay" class="text-emerald-600 font-bold">60</span> <span id="areaForHeightUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaForHeightSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="400"
+                      step="0.5"
+                      value="60"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaHeightMaxLabel">400</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Top Base (a) = <span id="topBaseForHeightDisplay" class="text-emerald-600 font-bold">8</span> <span id="topBaseForHeightUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="topBaseForHeightSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="8"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Bottom Base (b) = <span id="bottomBaseForHeightDisplay" class="text-emerald-600 font-bold">12</span> <span id="bottomBaseForHeightUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="bottomBaseForHeightSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="12"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaForHeightInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="60"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="topBaseForHeightInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Top Base (a)"
+                        value="8"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="bottomBaseForHeightInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Bottom Base (b)"
+                        value="12"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findHeightBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Find h
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Base Mode -->
+                <div id="trapBaseModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaForBaseDisplay" class="text-emerald-600 font-bold">60</span> <span id="areaForBaseUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaForBaseSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="400"
+                      step="0.5"
+                      value="60"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaBaseMaxLabel">400</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Height (h) = <span id="heightForBaseDisplay" class="text-emerald-600 font-bold">6</span> <span id="heightForBaseUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="heightForBaseSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="6"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Known Base = <span id="knownBaseForBaseDisplay" class="text-emerald-600 font-bold">8</span> <span id="knownBaseForBaseUnit">cm</span>
+                      </label>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mb-2">
+                      <button 
+                        id="knownBaseTop"
+                        class="known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                      >
+                        Top (a)
+                      </button>
+                      <button 
+                        id="knownBaseBottom"
+                        class="known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      >
+                        Bottom (b)
+                      </button>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="knownBaseForBaseSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="8"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaForBaseInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="60"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="heightForBaseInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Height (h)"
+                        value="6"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="knownBaseForBaseInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Known Base"
+                        value="8"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findBaseBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Find Base
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Result Box -->
+              <div id="trapResultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="trapResultLabel">Area of Trapezoid</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="trapResultValue">60.00</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="trapResultSecondaryLabel">Formula</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" id="trapResultFormula">A = ½ × (a + b) × h</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Formula & Explanation -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-2xl font-mono text-gray-800 dark:text-gray-200" id="trapFormulaDisplay">A = ½ × (a + b) × h</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="trapFormulaDesc">Area = ½ × (Top Base + Bottom Base) × Height</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="trapFormulaLabel1">Top Base (a)</span>
+                <span class="font-mono" id="trapFormulaVal1">8 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="trapFormulaLabel2">Bottom Base (b)</span>
+                <span class="font-mono" id="trapFormulaVal2">12 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="trapFormulaLabel3">Height (h)</span>
+                <span class="font-mono" id="trapFormulaVal3">6 cm</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span id="trapFormulaResultLabel">Area</span>
+                <span class="font-mono" id="trapFormulaResult">60.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Solution -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div id="trapStepsContainer" class="space-y-3 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="trapStep1">Formula: A = ½ × (a + b) × h</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="trapStep2">Add bases: a + b = 8 + 12 = 20</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="trapStep3">Multiply: A = ½ × 20 × 6 = 60</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="trapStep4">Answer: A = 60.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fun Fact -->
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              💡 <span class="font-medium">Did you know?</span>
+              A trapezoid is also called a trapezium in some countries! The formula works for any trapezoid, regardless of its shape.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'cm';
+      let currentMode = 'area'; // 'area', 'height', 'base'
+      let knownBase = 'top'; // 'top' or 'bottom'
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      // Area mode
+      const topBaseSlider = document.getElementById('topBaseSlider');
+      const bottomBaseSlider = document.getElementById('bottomBaseSlider');
+      const heightSliderTrap = document.getElementById('heightSliderTrap');
+      const topBaseInput = document.getElementById('topBaseInput');
+      const bottomBaseInput = document.getElementById('bottomBaseInput');
+      const heightInputTrap = document.getElementById('heightInputTrap');
+      const topBaseDisplay = document.getElementById('topBaseDisplay');
+      const bottomBaseDisplay = document.getElementById('bottomBaseDisplay');
+      const heightDisplayTrap = document.getElementById('heightDisplayTrap');
+      const topBaseUnitDisplay = document.getElementById('topBaseUnitDisplay');
+      const bottomBaseUnitDisplay = document.getElementById('bottomBaseUnitDisplay');
+      const heightUnitDisplayTrap = document.getElementById('heightUnitDisplayTrap');
+
+      // Height mode
+      const areaForHeightSlider = document.getElementById('areaForHeightSlider');
+      const topBaseForHeightSlider = document.getElementById('topBaseForHeightSlider');
+      const bottomBaseForHeightSlider = document.getElementById('bottomBaseForHeightSlider');
+      const areaForHeightInput = document.getElementById('areaForHeightInput');
+      const topBaseForHeightInput = document.getElementById('topBaseForHeightInput');
+      const bottomBaseForHeightInput = document.getElementById('bottomBaseForHeightInput');
+      const areaForHeightDisplay = document.getElementById('areaForHeightDisplay');
+      const areaForHeightUnit = document.getElementById('areaForHeightUnit');
+      const topBaseForHeightDisplay = document.getElementById('topBaseForHeightDisplay');
+      const topBaseForHeightUnit = document.getElementById('topBaseForHeightUnit');
+      const bottomBaseForHeightDisplay = document.getElementById('bottomBaseForHeightDisplay');
+      const bottomBaseForHeightUnit = document.getElementById('bottomBaseForHeightUnit');
+      const areaHeightMaxLabel = document.getElementById('areaHeightMaxLabel');
+
+      // Base mode
+      const areaForBaseSlider = document.getElementById('areaForBaseSlider');
+      const heightForBaseSlider = document.getElementById('heightForBaseSlider');
+      const knownBaseForBaseSlider = document.getElementById('knownBaseForBaseSlider');
+      const areaForBaseInput = document.getElementById('areaForBaseInput');
+      const heightForBaseInput = document.getElementById('heightForBaseInput');
+      const knownBaseForBaseInput = document.getElementById('knownBaseForBaseInput');
+      const areaForBaseDisplay = document.getElementById('areaForBaseDisplay');
+      const areaForBaseUnit = document.getElementById('areaForBaseUnit');
+      const heightForBaseDisplay = document.getElementById('heightForBaseDisplay');
+      const heightForBaseUnit = document.getElementById('heightForBaseUnit');
+      const knownBaseForBaseDisplay = document.getElementById('knownBaseForBaseDisplay');
+      const knownBaseForBaseUnit = document.getElementById('knownBaseForBaseUnit');
+      const areaBaseMaxLabel = document.getElementById('areaBaseMaxLabel');
+
+      // SVG
+      const trapVisual = document.getElementById('trapVisual');
+      const heightLineTrap = document.getElementById('heightLineTrap');
+      const topBaseLabelValue = document.getElementById('topBaseLabelValue');
+      const bottomBaseLabelValue = document.getElementById('bottomBaseLabelValue');
+      const heightLabelTrapValue = document.getElementById('heightLabelTrapValue');
+      const areaLabelTrapValue = document.getElementById('areaLabelTrapValue');
+      const trapResultValue = document.getElementById('trapResultValue');
+      const trapResultLabel = document.getElementById('trapResultLabel');
+      const trapResultSecondaryLabel = document.getElementById('trapResultSecondaryLabel');
+      const trapResultFormula = document.getElementById('trapResultFormula');
+      const trapFormulaDisplay = document.getElementById('trapFormulaDisplay');
+      const trapFormulaDesc = document.getElementById('trapFormulaDesc');
+      const trapFormulaLabel1 = document.getElementById('trapFormulaLabel1');
+      const trapFormulaLabel2 = document.getElementById('trapFormulaLabel2');
+      const trapFormulaLabel3 = document.getElementById('trapFormulaLabel3');
+      const trapFormulaVal1 = document.getElementById('trapFormulaVal1');
+      const trapFormulaVal2 = document.getElementById('trapFormulaVal2');
+      const trapFormulaVal3 = document.getElementById('trapFormulaVal3');
+      const trapFormulaResultLabel = document.getElementById('trapFormulaResultLabel');
+      const trapFormulaResult = document.getElementById('trapFormulaResult');
+      const trapStep1 = document.getElementById('trapStep1');
+      const trapStep2 = document.getElementById('trapStep2');
+      const trapStep3 = document.getElementById('trapStep3');
+      const trapStep4 = document.getElementById('trapStep4');
+
+      const trapAreaModeInputs = document.getElementById('trapAreaModeInputs');
+      const trapHeightModeInputs = document.getElementById('trapHeightModeInputs');
+      const trapBaseModeInputs = document.getElementById('trapBaseModeInputs');
+
+      const unitConversions = {
+        cm: { label: 'cm', factor: 1, display: 'cm' },
+        m: { label: 'm', factor: 100, display: 'm' },
+        in: { label: 'in', factor: 2.54, display: 'in' },
+        ft: { label: 'ft', factor: 30.48, display: 'ft' }
+      };
+
+      function getUnit() { return unitConversions[currentUnit]; }
+
+      function formatArea(area) {
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+        else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+        else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+        return { value: displayArea, unit: areaUnit };
+      }
+
+      function updateSVG(top, bottom, height, area) {
+        const maxSize = 20;
+        const scaleTop = Math.min(top / maxSize, 1);
+        const scaleBottom = Math.min(bottom / maxSize, 1);
+        const scaleHeight = Math.min(height / maxSize, 1);
+        const centerX = 250;
+        const topY = 100 + (1 - scaleHeight) * 150;
+        const bottomY = 100 + (1 + scaleHeight) * 150;
+        const topWidth = 100 + scaleTop * 150;
+        const bottomWidth = 100 + scaleBottom * 150;
+        const topLeftX = centerX - topWidth / 2;
+        const topRightX = centerX + topWidth / 2;
+        const bottomLeftX = centerX - bottomWidth / 2;
+        const bottomRightX = centerX + bottomWidth / 2;
+
+        trapVisual.setAttribute('points', 
+          `${topLeftX},${topY} ${topRightX},${topY} ${bottomRightX},${bottomY} ${bottomLeftX},${bottomY}`
+        );
+        heightLineTrap.setAttribute('x1', bottomLeftX);
+        heightLineTrap.setAttribute('y1', topY);
+        heightLineTrap.setAttribute('x2', bottomLeftX);
+        heightLineTrap.setAttribute('y2', bottomY);
+
+        const formatted = formatArea(area);
+        topBaseLabelValue.textContent = top.toFixed(2);
+        bottomBaseLabelValue.textContent = bottom.toFixed(2);
+        heightLabelTrapValue.textContent = height.toFixed(2);
+        areaLabelTrapValue.textContent = formatted.value.toFixed(2);
+      }
+
+      function updateResult(value, label, secondary, formula) {
+        trapResultValue.textContent = value;
+        trapResultLabel.textContent = label;
+        trapResultSecondaryLabel.textContent = secondary;
+        trapResultFormula.textContent = formula;
+      }
+
+      function updateFormula(val1, val2, val3, result, label1, label2, label3, resultLabel, display, desc) {
+        trapFormulaVal1.textContent = val1;
+        trapFormulaVal2.textContent = val2;
+        trapFormulaVal3.textContent = val3;
+        trapFormulaResult.textContent = result;
+        trapFormulaLabel1.textContent = label1;
+        trapFormulaLabel2.textContent = label2;
+        trapFormulaLabel3.textContent = label3;
+        trapFormulaResultLabel.textContent = resultLabel;
+        if (display) trapFormulaDisplay.textContent = display;
+        if (desc) trapFormulaDesc.textContent = desc;
+      }
+
+      function updateSteps(s1, s2, s3, s4) {
+        trapStep1.textContent = s1;
+        trapStep2.textContent = s2;
+        trapStep3.textContent = s3;
+        trapStep4.textContent = s4;
+      }
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.trap-mode-btn').forEach(b => {
+          b.className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        const btnMap = { area: 'modeAreaTrap', height: 'modeHeightTrap', base: 'modeBaseTrap' };
+        document.getElementById(btnMap[mode]).className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+        trapAreaModeInputs.classList.toggle('hidden', mode !== 'area');
+        trapHeightModeInputs.classList.toggle('hidden', mode !== 'height');
+        trapBaseModeInputs.classList.toggle('hidden', mode !== 'base');
+
+        if (mode === 'area') {
+          topBaseInput.value = topBaseSlider.value;
+          bottomBaseInput.value = bottomBaseSlider.value;
+          heightInputTrap.value = heightSliderTrap.value;
+        } else if (mode === 'height') {
+          areaForHeightInput.value = areaForHeightSlider.value;
+          topBaseForHeightInput.value = topBaseForHeightSlider.value;
+          bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
+        } else if (mode === 'base') {
+          areaForBaseInput.value = areaForBaseSlider.value;
+          heightForBaseInput.value = heightForBaseSlider.value;
+          knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
+        }
+        updateTrapezoid();
+      }
+
+      document.getElementById('modeAreaTrap').addEventListener('click', () => setMode('area'));
+      document.getElementById('modeHeightTrap').addEventListener('click', () => setMode('height'));
+      document.getElementById('modeBaseTrap').addEventListener('click', () => setMode('base'));
+
+      // ============================================
+      // KNOWN BASE TOGGLE
+      // ============================================
+      document.getElementById('knownBaseTop').addEventListener('click', () => {
+        document.querySelectorAll('.known-base-btn').forEach(b => {
+          b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('knownBaseTop').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        knownBase = 'top';
+        document.getElementById('knownBaseForBaseDisplay').textContent = 'Top (a)';
+        updateTrapezoid();
+      });
+
+      document.getElementById('knownBaseBottom').addEventListener('click', () => {
+        document.querySelectorAll('.known-base-btn').forEach(b => {
+          b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('knownBaseBottom').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        knownBase = 'bottom';
+        document.getElementById('knownBaseForBaseDisplay').textContent = 'Bottom (b)';
+        updateTrapezoid();
+      });
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.querySelectorAll('.trap-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.trap-unit-btn').forEach(b => {
+            b.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentUnit = btn.dataset.unit;
+          const maxArea = 0.5 * (20 + 20) * 20;
+          const formatted = formatArea(maxArea);
+          areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
+          areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
+          updateTrapezoid();
+        });
+      });
+
+      // ============================================
+      // UPDATE TRAPEZOID
+      // ============================================
+      function updateTrapezoid() {
+        const unit = getUnit();
+        const displayUnit = unit.display;
+        let top, bottom, height, area;
+        let resultValue, resultLabel, resultSecondary, resultFormula;
+        let formulaDisplay, formulaDesc, label1, label2, label3, resultLabelText;
+        let val1, val2, val3, result;
+        let step1, step2, step3, step4;
+
+        if (currentMode === 'area') {
+          top = parseFloat(topBaseSlider.value);
+          bottom = parseFloat(bottomBaseSlider.value);
+          height = parseFloat(heightSliderTrap.value);
+          area = 0.5 * (top + bottom) * height;
+
+          const formatted = formatArea(area);
+          resultValue = formatted.value.toFixed(2);
+          resultLabel = 'Area of Trapezoid';
+          resultSecondary = 'A = ½ × (a + b) × h';
+          resultFormula = 'A = ½ × (a + b) × h';
+          formulaDisplay = 'A = ½ × (a + b) × h';
+          formulaDesc = 'Area = ½ × (Top Base + Bottom Base) × Height';
+          label1 = 'Top Base (a)';
+          label2 = 'Bottom Base (b)';
+          label3 = 'Height (h)';
+          resultLabelText = 'Area';
+          val1 = `${top} ${displayUnit}`;
+          val2 = `${bottom} ${displayUnit}`;
+          val3 = `${height} ${displayUnit}`;
+          result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          step1 = 'Formula: A = ½ × (a + b) × h';
+          step2 = `Add bases: a + b = ${top} + ${bottom} = ${(top + bottom).toFixed(2)}`;
+          step3 = `Multiply: A = ½ × ${(top + bottom).toFixed(2)} × ${height} = ${area.toFixed(2)}`;
+          step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
+
+          topBaseDisplay.textContent = top;
+          bottomBaseDisplay.textContent = bottom;
+          heightDisplayTrap.textContent = height;
+          topBaseUnitDisplay.textContent = displayUnit;
+          bottomBaseUnitDisplay.textContent = displayUnit;
+          heightUnitDisplayTrap.textContent = displayUnit;
+
+        } else if (currentMode === 'height') {
+          const areaVal = parseFloat(areaForHeightSlider.value);
+          top = parseFloat(topBaseForHeightSlider.value);
+          bottom = parseFloat(bottomBaseForHeightSlider.value);
+          let areaCm2 = areaVal;
+          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+          height = (2 * areaCm2) / (top + bottom);
+          area = areaCm2;
+
+          const formatted = formatArea(area);
+          resultValue = height.toFixed(2);
+          resultLabel = 'Height (h)';
+          resultSecondary = 'h = 2A / (a + b)';
+          resultFormula = 'h = 2A / (a + b)';
+          formulaDisplay = 'h = 2A / (a + b)';
+          formulaDesc = 'Height = 2 × Area ÷ (Top Base + Bottom Base)';
+          label1 = 'Area';
+          label2 = 'Top Base (a)';
+          label3 = 'Bottom Base (b)';
+          resultLabelText = 'Height (h)';
+          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          val2 = `${top} ${displayUnit}`;
+          val3 = `${bottom} ${displayUnit}`;
+          result = `${height.toFixed(2)} ${displayUnit}`;
+          step1 = 'Formula: h = 2A / (a + b)';
+          step2 = `Plug in: h = 2 × ${formatted.value.toFixed(2)} ÷ (${top} + ${bottom})`;
+          step3 = `Calculate: h = ${height.toFixed(2)}`;
+          step4 = `Answer: h = ${height.toFixed(2)} ${displayUnit}`;
+
+          areaForHeightDisplay.textContent = formatted.value.toFixed(2);
+          areaForHeightUnit.textContent = formatted.unit;
+          topBaseForHeightDisplay.textContent = top;
+          topBaseForHeightUnit.textContent = displayUnit;
+          bottomBaseForHeightDisplay.textContent = bottom;
+          bottomBaseForHeightUnit.textContent = displayUnit;
+
+        } else if (currentMode === 'base') {
+          const areaVal = parseFloat(areaForBaseSlider.value);
+          height = parseFloat(heightForBaseSlider.value);
+          const known = parseFloat(knownBaseForBaseSlider.value);
+          let areaCm2 = areaVal;
+          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+          
+          if (knownBase === 'top') {
+            top = known;
+            bottom = (2 * areaCm2) / height - top;
+          } else {
+            bottom = known;
+            top = (2 * areaCm2) / height - bottom;
+          }
+          area = areaCm2;
+
+          const formatted = formatArea(area);
+          resultValue = knownBase === 'top' ? bottom.toFixed(2) : top.toFixed(2);
+          resultLabel = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
+          resultSecondary = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+          resultFormula = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+          formulaDisplay = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+          formulaDesc = `Find ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'}`;
+          label1 = 'Area';
+          label2 = 'Height (h)';
+          label3 = knownBase === 'top' ? 'Top Base (a)' : 'Bottom Base (b)';
+          resultLabelText = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
+          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          val2 = `${height} ${displayUnit}`;
+          val3 = `${known} ${displayUnit}`;
+          result = `${(knownBase === 'top' ? bottom : top).toFixed(2)} ${displayUnit}`;
+          step1 = `Formula: ${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+          step2 = `Plug in: ${knownBase === 'top' ? 'b' : 'a'} = 2 × ${formatted.value.toFixed(2)} / ${height} - ${known}`;
+          step3 = `Calculate: ${knownBase === 'top' ? 'b' : 'a'} = ${(knownBase === 'top' ? bottom : top).toFixed(2)}`;
+          step4 = `Answer: ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'} = ${(knownBase === 'top' ? bottom : top).toFixed(2)} ${displayUnit}`;
+
+          areaForBaseDisplay.textContent = formatted.value.toFixed(2);
+          areaForBaseUnit.textContent = formatted.unit;
+          heightForBaseDisplay.textContent = height;
+          heightForBaseUnit.textContent = displayUnit;
+          knownBaseForBaseDisplay.textContent = known;
+          knownBaseForBaseUnit.textContent = displayUnit;
+        }
+
+        // Update SVG
+        updateSVG(top, bottom, height, area);
+
+        // Update result
+        updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
+
+        // Update formula
+        updateFormula(
+          val1,
+          val2,
+          val3,
+          result,
+          label1,
+          label2,
+          label3,
+          resultLabelText,
+          formulaDisplay,
+          formulaDesc
+        );
+
+        // Update steps
+        updateSteps(step1, step2, step3, step4);
+
+        // Update inputs
+        if (currentMode === 'area') {
+          topBaseInput.value = top;
+          bottomBaseInput.value = bottom;
+          heightInputTrap.value = height;
+        } else if (currentMode === 'height') {
+          areaForHeightInput.value = areaForHeightSlider.value;
+          topBaseForHeightInput.value = topBaseForHeightSlider.value;
+          bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
+        } else if (currentMode === 'base') {
+          areaForBaseInput.value = areaForBaseSlider.value;
+          heightForBaseInput.value = heightForBaseSlider.value;
+          knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
+        }
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      // Area mode
+      topBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+      bottomBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+      heightSliderTrap.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+
+      topBaseInput.addEventListener('input', () => {
+        if (currentMode === 'area') {
+          const val = parseFloat(topBaseInput.value);
+          if (val && val > 0) { topBaseSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      bottomBaseInput.addEventListener('input', () => {
+        if (currentMode === 'area') {
+          const val = parseFloat(bottomBaseInput.value);
+          if (val && val > 0) { bottomBaseSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      heightInputTrap.addEventListener('input', () => {
+        if (currentMode === 'area') {
+          const val = parseFloat(heightInputTrap.value);
+          if (val && val > 0) { heightSliderTrap.value = val; updateTrapezoid(); }
+        }
+      });
+
+      document.getElementById('trapCalculateBtn').addEventListener('click', () => {
+        if (currentMode === 'area') {
+          const a = parseFloat(topBaseInput.value);
+          const b = parseFloat(bottomBaseInput.value);
+          const h = parseFloat(heightInputTrap.value);
+          if (!a || a <= 0 || !b || b <= 0 || !h || h <= 0) {
+            alert('Please enter valid positive numbers for all fields.');
+            return;
+          }
+          topBaseSlider.value = a;
+          bottomBaseSlider.value = b;
+          heightSliderTrap.value = h;
+          updateTrapezoid();
+        }
+      });
+
+      // Height mode
+      areaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+      topBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+      bottomBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+
+      areaForHeightInput.addEventListener('input', () => {
+        if (currentMode === 'height') {
+          const val = parseFloat(areaForHeightInput.value);
+          if (val && val > 0) { areaForHeightSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      topBaseForHeightInput.addEventListener('input', () => {
+        if (currentMode === 'height') {
+          const val = parseFloat(topBaseForHeightInput.value);
+          if (val && val > 0) { topBaseForHeightSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      bottomBaseForHeightInput.addEventListener('input', () => {
+        if (currentMode === 'height') {
+          const val = parseFloat(bottomBaseForHeightInput.value);
+          if (val && val > 0) { bottomBaseForHeightSlider.value = val; updateTrapezoid(); }
+        }
+      });
+
+      document.getElementById('findHeightBtn').addEventListener('click', () => {
+        if (currentMode === 'height') {
+          const a = parseFloat(areaForHeightInput.value);
+          const b = parseFloat(topBaseForHeightInput.value);
+          const c = parseFloat(bottomBaseForHeightInput.value);
+          if (!a || a <= 0 || !b || b <= 0 || !c || c <= 0) {
+            alert('Please enter valid positive numbers for all fields.');
+            return;
+          }
+          areaForHeightSlider.value = a;
+          topBaseForHeightSlider.value = b;
+          bottomBaseForHeightSlider.value = c;
+          updateTrapezoid();
+        }
+      });
+
+      // Base mode
+      areaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+      heightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+      knownBaseForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+
+      areaForBaseInput.addEventListener('input', () => {
+        if (currentMode === 'base') {
+          const val = parseFloat(areaForBaseInput.value);
+          if (val && val > 0) { areaForBaseSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      heightForBaseInput.addEventListener('input', () => {
+        if (currentMode === 'base') {
+          const val = parseFloat(heightForBaseInput.value);
+          if (val && val > 0) { heightForBaseSlider.value = val; updateTrapezoid(); }
+        }
+      });
+      knownBaseForBaseInput.addEventListener('input', () => {
+        if (currentMode === 'base') {
+          const val = parseFloat(knownBaseForBaseInput.value);
+          if (val && val > 0) { knownBaseForBaseSlider.value = val; updateTrapezoid(); }
+        }
+      });
+
+      document.getElementById('findBaseBtn').addEventListener('click', () => {
+        if (currentMode === 'base') {
+          const a = parseFloat(areaForBaseInput.value);
+          const b = parseFloat(heightForBaseInput.value);
+          const c = parseFloat(knownBaseForBaseInput.value);
+          if (!a || a <= 0 || !b || b <= 0 || !c || c <= 0) {
+            alert('Please enter valid positive numbers for all fields.');
+            return;
+          }
+          areaForBaseSlider.value = a;
+          heightForBaseSlider.value = b;
+          knownBaseForBaseSlider.value = c;
+          updateTrapezoid();
+        }
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      const maxArea = 0.5 * (20 + 20) * 20;
+      const formatted = formatArea(maxArea);
+      areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
+      areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
+      updateTrapezoid();
+    });
+  </script>
+</Layout>

@@ -1,0 +1,355 @@
+---
+// src/pages/index.astro
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+import Calculator from '../components/Calculator.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+---
+
+<Layout title="Find any calculator in one place">
+  <Navbar />
+
+  <main>
+    <!-- Hero Section with Floating Shapes -->
+    <section class="relative overflow-hidden pt-12 pb-16 bg-pattern min-h-[90vh] flex items-center">
+      <!-- Floating Shapes -->
+      <div class="floating-shape w-64 h-64 bg-emerald-400 top-10 -left-20 float-animation" style="animation-delay: 0s;"></div>
+      <div class="floating-shape w-48 h-48 bg-teal-400 bottom-10 -right-20 float-animation" style="animation-delay: 2s;"></div>
+      <div class="floating-shape w-32 h-32 bg-emerald-300 top-1/2 left-1/2 float-animation" style="animation-delay: 4s;"></div>
+      
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-12">
+          <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-medium mb-4 fade-in">
+            🚀 50+ Free Calculators
+          </span>
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight fade-in fade-in-delay-1">
+            Find It.
+            <span class="gradient-text">
+              Calculate It.
+            </span>
+          </h1>
+          <p class="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto fade-in fade-in-delay-2">
+            Your all-in-one calculator hub. From math to health, finance to conversion — find every tool you need in one place.
+          </p>
+          
+          <!-- Search Bar with Keyboard Shortcut Hint -->
+          <div class="max-w-md mx-auto mt-6 fade-in fade-in-delay-3">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 z-10">🔍</span>
+              <input 
+                type="text" 
+                placeholder="Search calculators... (⌘K)" 
+                class="search-input pl-10"
+                id="searchInput"
+                autocomplete="off"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="searchResults"
+              />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
+                ⌘K
+              </span>
+
+              <!-- Live search results -->
+              <div 
+                id="searchResults" 
+                class="hidden absolute left-0 right-0 top-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-20 text-left"
+              ></div>
+            </div>
+          </div>
+        
+          
+          <!-- Stats -->
+          <div class="mt-8 flex flex-wrap justify-center gap-8 fade-in fade-in-delay-4">
+            <div class="trust-badge">
+              <div class="text-2xl font-bold text-emerald-600">50+</div>
+              <div class="text-xs text-gray-500">Calculators</div>
+            </div>
+            <div class="trust-badge">
+              <div class="text-2xl font-bold text-emerald-600">12</div>
+              <div class="text-xs text-gray-500">Categories</div>
+            </div>
+            <div class="trust-badge">
+              <div class="text-2xl font-bold text-emerald-600">100%</div>
+              <div class="text-xs text-gray-500">Free to Use</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator -->
+        <div class="max-w-md mx-auto fade-in fade-in-delay-3">
+          <Calculator />
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="py-16 bg-white dark:bg-gray-800/50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
+            Explore Our <span class="gradient-text">Calculators</span>
+          </h2>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Choose a category and start calculating
+          </p>
+          <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CategoryCard icon="📐" title="Math" count={12} href="/math" color="emerald" />
+          <CategoryCard icon="❤️" title="Health" count={8} href="/health" color="red" />
+          <CategoryCard icon="💰" title="Finance" count={6} href="/finance" color="blue" />
+          <CategoryCard icon="📊" title="Conversion" count={10} href="/conversion" color="orange" />
+          <CategoryCard icon="⚡" title="Utilities" count={5} href="/utilities" color="purple" />
+          <CategoryCard icon="🎮" title="Fun" count={4} href="/fun" color="pink" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Trending Section -->
+    <section class="py-16 bg-pattern">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">🔥 Trending Calculators</h2>
+          <a href="/trending" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline font-medium">View all →</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { name: "Area of Circle", icon: "⭕", views: "12.4K" },
+            { name: "BMI Calculator", icon: "⚖️", views: "8.7K" },
+            { name: "Volume of Sphere", icon: "⚽", views: "6.2K" },
+            { name: "Loan Calculator", icon: "🏦", views: "5.8K" },
+          ].map((item) => (
+            <a href="#" class="group bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-700 card-hover">
+              <div class="flex items-center space-x-3">
+                <span class="text-2xl">{item.icon}</span>
+                <div>
+                  <h3 class="font-medium text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    {item.name}
+                  </h3>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{item.views} uses this month</p>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-emerald-600 to-teal-600">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Ready to Calculate?</h2>
+        <p class="text-emerald-100 text-lg mb-6">Join thousands of users who trust FindInCalc for their daily calculations.</p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/math" class="px-6 py-3 bg-white text-emerald-600 font-semibold rounded-xl hover:shadow-xl transition-all hover:scale-105">Start Calculating</a>
+          <a href="/about" class="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white/10 transition-all">Learn More</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <span class="text-xl font-extrabold text-emerald-400">FindInCalc</span>
+          <p class="mt-2 text-sm text-gray-400">Your all-in-one calculator hub. Built with ❤️ for everyone.</p>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3">Categories</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/math" class="hover:text-emerald-400 transition-colors">📐 Math</a></li>
+            <li><a href="/health" class="hover:text-emerald-400 transition-colors">❤️ Health</a></li>
+            <li><a href="/finance" class="hover:text-emerald-400 transition-colors">💰 Finance</a></li>
+            <li><a href="/conversion" class="hover:text-emerald-400 transition-colors">📊 Conversion</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3">Company</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="/about" class="hover:text-emerald-400 transition-colors">About</a></li>
+            <li><a href="/contact" class="hover:text-emerald-400 transition-colors">Contact</a></li>
+            <li><a href="/privacy" class="hover:text-emerald-400 transition-colors">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white font-semibold mb-3">Follow Us</h4>
+          <div class="flex space-x-4">
+            <a href="#" class="hover:text-emerald-400 transition-colors text-xl">🐦</a>
+            <a href="#" class="hover:text-emerald-400 transition-colors text-xl">📘</a>
+            <a href="#" class="hover:text-emerald-400 transition-colors text-xl">📸</a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 pt-8 border-t border-gray-800 text-center text-sm text-gray-500">
+        © 2026 FindInCalc.com. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <button id="backToTop" class="back-to-top bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-full shadow-lg shadow-emerald-500/30">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+
+  <!-- ============================================ -->
+  <!-- ALL SCRIPTS (Search, Back to Top, Keyboard) -->
+  <!-- ============================================ -->
+  <script>
+    // ============================================
+    // SEARCH FUNCTIONALITY
+    // ============================================
+    // Only real, working pages go here — a search result that leads
+    // to a 404 is worse than no search at all. Add to this list as
+    // new calculator pages ship.
+    const SEARCH_INDEX = [
+      { name: 'Math Calculators', desc: 'Browse all math tools', icon: '📐', href: '/math', keywords: 'math category all' },
+      { name: 'Circle Area Calculator', desc: 'A = πr²', icon: '⭕', href: '/math/circle-area', keywords: 'circle area radius pi π round' },
+      { name: 'Rectangle Area Calculator', desc: 'A = l × w', icon: '▭', href: '/math/rectangle-area', keywords: 'rectangle area length width square' },
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('searchInput');
+      const resultsBox = document.getElementById('searchResults');
+
+      function renderResults(query) {
+        const q = query.toLowerCase().trim();
+
+        if (!q) {
+          resultsBox.classList.add('hidden');
+          searchInput.setAttribute('aria-expanded', 'false');
+          return;
+        }
+
+        const matches = SEARCH_INDEX.filter((item) =>
+          item.name.toLowerCase().includes(q) || item.keywords.includes(q)
+        ).slice(0, 6);
+
+        if (matches.length === 0) {
+          resultsBox.innerHTML = `
+            <div class="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+              No calculators found for "<span class="font-medium">${query}</span>" yet.
+            </div>`;
+        } else {
+          resultsBox.innerHTML = matches.map((item) => `
+            <a href="${item.href}" class="search-result-item flex items-center gap-3 px-4 py-3 hover:bg-emerald-50 dark:hover:bg-gray-700/60 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0">
+              <span class="text-xl">${item.icon}</span>
+              <span>
+                <span class="block text-sm font-medium text-gray-900 dark:text-white">${item.name}</span>
+                <span class="block text-xs text-gray-500 dark:text-gray-400 font-mono">${item.desc}</span>
+              </span>
+            </a>
+          `).join('');
+        }
+
+        resultsBox.classList.remove('hidden');
+        searchInput.setAttribute('aria-expanded', 'true');
+      }
+
+      searchInput.addEventListener('input', () => renderResults(searchInput.value));
+
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const first = resultsBox.querySelector('.search-result-item');
+          if (first) window.location.href = first.getAttribute('href');
+        }
+      });
+
+      // Close results when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#searchInput') && !e.target.closest('#searchResults')) {
+          resultsBox.classList.add('hidden');
+          searchInput.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // ============================================
+      // BACK TO TOP BUTTON
+      // ============================================
+      const backToTop = document.getElementById('backToTop');
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // ============================================
+    // KEYBOARD SHORTCUTS
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      // Press '?' to show shortcuts
+      if (e.key === '?' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        const shortcuts = [
+          '⌘/Ctrl + K → Search calculators',
+          '? → Show this help menu',
+          'Esc → Clear search'
+        ];
+        alert('⌨️ Keyboard Shortcuts:\n\n' + shortcuts.join('\n'));
+      }
+
+      // Press 'Ctrl+K' or 'Cmd+K' to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.select();
+          // Show toast notification if available
+          if (window.showToast) {
+            window.showToast('🔍 Search activated! Type your query.', 'info');
+          }
+        }
+      }
+
+      // Press 'Esc' to clear search
+      if (e.key === 'Escape') {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        if (searchInput && document.activeElement === searchInput) {
+          searchInput.value = '';
+          searchInput.blur();
+          if (searchResults) {
+            searchResults.classList.add('hidden');
+            searchInput.setAttribute('aria-expanded', 'false');
+          }
+          if (window.showToast) {
+            window.showToast('🧹 Search cleared', 'info');
+          }
+        }
+      }
+    });
+
+    // ============================================
+    // WELCOME TOAST (Optional - Test Toast)
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // Uncomment below to show welcome toast on load
+      // setTimeout(() => {
+      //   if (window.showToast) {
+      //     window.showToast('🚀 Welcome to FindInCalc!', 'success');
+      //   }
+      // }, 500);
+
+      // Show keyboard shortcut hint
+      setTimeout(() => {
+        if (window.showToast) {
+          window.showToast('⌨️ Press ? for keyboard shortcuts', 'info');
+        }
+      }, 1500);
+    });
+  </script>
+</Layout>

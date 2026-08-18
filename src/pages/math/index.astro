@@ -1,0 +1,97 @@
+---
+// src/pages/math/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Math Calculators - Visual Interactive Tools">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12 fade-in">
+        <span class="text-5xl">📐</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Math Calculators
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Visual, interactive tools to help you learn and calculate
+        </p>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <!-- Category Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Area Calculators -->
+        <div class="lg:col-span-3">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>📏 Area Calculators</span>
+            <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">8 tools</span>
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { name: "Circle Area", icon: "⭕", desc: "A = πr²", href: "/math/circle-area", color: "emerald" },
+              { name: "Rectangle Area", icon: "▭", desc: "A = l × w", href: "/math/rectangle-area", color: "blue" },
+              { name: "Triangle Area", icon: "△", desc: "A = ½ × b × h", href: "/math/triangle-area", color: "orange" },
+              { name: "Trapezoid Area", icon: "⏢", desc: "A = ½(a+b)h", href: "/math/trapezoid-area", color: "purple" },
+              { name: "Parallelogram Area", icon: "▱", desc: "A = b × h", href: "/math/parallelogram-area", color: "red" },
+              { name: "Ellipse Area", icon: "⬮", desc: "A = πab", href: "/math/ellipse-area", color: "pink" },
+            ].map((item) => (
+              <a href={item.href} class="group bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover">
+                <div class="flex items-center space-x-4">
+                  <span class="text-3xl">{item.icon}</span>
+                  <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-mono">{item.desc}</p>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Volume Calculators -->
+        <div class="lg:col-span-3 mt-8">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>🧊 Volume Calculators</span>
+            <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">6 tools</span>
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { name: "Sphere Volume", icon: "⚽", desc: "V = ⁴⁄₃πr³", href: "/math/sphere-volume", color: "emerald" },
+              { name: "Cube Volume", icon: "🧊", desc: "V = s³", href: "/math/cube-volume", color: "blue" },
+              { name: "Cylinder Volume", icon: "🥫", desc: "V = πr²h", href: "/math/cylinder-volume", color: "orange" },
+              { name: "Cone Volume", icon: "🍦", desc: "V = ⅓πr²h", href: "/math/cone-volume", color: "purple" },
+              { name: "Rectangular Prism", icon: "📦", desc: "V = l × w × h", href: "/math/prism-volume", color: "red" },
+              { name: "Pyramid Volume", icon: "🔺", desc: "V = ⅓Bh", href: "/math/pyramid-volume", color: "pink" },
+            ].map((item) => (
+              <a href={item.href} class="group bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover">
+                <div class="flex items-center space-x-4">
+                  <span class="text-3xl">{item.icon}</span>
+                  <div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 font-mono">{item.desc}</p>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <!-- Coming Soon -->
+        <div class="lg:col-span-3 mt-8">
+          <div class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-800/30 rounded-2xl p-8 text-center border-2 border-dashed border-gray-300 dark:border-gray-700">
+            <span class="text-3xl">🚀</span>
+            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mt-2">More Coming Soon!</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Algebra, Trigonometry, Statistics calculators are in development.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

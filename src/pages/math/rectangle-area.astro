@@ -1,0 +1,928 @@
+---
+// src/pages/math/rectangle-area.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Rectangle Area Calculator - Interactive Math Tool">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">▭</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Rectangle Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate area, find length, or find width
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Interactive Visualization -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeAreaRect"
+                  class="rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📐 Find Area
+                </button>
+                <button 
+                  id="modeLengthRect"
+                  class="rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📏 Find Length
+                </button>
+                <button 
+                  id="modeWidthRect"
+                  class="rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📏 Find Width
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Rectangle Visualization -->
+            <div class="relative w-full max-w-lg mx-auto aspect-square">
+              <svg viewBox="0 0 500 500" class="w-full h-full">
+                <defs>
+                  <pattern id="gridRect" width="25" height="25" patternUnits="userSpaceOnUse">
+                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5" class="dark:stroke-gray-700"/>
+                  </pattern>
+                  <linearGradient id="rectGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0d9488" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+                  </linearGradient>
+                </defs>
+                
+                <rect width="500" height="500" fill="url(#gridRect)"/>
+                
+                <rect 
+                  id="rectVisual"
+                  x="100" 
+                  y="150" 
+                  width="200" 
+                  height="200"
+                  fill="url(#rectGradient)"
+                  stroke="#0d9488"
+                  stroke-width="3"
+                  rx="4"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <text 
+                  id="lengthLabel"
+                  x="300" 
+                  y="390" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  Length = <tspan id="lengthLabelValue">10</tspan> cm
+                </text>
+                
+                <text 
+                  id="widthLabel"
+                  x="50" 
+                  y="220" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  Width = <tspan id="widthLabelValue">6</tspan> cm
+                </text>
+                
+                <text 
+                  id="areaLabelRect"
+                  x="250" 
+                  y="470" 
+                  fill="#0d9488" 
+                  font-size="18" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  A = <tspan id="areaLabelRectValue">60</tspan> cm²
+                </text>
+
+                <line x1="100" y1="400" x2="300" y2="400" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4" opacity="0.5"/>
+                <line x1="90" y1="150" x2="90" y2="350" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4" opacity="0.5"/>
+              </svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 space-y-4">
+              <!-- Unit Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  Unit System
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  {['cm', 'm', 'in', 'ft'].map((unit) => (
+                    <button 
+                      class={`rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        unit === 'cm' 
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-unit={unit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Dynamic Input Section -->
+              <div id="rectInputSection">
+                <!-- Find Area Mode (Default) -->
+                <div id="rectAreaModeInputs">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Length = <span id="lengthDisplay" class="text-emerald-600 font-bold">10</span> <span id="lengthUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="lengthSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="10"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Width = <span id="widthDisplay" class="text-emerald-600 font-bold">6</span> <span id="widthUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="widthSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="6"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="lengthInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Length"
+                        value="10"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="widthInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Width"
+                        value="6"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="rectCalculateBtn"
+                      class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                    >
+                      Calculate
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Length Mode -->
+                <div id="rectLengthModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaInputLengthDisplay" class="text-emerald-600 font-bold">60</span> <span id="areaInputLengthUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaSliderLength"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="400"
+                      step="0.5"
+                      value="60"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaLengthMaxLabel">400</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Width = <span id="widthForLengthDisplay" class="text-emerald-600 font-bold">6</span> <span id="widthForLengthUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="widthForLengthSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="6"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaInputLength"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="60"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="widthForLengthInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Width"
+                        value="6"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findLengthBtn"
+                      class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                    >
+                      Find Length
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Width Mode -->
+                <div id="rectWidthModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaInputWidthDisplay" class="text-emerald-600 font-bold">60</span> <span id="areaInputWidthUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaSliderWidth"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="400"
+                      step="0.5"
+                      value="60"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaWidthMaxLabel">400</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Length = <span id="lengthForWidthDisplay" class="text-emerald-600 font-bold">10</span> <span id="lengthForWidthUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="lengthForWidthSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="20"
+                      step="0.5"
+                      value="10"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaInputWidth"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="60"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="lengthForWidthInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Length"
+                        value="10"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findWidthBtn"
+                      class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                    >
+                      Find Width
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Result Box -->
+              <div id="rectResultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="rectResultLabel">Area of Rectangle</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="rectResultValue">60.00</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="rectResultSecondaryLabel">Dimensions</p>
+                    <p class="text-xl font-bold text-gray-700 dark:text-gray-300" id="rectResultDimensions">10 × 6 cm</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Formula & Explanation -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-2xl font-mono text-gray-800 dark:text-gray-200" id="rectFormulaDisplay">A = l × w</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="rectFormulaDesc">Area = Length × Width</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="rectFormulaLabel1">Length</span>
+                <span class="font-mono" id="rectFormulaVal1">10 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="rectFormulaLabel2">Width</span>
+                <span class="font-mono" id="rectFormulaVal2">6 cm</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span id="rectFormulaResultLabel">Area</span>
+                <span class="font-mono" id="rectFormulaResult">60.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Solution -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div id="rectStepsContainer" class="space-y-3 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="rectStep1">Formula: A = l × w</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="rectStep2">Plug in: A = 10 × 6</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="rectStep3">Calculate: A = 60</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="rectStep4">Answer: A = 60.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fun Fact -->
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              💡 <span class="font-medium">Did you know?</span>
+              A square is a special rectangle where all sides are equal!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'cm';
+      let currentMode = 'area'; // 'area', 'length', 'width'
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const lengthSlider = document.getElementById('lengthSlider');
+      const widthSlider = document.getElementById('widthSlider');
+      const lengthInput = document.getElementById('lengthInput');
+      const widthInput = document.getElementById('widthInput');
+      const lengthDisplay = document.getElementById('lengthDisplay');
+      const widthDisplay = document.getElementById('widthDisplay');
+      const lengthUnitDisplay = document.getElementById('lengthUnitDisplay');
+      const widthUnitDisplay = document.getElementById('widthUnitDisplay');
+      const lengthLabelValue = document.getElementById('lengthLabelValue');
+      const widthLabelValue = document.getElementById('widthLabelValue');
+      const areaLabelRectValue = document.getElementById('areaLabelRectValue');
+      const rectResultValue = document.getElementById('rectResultValue');
+      const rectResultDimensions = document.getElementById('rectResultDimensions');
+      const rectResultLabel = document.getElementById('rectResultLabel');
+      const rectResultSecondaryLabel = document.getElementById('rectResultSecondaryLabel');
+      const rectFormulaDisplay = document.getElementById('rectFormulaDisplay');
+      const rectFormulaDesc = document.getElementById('rectFormulaDesc');
+      const rectFormulaLabel1 = document.getElementById('rectFormulaLabel1');
+      const rectFormulaLabel2 = document.getElementById('rectFormulaLabel2');
+      const rectFormulaVal1 = document.getElementById('rectFormulaVal1');
+      const rectFormulaVal2 = document.getElementById('rectFormulaVal2');
+      const rectFormulaResultLabel = document.getElementById('rectFormulaResultLabel');
+      const rectFormulaResult = document.getElementById('rectFormulaResult');
+      const rectStep1 = document.getElementById('rectStep1');
+      const rectStep2 = document.getElementById('rectStep2');
+      const rectStep3 = document.getElementById('rectStep3');
+      const rectStep4 = document.getElementById('rectStep4');
+      const rectVisual = document.getElementById('rectVisual');
+      const rectAreaModeInputs = document.getElementById('rectAreaModeInputs');
+      const rectLengthModeInputs = document.getElementById('rectLengthModeInputs');
+      const rectWidthModeInputs = document.getElementById('rectWidthModeInputs');
+      const areaInputLength = document.getElementById('areaInputLength');
+      const areaInputLengthDisplay = document.getElementById('areaInputLengthDisplay');
+      const areaInputLengthUnit = document.getElementById('areaInputLengthUnit');
+      const areaSliderLength = document.getElementById('areaSliderLength');
+      const areaLengthMaxLabel = document.getElementById('areaLengthMaxLabel');
+      const widthForLengthInput = document.getElementById('widthForLengthInput');
+      const widthForLengthDisplay = document.getElementById('widthForLengthDisplay');
+      const widthForLengthUnit = document.getElementById('widthForLengthUnit');
+      const widthForLengthSlider = document.getElementById('widthForLengthSlider');
+      const areaInputWidth = document.getElementById('areaInputWidth');
+      const areaInputWidthDisplay = document.getElementById('areaInputWidthDisplay');
+      const areaInputWidthUnit = document.getElementById('areaInputWidthUnit');
+      const areaSliderWidth = document.getElementById('areaSliderWidth');
+      const areaWidthMaxLabel = document.getElementById('areaWidthMaxLabel');
+      const lengthForWidthInput = document.getElementById('lengthForWidthInput');
+      const lengthForWidthDisplay = document.getElementById('lengthForWidthDisplay');
+      const lengthForWidthUnit = document.getElementById('lengthForWidthUnit');
+      const lengthForWidthSlider = document.getElementById('lengthForWidthSlider');
+
+      const unitConversions = {
+        cm: { label: 'cm', factor: 1, display: 'cm' },
+        m: { label: 'm', factor: 100, display: 'm' },
+        in: { label: 'in', factor: 2.54, display: 'in' },
+        ft: { label: 'ft', factor: 30.48, display: 'ft' }
+      };
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.querySelectorAll('.rect-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.rect-unit-btn').forEach(b => {
+            b.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentUnit = btn.dataset.unit;
+          
+          if (currentMode === 'area') updateRectangle();
+          else if (currentMode === 'length') updateFindLength();
+          else if (currentMode === 'width') updateFindWidth();
+        });
+      });
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      document.getElementById('modeAreaRect').addEventListener('click', () => {
+        document.querySelectorAll('.rect-mode-btn').forEach(b => {
+          b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeAreaRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'area';
+        rectAreaModeInputs.classList.remove('hidden');
+        rectLengthModeInputs.classList.add('hidden');
+        rectWidthModeInputs.classList.add('hidden');
+        updateRectangle();
+      });
+
+      document.getElementById('modeLengthRect').addEventListener('click', () => {
+        document.querySelectorAll('.rect-mode-btn').forEach(b => {
+          b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeLengthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'length';
+        rectAreaModeInputs.classList.add('hidden');
+        rectLengthModeInputs.classList.remove('hidden');
+        rectWidthModeInputs.classList.add('hidden');
+        updateFindLength();
+      });
+
+      document.getElementById('modeWidthRect').addEventListener('click', () => {
+        document.querySelectorAll('.rect-mode-btn').forEach(b => {
+          b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeWidthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'width';
+        rectAreaModeInputs.classList.add('hidden');
+        rectLengthModeInputs.classList.add('hidden');
+        rectWidthModeInputs.classList.remove('hidden');
+        updateFindWidth();
+      });
+
+      // ============================================
+      // UPDATE RECTANGLE (Find Area)
+      // ============================================
+      function updateRectangle() {
+        const length = parseFloat(lengthSlider.value);
+        const width = parseFloat(widthSlider.value);
+        const unit = unitConversions[currentUnit];
+        const displayUnit = unit.display;
+
+        const maxSize = 20;
+        const scaleX = Math.min(length / maxSize, 1);
+        const scaleY = Math.min(width / maxSize, 1);
+        const rectWidth = 150 + (scaleX * 200);
+        const rectHeight = 100 + (scaleY * 200);
+        const x = (500 - rectWidth) / 2;
+        const y = (500 - rectHeight) / 2;
+
+        rectVisual.setAttribute('width', rectWidth);
+        rectVisual.setAttribute('height', rectHeight);
+        rectVisual.setAttribute('x', x);
+        rectVisual.setAttribute('y', y);
+
+        const area = length * width;
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        
+        if (currentUnit === 'm') {
+          displayArea = area / 10000;
+          areaUnit = 'm²';
+        } else if (currentUnit === 'in') {
+          displayArea = area / 6.4516;
+          areaUnit = 'in²';
+        } else if (currentUnit === 'ft') {
+          displayArea = area / 929.0304;
+          areaUnit = 'ft²';
+        }
+
+        const formattedArea = displayArea.toFixed(2);
+
+        // SVG Labels
+        lengthLabelValue.textContent = length;
+        widthLabelValue.textContent = width;
+        areaLabelRectValue.textContent = formattedArea;
+        
+        // Displays
+        lengthDisplay.textContent = length;
+        widthDisplay.textContent = width;
+        lengthUnitDisplay.textContent = displayUnit;
+        widthUnitDisplay.textContent = displayUnit;
+        
+        // Result
+        rectResultValue.textContent = formattedArea;
+        rectResultDimensions.textContent = `${length} × ${width} ${displayUnit}`;
+        rectResultLabel.textContent = 'Area of Rectangle';
+        rectResultSecondaryLabel.textContent = 'Dimensions';
+        
+        // Formula
+        rectFormulaDisplay.textContent = 'A = l × w';
+        rectFormulaDesc.textContent = 'Area = Length × Width';
+        rectFormulaLabel1.textContent = 'Length';
+        rectFormulaLabel2.textContent = 'Width';
+        rectFormulaVal1.textContent = `${length} ${displayUnit}`;
+        rectFormulaVal2.textContent = `${width} ${displayUnit}`;
+        rectFormulaResultLabel.textContent = 'Area';
+        rectFormulaResult.textContent = `${formattedArea} ${areaUnit}`;
+        
+        // Steps
+        rectStep1.textContent = 'Formula: A = l × w';
+        rectStep2.textContent = `Plug in: A = ${length} × ${width}`;
+        rectStep3.textContent = `Calculate: A = ${area}`;
+        rectStep4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
+
+        // Inputs
+        lengthInput.value = length;
+        widthInput.value = width;
+      }
+
+      // ============================================
+      // FIND LENGTH
+      // ============================================
+      function updateFindLength() {
+        const area = parseFloat(areaSliderLength.value);
+        const width = parseFloat(widthForLengthSlider.value);
+        const unit = unitConversions[currentUnit];
+        const displayUnit = unit.display;
+
+        // Convert area to cm² if needed
+        let areaCm2 = area;
+        if (currentUnit === 'm') areaCm2 = area * 10000;
+        else if (currentUnit === 'in') areaCm2 = area * 6.4516;
+        else if (currentUnit === 'ft') areaCm2 = area * 929.0304;
+
+        const length = areaCm2 / width;
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        
+        if (currentUnit === 'm') {
+          displayArea = area;
+          areaUnit = 'm²';
+        } else if (currentUnit === 'in') {
+          displayArea = area;
+          areaUnit = 'in²';
+        } else if (currentUnit === 'ft') {
+          displayArea = area;
+          areaUnit = 'ft²';
+        }
+
+        const formattedLength = length.toFixed(2);
+        const formattedArea = displayArea.toFixed(2);
+
+        // Update SVG
+        const maxSize = 20;
+        const scaleX = Math.min(length / maxSize, 1);
+        const scaleY = Math.min(width / maxSize, 1);
+        const rectWidth = 150 + (scaleX * 200);
+        const rectHeight = 100 + (scaleY * 200);
+        const x = (500 - rectWidth) / 2;
+        const y = (500 - rectHeight) / 2;
+
+        rectVisual.setAttribute('width', rectWidth);
+        rectVisual.setAttribute('height', rectHeight);
+        rectVisual.setAttribute('x', x);
+        rectVisual.setAttribute('y', y);
+
+        // SVG Labels
+        lengthLabelValue.textContent = formattedLength;
+        widthLabelValue.textContent = width;
+        areaLabelRectValue.textContent = formattedArea;
+        
+        // Result
+        rectResultValue.textContent = formattedLength;
+        rectResultDimensions.textContent = `${formattedLength} × ${width} ${displayUnit}`;
+        rectResultLabel.textContent = 'Length';
+        rectResultSecondaryLabel.textContent = 'Dimensions';
+        
+        // Formula
+        rectFormulaDisplay.textContent = 'l = A / w';
+        rectFormulaDesc.textContent = 'Length = Area ÷ Width';
+        rectFormulaLabel1.textContent = 'Area';
+        rectFormulaLabel2.textContent = 'Width';
+        rectFormulaVal1.textContent = `${formattedArea} ${areaUnit}`;
+        rectFormulaVal2.textContent = `${width} ${displayUnit}`;
+        rectFormulaResultLabel.textContent = 'Length';
+        rectFormulaResult.textContent = `${formattedLength} ${displayUnit}`;
+        
+        // Steps
+        rectStep1.textContent = 'Formula: l = A / w';
+        rectStep2.textContent = `Plug in: l = ${formattedArea} ÷ ${width}`;
+        rectStep3.textContent = `Calculate: l = ${formattedLength}`;
+        rectStep4.textContent = `Answer: Length = ${formattedLength} ${displayUnit}`;
+
+        // Update inputs
+        areaInputLength.value = area;
+        widthForLengthInput.value = width;
+        areaInputLengthDisplay.textContent = formattedArea;
+        areaInputLengthUnit.textContent = areaUnit;
+        widthForLengthDisplay.textContent = width;
+        widthForLengthUnit.textContent = displayUnit;
+      }
+
+      // ============================================
+      // FIND WIDTH
+      // ============================================
+      function updateFindWidth() {
+        const area = parseFloat(areaSliderWidth.value);
+        const length = parseFloat(lengthForWidthSlider.value);
+        const unit = unitConversions[currentUnit];
+        const displayUnit = unit.display;
+
+        // Convert area to cm² if needed
+        let areaCm2 = area;
+        if (currentUnit === 'm') areaCm2 = area * 10000;
+        else if (currentUnit === 'in') areaCm2 = area * 6.4516;
+        else if (currentUnit === 'ft') areaCm2 = area * 929.0304;
+
+        const width = areaCm2 / length;
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        
+        if (currentUnit === 'm') {
+          displayArea = area;
+          areaUnit = 'm²';
+        } else if (currentUnit === 'in') {
+          displayArea = area;
+          areaUnit = 'in²';
+        } else if (currentUnit === 'ft') {
+          displayArea = area;
+          areaUnit = 'ft²';
+        }
+
+        const formattedWidth = width.toFixed(2);
+        const formattedArea = displayArea.toFixed(2);
+
+        // Update SVG
+        const maxSize = 20;
+        const scaleX = Math.min(length / maxSize, 1);
+        const scaleY = Math.min(width / maxSize, 1);
+        const rectWidth = 150 + (scaleX * 200);
+        const rectHeight = 100 + (scaleY * 200);
+        const x = (500 - rectWidth) / 2;
+        const y = (500 - rectHeight) / 2;
+
+        rectVisual.setAttribute('width', rectWidth);
+        rectVisual.setAttribute('height', rectHeight);
+        rectVisual.setAttribute('x', x);
+        rectVisual.setAttribute('y', y);
+
+        // SVG Labels
+        lengthLabelValue.textContent = length;
+        widthLabelValue.textContent = formattedWidth;
+        areaLabelRectValue.textContent = formattedArea;
+        
+        // Result
+        rectResultValue.textContent = formattedWidth;
+        rectResultDimensions.textContent = `${length} × ${formattedWidth} ${displayUnit}`;
+        rectResultLabel.textContent = 'Width';
+        rectResultSecondaryLabel.textContent = 'Dimensions';
+        
+        // Formula
+        rectFormulaDisplay.textContent = 'w = A / l';
+        rectFormulaDesc.textContent = 'Width = Area ÷ Length';
+        rectFormulaLabel1.textContent = 'Area';
+        rectFormulaLabel2.textContent = 'Length';
+        rectFormulaVal1.textContent = `${formattedArea} ${areaUnit}`;
+        rectFormulaVal2.textContent = `${length} ${displayUnit}`;
+        rectFormulaResultLabel.textContent = 'Width';
+        rectFormulaResult.textContent = `${formattedWidth} ${displayUnit}`;
+        
+        // Steps
+        rectStep1.textContent = 'Formula: w = A / l';
+        rectStep2.textContent = `Plug in: w = ${formattedArea} ÷ ${length}`;
+        rectStep3.textContent = `Calculate: w = ${formattedWidth}`;
+        rectStep4.textContent = `Answer: Width = ${formattedWidth} ${displayUnit}`;
+
+        // Update inputs
+        areaInputWidth.value = area;
+        lengthForWidthInput.value = length;
+        areaInputWidthDisplay.textContent = formattedArea;
+        areaInputWidthUnit.textContent = areaUnit;
+        lengthForWidthDisplay.textContent = length;
+        lengthForWidthUnit.textContent = displayUnit;
+      }
+
+      // ============================================
+      // AREA MODE EVENTS
+      // ============================================
+      lengthSlider.addEventListener('input', updateRectangle);
+      widthSlider.addEventListener('input', updateRectangle);
+
+      lengthInput.addEventListener('input', () => {
+        const val = parseFloat(lengthInput.value);
+        if (val && val > 0) {
+          lengthSlider.value = val;
+          updateRectangle();
+        }
+      });
+      widthInput.addEventListener('input', () => {
+        const val = parseFloat(widthInput.value);
+        if (val && val > 0) {
+          widthSlider.value = val;
+          updateRectangle();
+        }
+      });
+
+      document.getElementById('rectCalculateBtn').addEventListener('click', () => {
+        const l = parseFloat(lengthInput.value);
+        const w = parseFloat(widthInput.value);
+        if (!l || l <= 0 || !w || w <= 0) {
+          alert('Please enter valid positive numbers for length and width.');
+          return;
+        }
+        lengthSlider.value = l;
+        widthSlider.value = w;
+        updateRectangle();
+      });
+
+      // ============================================
+      // FIND LENGTH EVENTS
+      // ============================================
+      areaSliderLength.addEventListener('input', updateFindLength);
+      widthForLengthSlider.addEventListener('input', updateFindLength);
+
+      areaInputLength.addEventListener('input', () => {
+        const val = parseFloat(areaInputLength.value);
+        if (val && val > 0) {
+          areaSliderLength.value = val;
+          updateFindLength();
+        }
+      });
+      widthForLengthInput.addEventListener('input', () => {
+        const val = parseFloat(widthForLengthInput.value);
+        if (val && val > 0) {
+          widthForLengthSlider.value = val;
+          updateFindLength();
+        }
+      });
+
+      document.getElementById('findLengthBtn').addEventListener('click', () => {
+        const a = parseFloat(areaInputLength.value);
+        const w = parseFloat(widthForLengthInput.value);
+        if (!a || a <= 0 || !w || w <= 0) {
+          alert('Please enter valid positive numbers for area and width.');
+          return;
+        }
+        areaSliderLength.value = a;
+        widthForLengthSlider.value = w;
+        updateFindLength();
+      });
+
+      // ============================================
+      // FIND WIDTH EVENTS
+      // ============================================
+      areaSliderWidth.addEventListener('input', updateFindWidth);
+      lengthForWidthSlider.addEventListener('input', updateFindWidth);
+
+      areaInputWidth.addEventListener('input', () => {
+        const val = parseFloat(areaInputWidth.value);
+        if (val && val > 0) {
+          areaSliderWidth.value = val;
+          updateFindWidth();
+        }
+      });
+      lengthForWidthInput.addEventListener('input', () => {
+        const val = parseFloat(lengthForWidthInput.value);
+        if (val && val > 0) {
+          lengthForWidthSlider.value = val;
+          updateFindWidth();
+        }
+      });
+
+      document.getElementById('findWidthBtn').addEventListener('click', () => {
+        const a = parseFloat(areaInputWidth.value);
+        const l = parseFloat(lengthForWidthInput.value);
+        if (!a || a <= 0 || !l || l <= 0) {
+          alert('Please enter valid positive numbers for area and length.');
+          return;
+        }
+        areaSliderWidth.value = a;
+        lengthForWidthSlider.value = l;
+        updateFindWidth();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      updateRectangle();
+    });
+  </script>
+</Layout>

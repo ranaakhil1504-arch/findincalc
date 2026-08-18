@@ -1,0 +1,746 @@
+---
+// src/pages/health/bmi.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="BMI Calculator - Body Mass Index Calculator">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">⚖️</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          BMI Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate your Body Mass Index and get personalized motivation
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Unit Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Unit System
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="unitMetric"
+                  class="bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  Metric (kg/cm)
+                </button>
+                <button 
+                  id="unitImperial"
+                  class="bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  Imperial (lbs/in)
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Weight -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Weight = <span id="weightDisplay" class="text-emerald-600 font-bold">70</span> <span id="weightUnit">kg</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="weightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="20"
+                  max="200"
+                  step="0.5"
+                  value="70"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>20</span>
+                  <span id="weightMaxLabel">200 kg</span>
+                </div>
+              </div>
+
+              <!-- Height -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Height = <span id="heightDisplay" class="text-emerald-600 font-bold">175</span> <span id="heightUnit">cm</span>
+                    <span id="heightFeetInches" class="text-gray-400 font-normal text-xs ml-1"></span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="heightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="100"
+                  max="250"
+                  step="0.5"
+                  value="175"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>100</span>
+                  <span id="heightMaxLabel">250 cm</span>
+                </div>
+              </div>
+
+              <!-- Input Fields -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="weightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Weight"
+                    value="70"
+                    step="0.5"
+                    min="20"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="heightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Height"
+                    value="175"
+                    step="0.5"
+                    min="100"
+                  />
+                </div>
+                <button 
+                  id="bmiCalculateBtn"
+                  class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                >
+                  Calculate
+                </button>
+              </div>
+            </div>
+
+            <!-- Semicircular BMI Gauge -->
+            <div class="mt-6">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">BMI Gauge</h4>
+              <div class="relative w-full max-w-sm mx-auto">
+                <svg viewBox="0 0 300 180" class="w-full h-auto">
+                  <!-- Gauge Background -->
+                  <path d="M 20 160 A 130 130 0 0 1 280 160" fill="none" stroke="#e5e7eb" stroke-width="20" stroke-linecap="round" class="dark:stroke-gray-700"/>
+                  
+                  <!-- Colored Zones (boundaries match BMI 18.5 / 25 / 30, same pivot+radius as the needle) -->
+                  <path d="M 20 160 A 130 130 0 0 1 134.72 30.9" fill="none" stroke="#3b82f6" stroke-width="20" stroke-linecap="round"/>
+                  <path d="M 134.72 30.9 A 130 130 0 0 1 199.75 39.9" fill="none" stroke="#22c55e" stroke-width="20" stroke-linecap="round"/>
+                  <path d="M 199.75 39.9 A 130 130 0 0 1 241.92 68.08" fill="none" stroke="#eab308" stroke-width="20" stroke-linecap="round"/>
+                  <path d="M 241.92 68.08 A 130 130 0 0 1 280 160" fill="none" stroke="#ef4444" stroke-width="20" stroke-linecap="round"/>
+                  
+                  <!-- Labels -->
+                  <text x="35" y="175" fill="#3b82f6" font-size="10" font-weight="bold">Underweight</text>
+                  <text x="112" y="175" fill="#22c55e" font-size="10" font-weight="bold">Normal</text>
+                  <text x="182" y="175" fill="#eab308" font-size="10" font-weight="bold">Overweight</text>
+                  <text x="255" y="175" fill="#ef4444" font-size="10" font-weight="bold">Obese</text>
+                  
+                  <!-- Needle -->
+                  <g id="needleGroup" transform="rotate(0, 150, 160)">
+                    <line x1="150" y1="160" x2="150" y2="30" stroke="#1f2937" stroke-width="3" stroke-linecap="round" class="dark:stroke-white"/>
+                    <circle cx="150" cy="160" r="6" fill="#1f2937" class="dark:fill-white"/>
+                    <circle cx="150" cy="160" r="3" fill="white" class="dark:fill-gray-900"/>
+                  </g>
+                  
+                  <!-- Value -->
+                  <text id="gaugeValue" x="150" y="135" fill="#1f2937" font-size="16" font-weight="bold" text-anchor="middle" class="dark:fill-white">22.9</text>
+                  <text x="150" y="148" fill="#6b7280" font-size="10" text-anchor="middle" class="dark:text-gray-400">BMI</text>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Result Box - Now with Emoji, BMI, Category -->
+            <div id="bmiResultBox" class="mt-4 rounded-xl p-4 border transition-all duration-500 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20">
+              <!-- Row 1: BMI Value -->
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Your BMI</p>
+                <p class="text-5xl font-bold text-emerald-600 dark:text-emerald-400" id="bmiResultValue">22.9</p>
+              </div>
+
+              <!-- Row 2: Big Emoji with glowing category ring -->
+              <div class="text-center mt-3">
+                <div id="emojiRing" class="relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 bg-emerald-100 dark:bg-emerald-800/40 ring-4 ring-emerald-300/60 dark:ring-emerald-600/40">
+                  <div id="emojiDisplay" class="text-6xl transition-all duration-500 transform hover:scale-110 inline-block">
+                    😊
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 3: Category Label -->
+              <div class="text-center mt-2">
+                <p id="bmiCategory" class="text-xl font-bold text-emerald-600 dark:text-emerald-400 transition-all duration-500">
+                  Normal Weight
+                </p>
+              </div>
+
+              <!-- Row 4: Description -->
+              <div class="mt-3 p-3 rounded-lg bg-white/50 dark:bg-gray-700/50">
+                <p class="text-sm text-gray-600 dark:text-gray-400 text-center" id="bmiDescription">
+                  Your BMI indicates a healthy weight for your height.
+                </p>
+              </div>
+
+              <!-- Row 5: Share button -->
+              <div class="mt-3 flex justify-center">
+                <button
+                  id="shareResultBtn"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all"
+                >
+                  <span id="shareIcon">📋</span>
+                  <span id="shareLabel">Copy My Result</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Healthy Weight Range + BMI Prime -->
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">✅ Healthy Weight Range</h4>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600 dark:text-gray-400">For your height:</span>
+                  <span class="font-bold text-emerald-600 dark:text-emerald-400" id="healthyRange">54.0 – 72.9 kg</span>
+                </div>
+              </div>
+              <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+                <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">🎯 BMI Prime</h4>
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600 dark:text-gray-400">Ratio to upper normal:</span>
+                  <span class="font-bold text-emerald-600 dark:text-emerald-400" id="bmiPrime">0.92</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Motivational Message - Moved here, below all results -->
+            <div id="motivationalBox" class="mt-4 rounded-2xl p-5 border border-emerald-200 dark:border-emerald-800 transition-all duration-500 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
+              <div class="flex items-start gap-3">
+                <span class="text-2xl">💪</span>
+                <p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed" id="motivationalMessage">
+                  🌟 <span class="font-medium">Keep it up!</span> You're maintaining a healthy weight. Stay active and eat well to keep up the great work!
+                </p>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> BMI is a general screening tool and does not account for muscle mass, bone density, or body composition. Please consult a healthcare professional for personalized health advice.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- BMI Categories -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📊 BMI Categories</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                <span class="text-gray-700 dark:text-gray-300"><strong>Underweight</strong> &lt; 18.5</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-gray-700 dark:text-gray-300"><strong>Normal</strong> 18.5 – 24.9</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                <span class="text-gray-700 dark:text-gray-300"><strong>Overweight</strong> 25.0 – 29.9</span>
+              </div>
+              <div class="flex items-center gap-2 p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-gray-700 dark:text-gray-300"><strong>Obese</strong> ≥ 30.0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-xl font-mono text-gray-800 dark:text-gray-200" id="bmiFormula">BMI = weight / (height)²</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="bmiFormulaDetail">Weight in kg, Height in meters</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Weight</span>
+                <span class="font-mono" id="bmiWeight">70 kg</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Height</span>
+                <span class="font-mono" id="bmiHeight">175 cm (1.75 m)</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>BMI</span>
+                <span class="font-mono" id="bmiResultFormula">22.9</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Convert height to meters: 175 cm = 1.75 m</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Square height: 1.75² = 3.06</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">BMI = 70 ÷ 3.06 = 22.9</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Result: BMI = 22.9 (Normal Weight)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'metric';
+      let rawWeight = 70;
+      let rawHeight = 175;
+
+      // ============================================
+      // BMI DATA WITH EMOJIS & MOTIVATIONAL MESSAGES
+      // ============================================
+      const bmiData = {
+        underweight: {
+          emoji: '😔',
+          label: 'Underweight',
+          color: 'blue',
+          textColor: 'text-blue-600 dark:text-blue-400',
+          bgColor: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
+          gaugeColor: '#3b82f6',
+          description: 'Your BMI indicates you may be underweight. Consider consulting a healthcare professional.',
+          motivational: `🌟 Your body is a beautiful garden that needs the right nutrients to grow. Start your journey by adding one extra healthy snack each day. Remember, small steps lead to big changes! 💪
+
+          ✨ Focus on nutrient-rich foods like nuts, avocados, and whole grains. Your future self will thank you for the care you're giving your body today.`,
+          tip: 'Consider consulting a nutritionist for a healthy weight gain plan.'
+        },
+        normal: {
+          emoji: '😊',
+          label: 'Normal Weight',
+          color: 'green',
+          textColor: 'text-green-600 dark:text-green-400',
+          bgColor: 'border-green-500 bg-green-50 dark:bg-green-900/20',
+          gaugeColor: '#22c55e',
+          description: 'Your BMI indicates a healthy weight for your height. Great job!',
+          motivational: `🌟 You're doing amazing! Your healthy weight is a reflection of the good choices you make every day. Keep nurturing your body with balanced meals and regular movement.
+
+          🏃‍♂️ Remember, health is a journey, not a destination. Celebrate your wins, stay consistent, and continue being the best version of yourself. You've got this!`,
+          tip: 'Maintain your healthy lifestyle with balanced diet and regular exercise.'
+        },
+        overweight: {
+          emoji: '😐',
+          label: 'Overweight',
+          color: 'yellow',
+          textColor: 'text-yellow-600 dark:text-yellow-400',
+          bgColor: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
+          gaugeColor: '#eab308',
+          description: 'Your BMI indicates you may be overweight. Consider a balanced diet and exercise.',
+          motivational: `🌅 Every great journey begins with a single step. Your awareness today is the first step toward a healthier tomorrow. You have the power to create positive change!
+
+          🍎 Start small—swap one sugary drink for water, add a 10-minute walk to your day. Celebrate every small victory. Your health journey is unique, and every step counts. You can do this! 💪`,
+          tip: 'Incorporate more physical activity and balanced meals into your routine.'
+        },
+        obese: {
+          emoji: '😢',
+          label: 'Obese',
+          color: 'red',
+          textColor: 'text-red-600 dark:text-red-400',
+          bgColor: 'border-red-500 bg-red-50 dark:bg-red-900/20',
+          gaugeColor: '#ef4444',
+          description: 'Your BMI indicates obesity. Please consult with a healthcare professional.',
+          motivational: `❤️ You are worthy of health and happiness, exactly as you are right now. Your weight doesn't define your worth. Every journey starts with self-compassion and one small step forward.
+
+          🌟 Today is a new beginning. Reach out to a healthcare professional who can support you. Remember, asking for help is a sign of strength, not weakness. Your future self will be grateful for the love you show yourself today. You are capable of amazing things! 💪`,
+          tip: 'Consult with a healthcare professional for a personalized health plan.'
+        }
+      };
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const weightSlider = document.getElementById('weightSlider');
+      const heightSlider = document.getElementById('heightSlider');
+      const weightInput = document.getElementById('weightInput');
+      const heightInput = document.getElementById('heightInput');
+      const weightDisplay = document.getElementById('weightDisplay');
+      const heightDisplay = document.getElementById('heightDisplay');
+      const weightUnit = document.getElementById('weightUnit');
+      const heightUnit = document.getElementById('heightUnit');
+      const weightMaxLabel = document.getElementById('weightMaxLabel');
+      const heightMaxLabel = document.getElementById('heightMaxLabel');
+      const bmiResultValue = document.getElementById('bmiResultValue');
+      const bmiCategory = document.getElementById('bmiCategory');
+      const bmiDescription = document.getElementById('bmiDescription');
+      const bmiFormula = document.getElementById('bmiFormula');
+      const bmiFormulaDetail = document.getElementById('bmiFormulaDetail');
+      const bmiWeight = document.getElementById('bmiWeight');
+      const bmiHeight = document.getElementById('bmiHeight');
+      const bmiResultFormula = document.getElementById('bmiResultFormula');
+      const bmiResultBox = document.getElementById('bmiResultBox');
+      const motivationalBox = document.getElementById('motivationalBox');
+      const motivationalMessage = document.getElementById('motivationalMessage');
+      const healthyRange = document.getElementById('healthyRange');
+      const gaugeValue = document.getElementById('gaugeValue');
+      const needleGroup = document.getElementById('needleGroup');
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+      const emojiDisplay = document.getElementById('emojiDisplay');
+      const emojiRing = document.getElementById('emojiRing');
+      const heightFeetInches = document.getElementById('heightFeetInches');
+      const bmiPrime = document.getElementById('bmiPrime');
+      const shareResultBtn = document.getElementById('shareResultBtn');
+      const shareLabel = document.getElementById('shareLabel');
+      const shareIcon = document.getElementById('shareIcon');
+
+      let lastBMI = 22.9;
+      let lastAngle = -90 + (22.9 / 40) * 180;
+
+      // ============================================
+      // RING COLOR PER CATEGORY (bg + ring classes)
+      // ============================================
+      const ringClasses = {
+        underweight: 'bg-blue-100 dark:bg-blue-800/40 ring-4 ring-blue-300/60 dark:ring-blue-600/40',
+        normal: 'bg-emerald-100 dark:bg-emerald-800/40 ring-4 ring-emerald-300/60 dark:ring-emerald-600/40',
+        overweight: 'bg-yellow-100 dark:bg-yellow-800/40 ring-4 ring-yellow-300/60 dark:ring-yellow-600/40',
+        obese: 'bg-red-100 dark:bg-red-800/40 ring-4 ring-red-300/60 dark:ring-red-600/40'
+      };
+
+      // ============================================
+      // ANIMATED NUMBER COUNT-UP
+      // ============================================
+      function animateValue(el, start, end, duration = 500) {
+        const startTime = performance.now();
+        function step(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const value = start + (end - start) * eased;
+          el.textContent = value.toFixed(1);
+          if (progress < 1) requestAnimationFrame(step);
+          else el.textContent = end.toFixed(1);
+        }
+        requestAnimationFrame(step);
+      }
+
+      // ============================================
+      // ANIMATED NEEDLE ROTATION (JS-driven, avoids
+      // CSS transform-origin/transition ambiguity on
+      // the SVG "transform" attribute)
+      // ============================================
+      function animateNeedle(start, end, duration = 500) {
+        const startTime = performance.now();
+        function step(now) {
+          const progress = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const angle = start + (end - start) * eased;
+          needleGroup.setAttribute('transform', `rotate(${angle}, 150, 160)`);
+          if (progress < 1) requestAnimationFrame(step);
+          else needleGroup.setAttribute('transform', `rotate(${end}, 150, 160)`);
+        }
+        requestAnimationFrame(step);
+      }
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.getElementById('unitMetric').addEventListener('click', () => {
+        document.querySelectorAll('.bmi-unit-btn').forEach(b => {
+          b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitMetric').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentUnit = 'metric';
+        updateBMI();
+      });
+
+      document.getElementById('unitImperial').addEventListener('click', () => {
+        document.querySelectorAll('.bmi-unit-btn').forEach(b => {
+          b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitImperial').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentUnit = 'imperial';
+        updateBMI();
+      });
+
+      // ============================================
+      // UPDATE BMI
+      // ============================================
+      function updateBMI(syncInputs = true) {
+        let weight, height, weightLabel, heightLabel, weightMax, heightMax;
+        let weightVal, heightVal;
+
+        if (currentUnit === 'metric') {
+          weight = rawWeight;
+          height = rawHeight;
+          weightLabel = 'kg';
+          heightLabel = 'cm';
+          weightMax = '200 kg';
+          heightMax = '250 cm';
+          weightVal = weight;
+          heightVal = height / 100;
+          
+          bmiFormula.textContent = 'BMI = weight / (height)²';
+          bmiFormulaDetail.textContent = 'Weight in kg, Height in meters';
+          weightUnit.textContent = 'kg';
+          heightUnit.textContent = 'cm';
+          weightMaxLabel.textContent = '200 kg';
+          heightMaxLabel.textContent = '250 cm';
+          
+          weightSlider.min = 20;
+          weightSlider.max = 200;
+          heightSlider.min = 100;
+          heightSlider.max = 250;
+
+          weightInput.min = 20;
+          weightInput.max = 200;
+          weightInput.step = 0.5;
+          heightInput.min = 100;
+          heightInput.max = 250;
+          heightInput.step = 0.5;
+
+          heightFeetInches.textContent = '';
+
+        } else {
+          weight = rawWeight;
+          height = rawHeight;
+          weightLabel = 'lbs';
+          heightLabel = 'in';
+          weightMax = '440 lbs';
+          heightMax = '98 in';
+          weightVal = weight * 0.453592;
+          heightVal = height * 0.0254;
+          
+          bmiFormula.textContent = 'BMI = 703 × weight / (height)²';
+          bmiFormulaDetail.textContent = 'Weight in lbs, Height in inches';
+          weightUnit.textContent = 'lbs';
+          heightUnit.textContent = 'in';
+          weightMaxLabel.textContent = '440 lbs';
+          heightMaxLabel.textContent = '98 in';
+
+          const totalFeet = Math.floor(height / 12);
+          const remInches = Math.round(height % 12);
+          heightFeetInches.textContent = `(${totalFeet}'${remInches}")`;
+          
+          weightSlider.min = 44;
+          weightSlider.max = 440;
+          heightSlider.min = 39;
+          heightSlider.max = 98;
+
+          weightInput.min = 44;
+          weightInput.max = 440;
+          weightInput.step = 0.5;
+          heightInput.min = 39;
+          heightInput.max = 98;
+          heightInput.step = 0.5;
+        }
+
+        // Calculate BMI (guard against 0/blank values while the user is still typing)
+        const safeWeightVal = weightVal > 0 ? weightVal : 0;
+        const safeHeightVal = heightVal > 0 ? heightVal : 0;
+        const bmi = safeHeightVal > 0 ? safeWeightVal / (safeHeightVal * safeHeightVal) : 0;
+        const formattedBMI = bmi.toFixed(1);
+
+        // Determine category
+        let categoryKey;
+        if (bmi < 18.5) {
+          categoryKey = 'underweight';
+        } else if (bmi >= 18.5 && bmi < 25) {
+          categoryKey = 'normal';
+        } else if (bmi >= 25 && bmi < 30) {
+          categoryKey = 'overweight';
+        } else {
+          categoryKey = 'obese';
+        }
+
+        const data = bmiData[categoryKey];
+
+        // Update Emoji + glowing ring color
+        emojiDisplay.textContent = data.emoji;
+        emojiRing.className = `relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 ${ringClasses[categoryKey]}`;
+
+        // Update BMI Value (animated count-up)
+        animateValue(bmiResultValue, lastBMI, bmi);
+        bmiResultValue.className = `text-5xl font-bold ${data.textColor}`;
+
+        // Update Category
+        bmiCategory.textContent = data.label;
+        bmiCategory.className = `text-xl font-bold ${data.textColor} transition-all duration-500`;
+
+        // Update Description
+        bmiDescription.textContent = data.description;
+
+        // Update Result Box
+        bmiResultBox.className = `mt-4 rounded-xl p-4 border transition-all duration-500 ${data.bgColor}`;
+
+        // Update motivational message
+        motivationalMessage.innerHTML = data.motivational;
+
+        // Update BMI Prime (ratio of BMI to the upper limit of normal, 25)
+        bmiPrime.textContent = (bmi / 25).toFixed(2);
+
+        // Update gauge (JS-animated needle rotation — see animateNeedle)
+        const angle = Math.min(Math.max(-90 + (bmi / 40) * 180, -90), 90);
+        animateNeedle(lastAngle, angle);
+        animateValue(gaugeValue, lastBMI, bmi);
+        lastAngle = angle;
+
+        lastBMI = bmi;
+
+        // Update formula card
+        bmiWeight.textContent = `${weight} ${weightLabel}`;
+        if (currentUnit === 'metric') {
+          bmiHeight.textContent = `${height} cm (${heightVal.toFixed(2)} m)`;
+        } else {
+          bmiHeight.textContent = `${height} in (${(height * 2.54).toFixed(1)} cm)`;
+        }
+        bmiResultFormula.textContent = formattedBMI;
+
+        // Update healthy weight range
+        const minWeight = 18.5 * heightVal * heightVal;
+        const maxWeight = 24.9 * heightVal * heightVal;
+        if (currentUnit === 'metric') {
+          healthyRange.textContent = `${minWeight.toFixed(1)} – ${maxWeight.toFixed(1)} kg`;
+        } else {
+          healthyRange.textContent = `${(minWeight / 0.453592).toFixed(1)} – ${(maxWeight / 0.453592).toFixed(1)} lbs`;
+        }
+
+        // Update steps
+        if (currentUnit === 'metric') {
+          step1.textContent = `Convert height to meters: ${height} cm = ${heightVal.toFixed(2)} m`;
+        } else {
+          step1.textContent = `Convert height to meters: ${height} in = ${heightVal.toFixed(2)} m`;
+        }
+        step2.textContent = `Square height: ${heightVal.toFixed(2)}² = ${(heightVal * heightVal).toFixed(2)}`;
+        step3.textContent = `BMI = ${weightVal.toFixed(1)} ÷ ${(heightVal * heightVal).toFixed(2)} = ${formattedBMI}`;
+        step4.textContent = `Result: BMI = ${formattedBMI} (${data.label})`;
+
+        // Keep sliders in sync (browsers clamp these to min/max automatically)
+        weightSlider.value = weight;
+        heightSlider.value = height;
+
+        // Only overwrite the text inputs when the change came from the slider,
+        // the unit toggle, or the Calculate button — never while the user is
+        // actively typing in the field, or every keystroke gets clobbered.
+        if (syncInputs) {
+          weightInput.value = weight;
+          heightInput.value = height;
+        }
+      }
+
+      // ============================================
+      // AUTO-SCROLL TO RESULTS
+      // ============================================
+      function scrollToResults() {
+        const resultBox = document.getElementById('bmiResultBox');
+        if (resultBox) {
+          const yOffset = -80; // Offset for fixed navbar
+          const y = resultBox.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      weightSlider.addEventListener('input', () => {
+        rawWeight = parseFloat(weightSlider.value);
+        updateBMI();
+      });
+      heightSlider.addEventListener('input', () => {
+        rawHeight = parseFloat(heightSlider.value);
+        updateBMI();
+      });
+
+      weightInput.addEventListener('input', () => {
+        const val = parseFloat(weightInput.value);
+        if (!isNaN(val) && val >= 0) {
+          rawWeight = val;
+          updateBMI(false); // don't rewrite the field while the user is typing
+        }
+      });
+      heightInput.addEventListener('input', () => {
+        const val = parseFloat(heightInput.value);
+        if (!isNaN(val) && val >= 0) {
+          rawHeight = val;
+          updateBMI(false); // don't rewrite the field while the user is typing
+        }
+      });
+
+      // Calculate button - Update BMI AND scroll to results
+      document.getElementById('bmiCalculateBtn').addEventListener('click', () => {
+        const w = parseFloat(weightInput.value);
+        const h = parseFloat(heightInput.value);
+        if (!w || w <= 0 || !h || h <= 0) {
+          alert('Please enter valid positive numbers for weight and height.');
+          return;
+        }
+        rawWeight = w;
+        rawHeight = h;
+        updateBMI();
+        // Scroll to results after a tiny delay to let DOM update
+        setTimeout(scrollToResults, 100);
+      });
+
+      // Also scroll when sliders change (optional, but nice)
+      // We'll only scroll on button click to avoid annoying behavior
+
+      // ============================================
+      // SHARE / COPY RESULT
+      // ============================================
+      shareResultBtn.addEventListener('click', async () => {
+        const bmiVal = bmiResultValue.textContent;
+        const category = bmiCategory.textContent;
+        const w = weightInput.value;
+        const h = heightInput.value;
+        const wUnit = weightUnit.textContent;
+        const hUnit = heightUnit.textContent;
+        const summary = `My BMI is ${bmiVal} (${category}) — ${w} ${wUnit}, ${h} ${hUnit}. Calculated with the BMI Calculator.`;
+
+        try {
+          await navigator.clipboard.writeText(summary);
+          shareIcon.textContent = '✅';
+          shareLabel.textContent = 'Copied!';
+        } catch (err) {
+          shareIcon.textContent = '⚠️';
+          shareLabel.textContent = 'Could not copy';
+        }
+        setTimeout(() => {
+          shareIcon.textContent = '📋';
+          shareLabel.textContent = 'Copy My Result';
+        }, 2000);
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      updateBMI();
+    });
+  </script>
+</Layout>

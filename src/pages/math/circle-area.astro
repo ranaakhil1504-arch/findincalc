@@ -1,0 +1,740 @@
+---
+// src/pages/math/circle-area.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Circle Area Calculator - Interactive Math Tool">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="text-sm text-gray-500 dark:text-gray-400 mb-6 fade-in">
+        <a href="/" class="hover:text-emerald-600">Home</a>
+        <span class="mx-2">/</span>
+        <a href="/math" class="hover:text-emerald-600">Math</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-700 dark:text-gray-300">Circle Area Calculator</span>
+      </nav>
+
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">⭕</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Circle Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate area from radius, or find radius from area
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Interactive Visualization -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeArea"
+                  class="mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📐 Find Area
+                </button>
+                <button 
+                  id="modeRadius"
+                  class="mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  🔍 Find Radius
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Circle Visualization -->
+            <div class="relative w-full max-w-lg mx-auto aspect-square">
+              <svg 
+                viewBox="0 0 500 500" 
+                class="w-full h-full"
+                id="circleSvg"
+              >
+                <defs>
+                  <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5" class="dark:stroke-gray-700"/>
+                  </pattern>
+                  <radialGradient id="circleGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#0d9488" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+                  </radialGradient>
+                </defs>
+                
+                <rect width="500" height="500" fill="url(#grid)"/>
+                
+                <circle 
+                  id="circleVisual"
+                  cx="250" 
+                  cy="250" 
+                  r="100"
+                  fill="url(#circleGradient)"
+                  stroke="#0d9488"
+                  stroke-width="3"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <circle cx="250" cy="250" r="5" fill="#059669">
+                  <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                </circle>
+                
+                <line 
+                  id="radiusLine"
+                  x1="250" 
+                  y1="250" 
+                  x2="350" 
+                  y2="250"
+                  stroke="#f59e0b"
+                  stroke-width="3"
+                  stroke-dasharray="8,4"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <text 
+                  id="radiusLabel"
+                  x="270" 
+                  y="240" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  r = <tspan id="radiusLabelValue">5</tspan> <tspan id="radiusUnitLabel">cm</tspan>
+                </text>
+                
+                <text 
+                  id="areaLabel"
+                  x="250" 
+                  y="320" 
+                  fill="#0d9488" 
+                  font-size="18" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  A = <tspan id="areaLabelValue">78.54</tspan> <tspan id="areaUnitLabel">cm²</tspan>
+                </text>
+
+                <text x="355" y="270" fill="#f59e0b" font-size="12" font-weight="bold">← Radius →</text>
+              </svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 space-y-4">
+              <!-- Pi Value Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  π Value
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    id="pi314"
+                    class="pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    3.14
+                  </button>
+                  <button 
+                    id="pi227"
+                    class="pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    22/7
+                  </button>
+                  <button 
+                    id="piExact"
+                    class="pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    π (Exact)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Unit Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  Unit System
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  {['cm', 'm', 'in', 'ft'].map((unit) => (
+                    <button 
+                      class={`unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        unit === 'cm' 
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-unit={unit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Dynamic Input Section -->
+              <div id="inputSection">
+                <!-- Find Area Mode (Default) -->
+                <div id="areaModeInputs">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Radius (r) = <span id="radiusDisplay" class="text-emerald-600 font-bold">5</span> <span id="radiusUnitDisplay">cm</span>
+                      </label>
+                      <span id="radiusError" class="text-xs text-red-500 hidden">Please enter a positive number</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="radiusSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="0.5"
+                      max="20"
+                      step="0.5"
+                      value="5"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>0.5</span>
+                      <span>20</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col sm:flex-row gap-2 mt-3">
+                    <input 
+                      type="number" 
+                      id="radiusInput"
+                      class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Enter radius"
+                      value="5"
+                      step="0.5"
+                      min="0.5"
+                    />
+                    <button 
+                      id="calculateBtn"
+                      class="btn-primary px-6"
+                    >
+                      Calculate
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Radius Mode -->
+                <div id="radiusModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area (A) = <span id="areaInputDisplay" class="text-emerald-600 font-bold">78.54</span> <span id="areaInputUnitDisplay">cm²</span>
+                      </label>
+                      <span id="areaError" class="text-xs text-red-500 hidden">Please enter a positive number</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="1256"
+                      step="0.5"
+                      value="78.54"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaMaxLabel">1256</span>
+                    </div>
+                  </div>
+                  <div class="flex flex-col sm:flex-row gap-2 mt-3">
+                    <input 
+                      type="number" 
+                      id="areaInput"
+                      class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      placeholder="Enter area"
+                      value="78.54"
+                      step="0.5"
+                      min="1"
+                    />
+                    <button 
+                      id="findRadiusBtn"
+                      class="btn-primary px-6"
+                    >
+                      Find Radius
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Result Box -->
+              <div id="resultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="resultLabel">Area of Circle</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="resultValue">78.54</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400" id="resultPiInfo">Using π = 3.14</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="resultSecondaryLabel">Radius</p>
+                    <p class="text-xl font-bold text-gray-700 dark:text-gray-300" id="resultSecondary">5 cm</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Formula & Explanation -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 fade-in fade-in-delay-2">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-2xl font-mono text-gray-800 dark:text-gray-200" id="formulaDisplay">A = πr²</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="formulaDescription">Area = π × radius²</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>π (Pi)</span>
+                <span class="font-mono" id="formulaPi">3.14</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="formulaSecondaryLabel">Radius</span>
+                <span class="font-mono" id="formulaSecondary">5 cm</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span id="formulaResultLabel">Area</span>
+                <span class="font-mono" id="formulaResult">78.54 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Solution -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 fade-in fade-in-delay-3">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div id="stepsContainer" class="space-y-3 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Formula: A = πr²</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Plug in: A = π × 5²</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Calculate: A = 3.14 × 25</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Answer: A = 78.54 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pi Comparison -->
+          <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800 fade-in fade-in-delay-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              💡 <span class="font-medium">Pi Comparison:</span>
+              <span id="piComparison" class="block mt-1 text-xs text-gray-600 dark:text-gray-400">
+                3.14 is an approximation. 22/7 ≈ 3.142857. π ≈ 3.14159265 is the exact value.
+              </span>
+            </p>
+          </div>
+
+          <!-- Fun Fact -->
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800 fade-in fade-in-delay-4">
+            <p class="text-sm text-gray-700 dark:text-gray-300">
+              💡 <span class="font-medium">Did you know?</span>
+              <span id="funFact">The formula for circle area was discovered by ancient Greek mathematicians over 2,000 years ago!</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'cm';
+      let currentRadius = 5;
+      let currentPiMode = '314';
+      let currentMode = 'area'; // 'area' or 'radius'
+
+      const piValues = {
+        '314': { label: '3.14', value: 3.14, display: '3.14' },
+        '227': { label: '22/7', value: 22/7, display: '22/7 ≈ 3.142857' },
+        'exact': { label: 'π', value: Math.PI, display: 'π ≈ 3.14159265' }
+      };
+
+      const unitConversions = {
+        cm: { label: 'cm', factor: 1, display: 'cm' },
+        m: { label: 'm', factor: 100, display: 'm' },
+        in: { label: 'in', factor: 2.54, display: 'in' },
+        ft: { label: 'ft', factor: 30.48, display: 'ft' }
+      };
+
+      const funFacts = [
+        'The formula for circle area was discovered by ancient Greek mathematicians over 2,000 years ago!',
+        'A circle has the smallest perimeter for a given area of any shape!',
+        'The number π (pi) has been calculated to over 100 trillion digits!',
+        'The circle is the most symmetric shape in nature!',
+        'Earth is not a perfect circle - it\'s slightly elliptical!'
+      ];
+
+      const piComparisons = {
+        '314': '3.14 is an approximation. 22/7 ≈ 3.142857. π ≈ 3.14159265 is the exact value.',
+        '227': '22/7 ≈ 3.142857 is a common fraction approximation. π ≈ 3.14159265 is the exact value. 22/7 is slightly larger than π.',
+        'exact': 'π ≈ 3.14159265 is the exact mathematical constant. It is irrational and has infinite decimal places!'
+      };
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const radiusSlider = document.getElementById('radiusSlider');
+      const radiusInput = document.getElementById('radiusInput');
+      const radiusDisplay = document.getElementById('radiusDisplay');
+      const radiusUnitDisplay = document.getElementById('radiusUnitDisplay');
+      const radiusLabelValue = document.getElementById('radiusLabelValue');
+      const radiusUnitLabel = document.getElementById('radiusUnitLabel');
+      const areaLabelValue = document.getElementById('areaLabelValue');
+      const areaUnitLabel = document.getElementById('areaUnitLabel');
+      const formulaPi = document.getElementById('formulaPi');
+      const formulaDisplay = document.getElementById('formulaDisplay');
+      const formulaDescription = document.getElementById('formulaDescription');
+      const formulaSecondary = document.getElementById('formulaSecondary');
+      const formulaSecondaryLabel = document.getElementById('formulaSecondaryLabel');
+      const formulaResult = document.getElementById('formulaResult');
+      const formulaResultLabel = document.getElementById('formulaResultLabel');
+      const resultValue = document.getElementById('resultValue');
+      const resultSecondary = document.getElementById('resultSecondary');
+      const resultSecondaryLabel = document.getElementById('resultSecondaryLabel');
+      const resultLabel = document.getElementById('resultLabel');
+      const resultPiInfo = document.getElementById('resultPiInfo');
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+      const piComparison = document.getElementById('piComparison');
+      const circleVisual = document.getElementById('circleVisual');
+      const radiusLine = document.getElementById('radiusLine');
+      const radiusError = document.getElementById('radiusError');
+      const areaError = document.getElementById('areaError');
+      const funFact = document.getElementById('funFact');
+      const areaInput = document.getElementById('areaInput');
+      const areaInputDisplay = document.getElementById('areaInputDisplay');
+      const areaInputUnitDisplay = document.getElementById('areaInputUnitDisplay');
+      const areaSlider = document.getElementById('areaSlider');
+      const areaMaxLabel = document.getElementById('areaMaxLabel');
+      const areaModeInputs = document.getElementById('areaModeInputs');
+      const radiusModeInputs = document.getElementById('radiusModeInputs');
+
+      // ============================================
+      // FUNCTIONS
+      // ============================================
+      function updateFunFact() {
+        const randomIndex = Math.floor(Math.random() * funFacts.length);
+        funFact.textContent = funFacts[randomIndex];
+      }
+
+      function getPiValue() {
+        return piValues[currentPiMode];
+      }
+
+      function getUnit() {
+        return unitConversions[currentUnit];
+      }
+
+      function formatArea(areaCm2) {
+        const unit = getUnit();
+        let displayArea = areaCm2;
+        let areaUnit = 'cm²';
+        
+        if (currentUnit === 'm') {
+          displayArea = areaCm2 / 10000;
+          areaUnit = 'm²';
+        } else if (currentUnit === 'in') {
+          displayArea = areaCm2 / 6.4516;
+          areaUnit = 'in²';
+        } else if (currentUnit === 'ft') {
+          displayArea = areaCm2 / 929.0304;
+          areaUnit = 'ft²';
+        }
+        return { value: displayArea, unit: areaUnit };
+      }
+
+      function updateCircle(radius) {
+        currentRadius = radius;
+        const pi = getPiValue();
+        const unit = getUnit();
+        const displayRadius = radius;
+        const displayUnit = unit.display;
+
+        // Calculate area
+        const areaCm2 = pi.value * radius * radius;
+        const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
+        const formattedArea = displayArea.toFixed(4);
+
+        // Auto-scale SVG
+        const maxRadius = 20;
+        const scale = Math.min(radius / maxRadius, 1);
+        const svgRadius = 100 + (scale * 120);
+        const center = 250;
+
+        // Update SVG
+        circleVisual.setAttribute('r', svgRadius);
+        radiusLine.setAttribute('x2', center + svgRadius);
+
+        // Update labels
+        radiusLabelValue.textContent = displayRadius;
+        radiusUnitLabel.textContent = displayUnit;
+        radiusUnitDisplay.textContent = displayUnit;
+        areaLabelValue.textContent = formattedArea;
+        areaUnitLabel.textContent = areaUnit;
+
+        // Update formula
+        formulaPi.textContent = pi.display;
+        formulaSecondary.textContent = `${displayRadius} ${displayUnit}`;
+        formulaSecondaryLabel.textContent = 'Radius';
+        formulaResult.textContent = `${formattedArea} ${areaUnit}`;
+        formulaResultLabel.textContent = 'Area';
+        formulaDisplay.textContent = `A = ${pi.label} × r²`;
+        formulaDescription.textContent = `Area = ${pi.label} × radius²`;
+
+        // Update result
+        resultValue.textContent = formattedArea;
+        resultSecondary.textContent = `${displayRadius} ${displayUnit}`;
+        resultSecondaryLabel.textContent = 'Radius';
+        resultLabel.textContent = 'Area of Circle';
+        resultPiInfo.textContent = `Using π = ${pi.label}`;
+
+        // Update steps
+        step1.textContent = `Formula: A = ${pi.label} × r²`;
+        step2.textContent = `Plug in: A = ${pi.label} × ${displayRadius}²`;
+        const radiusSquared = (radius * radius).toFixed(2);
+        step3.textContent = `Calculate: A = ${pi.value.toFixed(6)} × ${radiusSquared}`;
+        step4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
+
+        // Update Pi comparison
+        piComparison.textContent = piComparisons[currentPiMode];
+
+        // Update slider and input
+        radiusSlider.value = radius;
+        radiusInput.value = radius;
+        radiusDisplay.textContent = displayRadius;
+
+        // Update area slider for reverse mode
+        const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
+        areaSlider.max = areaSliderMax;
+        areaMaxLabel.textContent = areaSliderMax.toFixed(1);
+        areaSlider.value = displayArea;
+        areaInput.value = displayArea;
+        areaInputDisplay.textContent = displayArea.toFixed(2);
+        areaInputUnitDisplay.textContent = areaUnit;
+      }
+
+      function updateFromArea(areaValue) {
+        const pi = getPiValue();
+        const unit = getUnit();
+        
+        // Convert area back to cm² if needed
+        let areaCm2 = areaValue;
+        if (currentUnit === 'm') areaCm2 = areaValue * 10000;
+        else if (currentUnit === 'in') areaCm2 = areaValue * 6.4516;
+        else if (currentUnit === 'ft') areaCm2 = areaValue * 929.0304;
+        
+        const radius = Math.sqrt(areaCm2 / pi.value);
+        if (radius > 0) {
+          updateCircle(radius);
+        }
+      }
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      document.getElementById('modeArea').addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => {
+          b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeArea').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'area';
+        areaModeInputs.classList.remove('hidden');
+        radiusModeInputs.classList.add('hidden');
+        // Update with current radius
+        updateCircle(currentRadius);
+      });
+
+      document.getElementById('modeRadius').addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => {
+          b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeRadius').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'radius';
+        areaModeInputs.classList.add('hidden');
+        radiusModeInputs.classList.remove('hidden');
+        // Update area slider based on current radius
+        const pi = getPiValue();
+        const areaCm2 = pi.value * currentRadius * currentRadius;
+        const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
+        areaSlider.value = displayArea;
+        areaInput.value = displayArea;
+        areaInputDisplay.textContent = displayArea.toFixed(2);
+        areaInputUnitDisplay.textContent = areaUnit;
+        const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
+        areaSlider.max = areaSliderMax;
+        areaMaxLabel.textContent = areaSliderMax.toFixed(1);
+      });
+
+      // ============================================
+      // PI BUTTONS
+      // ============================================
+      document.querySelectorAll('.pi-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.pi-btn').forEach(b => {
+            b.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          if (btn.id === 'pi314') currentPiMode = '314';
+          else if (btn.id === 'pi227') currentPiMode = '227';
+          else if (btn.id === 'piExact') currentPiMode = 'exact';
+          
+          if (currentMode === 'area') {
+            updateCircle(currentRadius);
+          } else {
+            const areaVal = parseFloat(areaInput.value);
+            if (areaVal && areaVal > 0) {
+              updateFromArea(areaVal);
+            }
+          }
+        });
+      });
+
+      // ============================================
+      // UNIT BUTTONS
+      // ============================================
+      document.querySelectorAll('.unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.unit-btn').forEach(b => {
+            b.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentUnit = btn.dataset.unit;
+          
+          if (currentMode === 'area') {
+            updateCircle(currentRadius);
+          } else {
+            const areaVal = parseFloat(areaInput.value);
+            if (areaVal && areaVal > 0) {
+              updateFromArea(areaVal);
+            }
+          }
+        });
+      });
+
+      // ============================================
+      // AREA MODE EVENTS
+      // ============================================
+      radiusSlider.addEventListener('input', () => {
+        const radius = parseFloat(radiusSlider.value);
+        if (!radius || radius < 0.5) {
+          radiusError.classList.remove('hidden');
+          return;
+        }
+        radiusError.classList.add('hidden');
+        updateCircle(radius);
+        updateFunFact();
+      });
+
+      radiusInput.addEventListener('input', () => {
+        const radius = parseFloat(radiusInput.value);
+        if (!radius || radius < 0.5) {
+          radiusError.classList.remove('hidden');
+          return;
+        }
+        radiusError.classList.add('hidden');
+        radiusSlider.value = radius;
+        updateCircle(radius);
+        updateFunFact();
+      });
+
+      document.getElementById('calculateBtn').addEventListener('click', () => {
+        const radius = parseFloat(radiusInput.value);
+        if (!radius || radius < 0.5) {
+          radiusError.classList.remove('hidden');
+          radiusInput.focus();
+          return;
+        }
+        radiusError.classList.add('hidden');
+        radiusSlider.value = radius;
+        updateCircle(radius);
+        updateFunFact();
+      });
+
+      radiusInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('calculateBtn').click();
+        }
+      });
+
+      // ============================================
+      // RADIUS MODE EVENTS
+      // ============================================
+      areaSlider.addEventListener('input', () => {
+        const areaVal = parseFloat(areaSlider.value);
+        if (!areaVal || areaVal <= 0) {
+          areaError.classList.remove('hidden');
+          return;
+        }
+        areaError.classList.add('hidden');
+        areaInput.value = areaVal;
+        areaInputDisplay.textContent = areaVal.toFixed(2);
+        updateFromArea(areaVal);
+        updateFunFact();
+      });
+
+      areaInput.addEventListener('input', () => {
+        const areaVal = parseFloat(areaInput.value);
+        if (!areaVal || areaVal <= 0) {
+          areaError.classList.remove('hidden');
+          return;
+        }
+        areaError.classList.add('hidden');
+        areaSlider.value = areaVal;
+        areaInputDisplay.textContent = areaVal.toFixed(2);
+        updateFromArea(areaVal);
+        updateFunFact();
+      });
+
+      document.getElementById('findRadiusBtn').addEventListener('click', () => {
+        const areaVal = parseFloat(areaInput.value);
+        if (!areaVal || areaVal <= 0) {
+          areaError.classList.remove('hidden');
+          areaInput.focus();
+          return;
+        }
+        areaError.classList.add('hidden');
+        areaSlider.value = areaVal;
+        areaInputDisplay.textContent = areaVal.toFixed(2);
+        updateFromArea(areaVal);
+        updateFunFact();
+      });
+
+      areaInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          document.getElementById('findRadiusBtn').click();
+        }
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      updateCircle(5);
+      updateFunFact();
+    });
+  </script>
+</Layout>

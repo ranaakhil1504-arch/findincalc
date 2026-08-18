@@ -1,0 +1,62 @@
+---
+// src/pages/health/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Health Calculators - BMI, BMR, and More">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12 fade-in">
+        <span class="text-5xl">❤️</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Health Calculators
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Tools to help you track and understand your health
+        </p>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <!-- Calculator Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- BMI Calculator -->
+        <a href="/health/bmi" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover">
+          <div class="flex items-center space-x-4">
+            <span class="text-4xl">⚖️</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                BMI Calculator
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Body Mass Index</p>
+            </div>
+          </div>
+        </a>
+
+        <!-- Coming Soon -->
+        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
+          <div class="flex items-center space-x-4">
+            <span class="text-4xl">🔥</span>
+            <div>
+              <h3 class="font-semibold text-gray-500 dark:text-gray-400">BMR Calculator</h3>
+              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
+          <div class="flex items-center space-x-4">
+            <span class="text-4xl">💧</span>
+            <div>
+              <h3 class="font-semibold text-gray-500 dark:text-gray-400">Body Fat Calculator</h3>
+              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,90 @@
+---
+// src/layouts/Layout.astro
+import '../styles/global.css';
+import Toast from '../components/Toast.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  keywords?: string;
+  image?: string;
+  canonical?: string; // optional override; defaults to the current page's own URL
+}
+
+const SITE_URL = "https://findincalc.com";
+
+const { 
+  title, 
+  description = "Find any calculator in one place. Math, Health, Finance, and more.",
+  keywords = "calculator, math, health, finance, conversion, online tools",
+  image = "/og-image.png",
+  canonical
+} = Astro.props;
+
+// Build this page's own canonical URL from its actual path, so every
+// page points at itself instead of every page pointing at the homepage.
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const pageUrl = canonical ?? `${SITE_URL}${path === '/' ? '/' : path}`;
+const absoluteImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>{title} | FindInCalc</title>
+    <meta name="title" content={`${title} | FindInCalc`} />
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords} />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="FindInCalc" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:title" content={`${title} | FindInCalc`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={absoluteImage} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={pageUrl} />
+    <meta property="twitter:title" content={`${title} | FindInCalc`} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={absoluteImage} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={pageUrl} />
+    
+    <!-- Dark Mode Script - Runs Immediately to Prevent Flash -->
+    <script>
+      // This runs before page renders to prevent flash
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="font-sans antialiased bg-[#faf8f5] dark:bg-gray-900 transition-colors duration-300">
+    <slot />
+    <Toast />
+  </body>
+</html>

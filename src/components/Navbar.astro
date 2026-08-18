@@ -1,0 +1,211 @@
+---
+// src/components/Navbar.astro
+---
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-emerald-100/30 dark:border-gray-700/50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center space-x-2 group">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-emerald-500/25">
+          FC
+        </div>
+        <span class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight group-hover:scale-105 transition-transform hidden sm:block">
+          FindInCalc
+        </span>
+      </a>
+      
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="/math" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
+          📐 Math
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="/health" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
+          ❤️ Health
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="/finance" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
+          💰 Finance
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
+        </a>
+        <a href="/conversion" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
+          📊 Conversion
+          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
+        </a>
+        
+        <!-- Dark Mode Toggle - Desktop -->
+        <button id="themeToggle" class="p-2 rounded-lg bg-emerald-50 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
+          <!-- Sun Icon (visible in light mode) -->
+          <svg id="sunIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <!-- Moon Icon (visible in dark mode) -->
+          <svg id="moonIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Mobile Controls -->
+      <div class="flex items-center gap-2 md:hidden">
+        <!-- Dark Mode Toggle - Mobile -->
+        <button id="themeToggleMobile" class="p-2 rounded-lg bg-emerald-50 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
+          <svg id="sunIconMobile" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg id="moonIconMobile" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+        
+        <button id="hamburgerBtn" class="p-2 rounded-lg bg-emerald-50 dark:bg-gray-800 text-emerald-600 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle menu">
+          <svg id="hamburgerOpen" class="w-6 h-6 block dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg id="hamburgerClose" class="w-6 h-6 hidden dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
+      <div class="flex flex-col space-y-3">
+        <a href="/math" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">📐 Math</a>
+        <a href="/health" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">❤️ Health</a>
+        <a href="/finance" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">💰 Finance</a>
+        <a href="/conversion" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">📊 Conversion</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Spacer -->
+<div class="h-16"></div>
+
+<!-- ============================================ -->
+<!-- DARK MODE SCRIPT - COMPLETE WORKING VERSION -->
+<!-- ============================================ -->
+<script>
+  (function() {
+    'use strict';
+
+    // Get elements
+    const themeToggle = document.getElementById('themeToggle');
+    const themeToggleMobile = document.getElementById('themeToggleMobile');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIconMobile = document.getElementById('sunIconMobile');
+    const moonIconMobile = document.getElementById('moonIconMobile');
+    const html = document.documentElement;
+
+    // Function to update icons
+    function updateIcons(isDark) {
+      // Desktop icons
+      if (sunIcon) {
+        sunIcon.style.display = isDark ? 'none' : 'block';
+      }
+      if (moonIcon) {
+        moonIcon.style.display = isDark ? 'block' : 'none';
+      }
+      // Mobile icons
+      if (sunIconMobile) {
+        sunIconMobile.style.display = isDark ? 'none' : 'block';
+      }
+      if (moonIconMobile) {
+        moonIconMobile.style.display = isDark ? 'block' : 'none';
+      }
+    }
+
+    // Function to set theme
+    function setTheme(isDark) {
+      if (isDark) {
+        html.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        html.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      updateIcons(isDark);
+    }
+
+    // Function to toggle theme
+    function toggleTheme() {
+      const isDark = html.classList.contains('dark');
+      setTheme(!isDark);
+      
+      // Show toast notification
+      if (window.showToast) {
+        window.showToast(isDark ? '☀️ Light mode activated' : '🌙 Dark mode activated', 'info');
+      }
+    }
+
+    // Load saved theme on page load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+      setTheme(true);
+    } else if (savedTheme === 'light') {
+      setTheme(false);
+    } else {
+      // Check system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark);
+    }
+
+    // Add event listeners
+    if (themeToggle) {
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+    if (themeToggleMobile) {
+      themeToggleMobile.addEventListener('click', toggleTheme);
+    }
+
+    // ============================================
+    // HAMBURGER MENU
+    // ============================================
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const hamburgerOpen = document.getElementById('hamburgerOpen');
+    const hamburgerClose = document.getElementById('hamburgerClose');
+    
+    if (hamburgerBtn && mobileMenu) {
+      hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+        if (hamburgerOpen) {
+          hamburgerOpen.classList.toggle('hidden');
+        }
+        if (hamburgerClose) {
+          hamburgerClose.classList.toggle('hidden');
+        }
+      });
+
+      // Close menu on link click
+      document.querySelectorAll('#mobileMenu a').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.add('hidden');
+          if (hamburgerOpen) {
+            hamburgerOpen.classList.remove('hidden');
+          }
+          if (hamburgerClose) {
+            hamburgerClose.classList.add('hidden');
+          }
+        });
+      });
+    }
+
+    // ============================================
+    // LISTEN FOR SYSTEM THEME CHANGES
+    // ============================================
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    darkModeMediaQuery.addEventListener('change', (e) => {
+      // Only change if user hasn't manually set a preference
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches);
+      }
+    });
+
+    console.log('🌓 Dark mode initialized successfully!');
+  })();
+</script>

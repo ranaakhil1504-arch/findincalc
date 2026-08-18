@@ -1,0 +1,985 @@
+---
+// src/pages/math/ellipse-area.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Ellipse Calculator - Interactive Math Tool">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">⬮</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Ellipse Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate area, find semi-major axis, or find semi-minor axis
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Interactive Visualization -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeAreaEllipse"
+                  class="ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📐 Find Area
+                </button>
+                <button 
+                  id="modeMajorEllipse"
+                  class="ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📏 Find a (Major)
+                </button>
+                <button 
+                  id="modeMinorEllipse"
+                  class="ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📐 Find b (Minor)
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Ellipse Visualization -->
+            <div class="relative w-full max-w-lg mx-auto aspect-square">
+              <svg viewBox="0 0 500 500" class="w-full h-full">
+                <defs>
+                  <pattern id="gridEllipse" width="25" height="25" patternUnits="userSpaceOnUse">
+                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5" class="dark:stroke-gray-700"/>
+                  </pattern>
+                  <radialGradient id="ellipseGradient" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#0d9488" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+                  </radialGradient>
+                </defs>
+                
+                <rect width="500" height="500" fill="url(#gridEllipse)"/>
+                
+                <ellipse 
+                  id="ellipseVisual"
+                  cx="250" 
+                  cy="250" 
+                  rx="100" 
+                  ry="60"
+                  fill="url(#ellipseGradient)"
+                  stroke="#0d9488"
+                  stroke-width="3"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <circle cx="250" cy="250" r="4" fill="#059669" class="animate-pulse"/>
+                
+                <text 
+                  id="semiMajorLabel"
+                  x="300" 
+                  y="265" 
+                  fill="#f59e0b" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  a = <tspan id="semiMajorLabelValue">8</tspan> cm
+                </text>
+                
+                <text 
+                  id="semiMinorLabel"
+                  x="210" 
+                  y="220" 
+                  fill="#ef4444" 
+                  font-size="16" 
+                  font-weight="bold"
+                  class="transition-all duration-500 ease-out"
+                >
+                  b = <tspan id="semiMinorLabelValue">5</tspan> cm
+                </text>
+
+                <line 
+                  id="semiMajorLine"
+                  x1="250" 
+                  y1="250" 
+                  x2="350" 
+                  y2="250"
+                  stroke="#f59e0b"
+                  stroke-width="2"
+                  stroke-dasharray="6,4"
+                />
+                
+                <line 
+                  id="semiMinorLine"
+                  x1="250" 
+                  y1="250" 
+                  x2="250" 
+                  y2="190"
+                  stroke="#ef4444"
+                  stroke-width="2"
+                  stroke-dasharray="6,4"
+                />
+                
+                <text 
+                  id="areaLabelEllipse"
+                  x="250" 
+                  y="440" 
+                  fill="#0d9488" 
+                  font-size="18" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  A = <tspan id="areaLabelEllipseValue">125.66</tspan> cm²
+                </text>
+              </svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 space-y-4">
+              <!-- Unit Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  Unit System
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  {['cm', 'm', 'in', 'ft'].map((unit) => (
+                    <button 
+                      class={`ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        unit === 'cm' 
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-unit={unit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Pi Value Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  π Value
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    id="pi314Ellipse"
+                    class="ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    3.14
+                  </button>
+                  <button 
+                    id="pi227Ellipse"
+                    class="ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    22/7
+                  </button>
+                  <button 
+                    id="piExactEllipse"
+                    class="ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    π (Exact)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dynamic Input Section -->
+              <div id="ellipseInputSection">
+                <!-- Find Area Mode (Default) -->
+                <div id="ellipseAreaModeInputs">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Semi-Major Axis (a) = <span id="semiMajorDisplay" class="text-emerald-600 font-bold">8</span> <span id="semiMajorUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="semiMajorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="15"
+                      step="0.5"
+                      value="8"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>15</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Semi-Minor Axis (b) = <span id="semiMinorDisplay" class="text-emerald-600 font-bold">5</span> <span id="semiMinorUnitDisplay">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="semiMinorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="15"
+                      step="0.5"
+                      value="5"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>15</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="semiMajorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Semi-Major (a)"
+                        value="8"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="semiMinorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Semi-Minor (b)"
+                        value="5"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="ellipseCalculateBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Calculate
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Major Axis (a) Mode -->
+                <div id="ellipseMajorModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaForMajorDisplay" class="text-emerald-600 font-bold">125.66</span> <span id="areaForMajorUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaForMajorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="706"
+                      step="0.5"
+                      value="125.66"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaMajorMaxLabel">706</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Semi-Minor Axis (b) = <span id="minorForMajorDisplay" class="text-emerald-600 font-bold">5</span> <span id="minorForMajorUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="minorForMajorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="15"
+                      step="0.5"
+                      value="5"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>15</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaForMajorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="125.66"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="minorForMajorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Semi-Minor (b)"
+                        value="5"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findMajorBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Find a
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Find Minor Axis (b) Mode -->
+                <div id="ellipseMinorModeInputs" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="areaForMinorDisplay" class="text-emerald-600 font-bold">125.66</span> <span id="areaForMinorUnit">cm²</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="areaForMinorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="706"
+                      step="0.5"
+                      value="125.66"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span id="areaMinorMaxLabel">706</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Semi-Major Axis (a) = <span id="majorForMinorDisplay" class="text-emerald-600 font-bold">8</span> <span id="majorForMinorUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="majorForMinorSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="1"
+                      max="15"
+                      step="0.5"
+                      value="8"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>1</span>
+                      <span>15</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row gap-2">
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="areaForMinorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Area"
+                        value="125.66"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <input 
+                        type="number" 
+                        id="majorForMinorInput"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                        placeholder="Semi-Major (a)"
+                        value="8"
+                        step="0.5"
+                        min="1"
+                      />
+                    </div>
+                    <button 
+                      id="findMinorBtn"
+                      class="btn-primary px-6 py-2.5 whitespace-nowrap"
+                    >
+                      Find b
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Result Box -->
+              <div id="ellipseResultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="ellipseResultLabel">Area of Ellipse</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="ellipseResultValue">125.66</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="ellipseResultSecondaryLabel">Formula</p>
+                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300" id="ellipseResultFormula">A = π × a × b</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Formula & Explanation -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-2xl font-mono text-gray-800 dark:text-gray-200" id="ellipseFormulaDisplay">A = π × a × b</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="ellipseFormulaDesc">Area = π × Semi-Major × Semi-Minor</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>π (Pi)</span>
+                <span class="font-mono" id="ellipseFormulaPi">3.14</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="ellipseFormulaLabel1">Semi-Major (a)</span>
+                <span class="font-mono" id="ellipseFormulaVal1">8 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="ellipseFormulaLabel2">Semi-Minor (b)</span>
+                <span class="font-mono" id="ellipseFormulaVal2">5 cm</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span id="ellipseFormulaResultLabel">Area</span>
+                <span class="font-mono" id="ellipseFormulaResult">125.66 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Solution -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div id="ellipseStepsContainer" class="space-y-3 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ellipseStep1">Formula: A = π × a × b</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ellipseStep2">Plug in: A = 3.14 × 8 × 5</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ellipseStep3">Calculate: A = 125.66</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="ellipseStep4">Answer: A = 125.66 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fun Facts -->
+          <div class="space-y-3">
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+              <p class="text-sm text-gray-700 dark:text-gray-300">
+                💡 <span class="font-medium">Did you know?</span>
+                A circle is a special ellipse where a = b (both axes are equal)!
+              </p>
+            </div>
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4 border border-blue-200 dark:border-blue-800">
+              <p class="text-sm text-gray-700 dark:text-gray-300">
+                📐 <span class="font-medium">Fun Fact:</span>
+                The orbits of planets around the sun are ellipses, not perfect circles!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'cm';
+      let currentPiMode = '314';
+      let currentMode = 'area'; // 'area', 'major', 'minor'
+
+      const piValues = {
+        '314': { label: '3.14', value: 3.14 },
+        '227': { label: '22/7', value: 22/7 },
+        'exact': { label: 'π', value: Math.PI }
+      };
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      // Area mode
+      const semiMajorSlider = document.getElementById('semiMajorSlider');
+      const semiMinorSlider = document.getElementById('semiMinorSlider');
+      const semiMajorInput = document.getElementById('semiMajorInput');
+      const semiMinorInput = document.getElementById('semiMinorInput');
+      const semiMajorDisplay = document.getElementById('semiMajorDisplay');
+      const semiMinorDisplay = document.getElementById('semiMinorDisplay');
+      const semiMajorUnitDisplay = document.getElementById('semiMajorUnitDisplay');
+      const semiMinorUnitDisplay = document.getElementById('semiMinorUnitDisplay');
+
+      // Major mode
+      const areaForMajorSlider = document.getElementById('areaForMajorSlider');
+      const minorForMajorSlider = document.getElementById('minorForMajorSlider');
+      const areaForMajorInput = document.getElementById('areaForMajorInput');
+      const minorForMajorInput = document.getElementById('minorForMajorInput');
+      const areaForMajorDisplay = document.getElementById('areaForMajorDisplay');
+      const areaForMajorUnit = document.getElementById('areaForMajorUnit');
+      const minorForMajorDisplay = document.getElementById('minorForMajorDisplay');
+      const minorForMajorUnit = document.getElementById('minorForMajorUnit');
+      const areaMajorMaxLabel = document.getElementById('areaMajorMaxLabel');
+
+      // Minor mode
+      const areaForMinorSlider = document.getElementById('areaForMinorSlider');
+      const majorForMinorSlider = document.getElementById('majorForMinorSlider');
+      const areaForMinorInput = document.getElementById('areaForMinorInput');
+      const majorForMinorInput = document.getElementById('majorForMinorInput');
+      const areaForMinorDisplay = document.getElementById('areaForMinorDisplay');
+      const areaForMinorUnit = document.getElementById('areaForMinorUnit');
+      const majorForMinorDisplay = document.getElementById('majorForMinorDisplay');
+      const majorForMinorUnit = document.getElementById('majorForMinorUnit');
+      const areaMinorMaxLabel = document.getElementById('areaMinorMaxLabel');
+
+      // SVG elements
+      const ellipseVisual = document.getElementById('ellipseVisual');
+      const semiMajorLine = document.getElementById('semiMajorLine');
+      const semiMinorLine = document.getElementById('semiMinorLine');
+      const semiMajorLabelValue = document.getElementById('semiMajorLabelValue');
+      const semiMinorLabelValue = document.getElementById('semiMinorLabelValue');
+      const areaLabelEllipseValue = document.getElementById('areaLabelEllipseValue');
+      const ellipseResultValue = document.getElementById('ellipseResultValue');
+      const ellipseResultLabel = document.getElementById('ellipseResultLabel');
+      const ellipseResultSecondaryLabel = document.getElementById('ellipseResultSecondaryLabel');
+      const ellipseResultFormula = document.getElementById('ellipseResultFormula');
+      const ellipseFormulaDisplay = document.getElementById('ellipseFormulaDisplay');
+      const ellipseFormulaDesc = document.getElementById('ellipseFormulaDesc');
+      const ellipseFormulaPi = document.getElementById('ellipseFormulaPi');
+      const ellipseFormulaLabel1 = document.getElementById('ellipseFormulaLabel1');
+      const ellipseFormulaLabel2 = document.getElementById('ellipseFormulaLabel2');
+      const ellipseFormulaVal1 = document.getElementById('ellipseFormulaVal1');
+      const ellipseFormulaVal2 = document.getElementById('ellipseFormulaVal2');
+      const ellipseFormulaResultLabel = document.getElementById('ellipseFormulaResultLabel');
+      const ellipseFormulaResult = document.getElementById('ellipseFormulaResult');
+      const ellipseStep1 = document.getElementById('ellipseStep1');
+      const ellipseStep2 = document.getElementById('ellipseStep2');
+      const ellipseStep3 = document.getElementById('ellipseStep3');
+      const ellipseStep4 = document.getElementById('ellipseStep4');
+
+      const ellipseAreaModeInputs = document.getElementById('ellipseAreaModeInputs');
+      const ellipseMajorModeInputs = document.getElementById('ellipseMajorModeInputs');
+      const ellipseMinorModeInputs = document.getElementById('ellipseMinorModeInputs');
+
+      const unitConversions = {
+        cm: { label: 'cm', factor: 1, display: 'cm' },
+        m: { label: 'm', factor: 100, display: 'm' },
+        in: { label: 'in', factor: 2.54, display: 'in' },
+        ft: { label: 'ft', factor: 30.48, display: 'ft' }
+      };
+
+      function getPi() { return piValues[currentPiMode]; }
+      function getUnit() { return unitConversions[currentUnit]; }
+
+      function formatArea(area) {
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+        else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+        else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+        return { value: displayArea, unit: areaUnit };
+      }
+
+      function updateSVG(a, b, area) {
+        const maxSize = 15;
+        const scaleA = Math.min(a / maxSize, 1);
+        const scaleB = Math.min(b / maxSize, 1);
+        const rx = 80 + scaleA * 160;
+        const ry = 60 + scaleB * 120;
+        const cx = 250;
+        const cy = 250;
+
+        ellipseVisual.setAttribute('rx', rx);
+        ellipseVisual.setAttribute('ry', ry);
+        ellipseVisual.setAttribute('cx', cx);
+        ellipseVisual.setAttribute('cy', cy);
+        semiMajorLine.setAttribute('x2', cx + rx);
+        semiMajorLine.setAttribute('y2', cy);
+        semiMinorLine.setAttribute('x1', cx);
+        semiMinorLine.setAttribute('x2', cx);
+        semiMinorLine.setAttribute('y1', cy);
+        semiMinorLine.setAttribute('y2', cy - ry);
+
+        const formatted = formatArea(area);
+        semiMajorLabelValue.textContent = a.toFixed(2);
+        semiMinorLabelValue.textContent = b.toFixed(2);
+        areaLabelEllipseValue.textContent = formatted.value.toFixed(2);
+      }
+
+      function updateResult(value, label, secondaryLabel, formula) {
+        ellipseResultValue.textContent = value;
+        ellipseResultLabel.textContent = label;
+        ellipseResultSecondaryLabel.textContent = secondaryLabel;
+        ellipseResultFormula.textContent = formula;
+      }
+
+      function updateFormula(pi, val1, val2, result, label1, label2, resultLabel, display, desc) {
+        ellipseFormulaPi.textContent = pi;
+        ellipseFormulaVal1.textContent = val1;
+        ellipseFormulaVal2.textContent = val2;
+        ellipseFormulaResult.textContent = result;
+        ellipseFormulaLabel1.textContent = label1;
+        ellipseFormulaLabel2.textContent = label2;
+        ellipseFormulaResultLabel.textContent = resultLabel;
+        if (display) ellipseFormulaDisplay.textContent = display;
+        if (desc) ellipseFormulaDesc.textContent = desc;
+      }
+
+      function updateSteps(s1, s2, s3, s4) {
+        ellipseStep1.textContent = s1;
+        ellipseStep2.textContent = s2;
+        ellipseStep3.textContent = s3;
+        ellipseStep4.textContent = s4;
+      }
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.ellipse-mode-btn').forEach(b => {
+          b.className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        const btnMap = { area: 'modeAreaEllipse', major: 'modeMajorEllipse', minor: 'modeMinorEllipse' };
+        document.getElementById(btnMap[mode]).className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+        ellipseAreaModeInputs.classList.toggle('hidden', mode !== 'area');
+        ellipseMajorModeInputs.classList.toggle('hidden', mode !== 'major');
+        ellipseMinorModeInputs.classList.toggle('hidden', mode !== 'minor');
+
+        if (mode === 'area') {
+          semiMajorInput.value = semiMajorSlider.value;
+          semiMinorInput.value = semiMinorSlider.value;
+        } else if (mode === 'major') {
+          areaForMajorInput.value = areaForMajorSlider.value;
+          minorForMajorInput.value = minorForMajorSlider.value;
+        } else if (mode === 'minor') {
+          areaForMinorInput.value = areaForMinorSlider.value;
+          majorForMinorInput.value = majorForMinorSlider.value;
+        }
+        updateEllipse();
+      }
+
+      document.getElementById('modeAreaEllipse').addEventListener('click', () => setMode('area'));
+      document.getElementById('modeMajorEllipse').addEventListener('click', () => setMode('major'));
+      document.getElementById('modeMinorEllipse').addEventListener('click', () => setMode('minor'));
+
+      // ============================================
+      // PI BUTTONS
+      // ============================================
+      document.querySelectorAll('.ellipse-pi-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ellipse-pi-btn').forEach(b => {
+            b.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          if (btn.id === 'pi314Ellipse') currentPiMode = '314';
+          else if (btn.id === 'pi227Ellipse') currentPiMode = '227';
+          else if (btn.id === 'piExactEllipse') currentPiMode = 'exact';
+          updateEllipse();
+        });
+      });
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.querySelectorAll('.ellipse-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ellipse-unit-btn').forEach(b => {
+            b.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentUnit = btn.dataset.unit;
+          
+          // Update max labels
+          const unit = getUnit();
+          const maxArea = Math.PI * 15 * 15;
+          const formatted = formatArea(maxArea);
+          areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
+          areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
+          
+          updateEllipse();
+        });
+      });
+
+      // ============================================
+      // UPDATE ELLIPSE
+      // ============================================
+      function updateEllipse() {
+        const pi = getPi();
+        const unit = getUnit();
+        const displayUnit = unit.display;
+        let a, b, area, resultValue, resultLabel, resultSecondary, resultFormula;
+        let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
+        let val1, val2, result;
+        let step1, step2, step3, step4;
+
+        if (currentMode === 'area') {
+          a = parseFloat(semiMajorSlider.value);
+          b = parseFloat(semiMinorSlider.value);
+          area = pi.value * a * b;
+          
+          const formatted = formatArea(area);
+          resultValue = formatted.value.toFixed(2);
+          resultLabel = 'Area of Ellipse';
+          resultSecondary = 'A = π × a × b';
+          resultFormula = 'A = π × a × b';
+          formulaDisplay = 'A = π × a × b';
+          formulaDesc = 'Area = π × Semi-Major × Semi-Minor';
+          label1 = 'Semi-Major (a)';
+          label2 = 'Semi-Minor (b)';
+          resultLabelText = 'Area';
+          val1 = `${a} ${displayUnit}`;
+          val2 = `${b} ${displayUnit}`;
+          result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          step1 = `Formula: A = π × a × b`;
+          step2 = `Plug in: A = ${pi.label} × ${a} × ${b}`;
+          step3 = `Calculate: A = ${(pi.value * a * b).toFixed(4)}`;
+          step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
+
+          semiMajorDisplay.textContent = a;
+          semiMinorDisplay.textContent = b;
+          semiMajorUnitDisplay.textContent = displayUnit;
+          semiMinorUnitDisplay.textContent = displayUnit;
+
+        } else if (currentMode === 'major') {
+          const areaVal = parseFloat(areaForMajorSlider.value);
+          b = parseFloat(minorForMajorSlider.value);
+          // Convert area to cm² if needed
+          let areaCm2 = areaVal;
+          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+          a = areaCm2 / (pi.value * b);
+          area = areaCm2;
+          
+          const formatted = formatArea(area);
+          resultValue = a.toFixed(2);
+          resultLabel = 'Semi-Major Axis (a)';
+          resultSecondary = 'a = A / (π × b)';
+          resultFormula = 'a = A / (π × b)';
+          formulaDisplay = 'a = A / (π × b)';
+          formulaDesc = 'Semi-Major = Area ÷ (π × Semi-Minor)';
+          label1 = 'Area';
+          label2 = 'Semi-Minor (b)';
+          resultLabelText = 'Semi-Major (a)';
+          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          val2 = `${b} ${displayUnit}`;
+          result = `${a.toFixed(2)} ${displayUnit}`;
+          step1 = `Formula: a = A / (π × b)`;
+          step2 = `Plug in: a = ${formatted.value.toFixed(2)} / (${pi.label} × ${b})`;
+          step3 = `Calculate: a = ${a.toFixed(2)}`;
+          step4 = `Answer: a = ${a.toFixed(2)} ${displayUnit}`;
+
+          areaForMajorDisplay.textContent = formatted.value.toFixed(2);
+          areaForMajorUnit.textContent = formatted.unit;
+          minorForMajorDisplay.textContent = b;
+          minorForMajorUnit.textContent = displayUnit;
+
+        } else if (currentMode === 'minor') {
+          const areaVal = parseFloat(areaForMinorSlider.value);
+          a = parseFloat(majorForMinorSlider.value);
+          let areaCm2 = areaVal;
+          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+          b = areaCm2 / (pi.value * a);
+          area = areaCm2;
+          
+          const formatted = formatArea(area);
+          resultValue = b.toFixed(2);
+          resultLabel = 'Semi-Minor Axis (b)';
+          resultSecondary = 'b = A / (π × a)';
+          resultFormula = 'b = A / (π × a)';
+          formulaDisplay = 'b = A / (π × a)';
+          formulaDesc = 'Semi-Minor = Area ÷ (π × Semi-Major)';
+          label1 = 'Area';
+          label2 = 'Semi-Major (a)';
+          resultLabelText = 'Semi-Minor (b)';
+          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+          val2 = `${a} ${displayUnit}`;
+          result = `${b.toFixed(2)} ${displayUnit}`;
+          step1 = `Formula: b = A / (π × a)`;
+          step2 = `Plug in: b = ${formatted.value.toFixed(2)} / (${pi.label} × ${a})`;
+          step3 = `Calculate: b = ${b.toFixed(2)}`;
+          step4 = `Answer: b = ${b.toFixed(2)} ${displayUnit}`;
+
+          areaForMinorDisplay.textContent = formatted.value.toFixed(2);
+          areaForMinorUnit.textContent = formatted.unit;
+          majorForMinorDisplay.textContent = a;
+          majorForMinorUnit.textContent = displayUnit;
+        }
+
+        // Update SVG
+        updateSVG(a, b, area);
+
+        // Update result
+        updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
+
+        // Update formula
+        const formattedArea = formatArea(area);
+        updateFormula(
+          pi.label,
+          val1,
+          val2,
+          result,
+          label1,
+          label2,
+          resultLabelText,
+          formulaDisplay,
+          formulaDesc
+        );
+
+        // Update steps
+        updateSteps(step1, step2, step3, step4);
+
+        // Update inputs
+        if (currentMode === 'area') {
+          semiMajorInput.value = a;
+          semiMinorInput.value = b;
+        } else if (currentMode === 'major') {
+          areaForMajorInput.value = areaForMajorSlider.value;
+          minorForMajorInput.value = minorForMajorSlider.value;
+        } else if (currentMode === 'minor') {
+          areaForMinorInput.value = areaForMinorSlider.value;
+          majorForMinorInput.value = majorForMinorSlider.value;
+        }
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      // Area mode
+      semiMajorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
+      semiMinorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
+
+      semiMajorInput.addEventListener('input', () => {
+        if (currentMode === 'area') {
+          const val = parseFloat(semiMajorInput.value);
+          if (val && val > 0) { semiMajorSlider.value = val; updateEllipse(); }
+        }
+      });
+      semiMinorInput.addEventListener('input', () => {
+        if (currentMode === 'area') {
+          const val = parseFloat(semiMinorInput.value);
+          if (val && val > 0) { semiMinorSlider.value = val; updateEllipse(); }
+        }
+      });
+
+      document.getElementById('ellipseCalculateBtn').addEventListener('click', () => {
+        if (currentMode === 'area') {
+          const a = parseFloat(semiMajorInput.value);
+          const b = parseFloat(semiMinorInput.value);
+          if (!a || a <= 0 || !b || b <= 0) {
+            alert('Please enter valid positive numbers for both axes.');
+            return;
+          }
+          semiMajorSlider.value = a;
+          semiMinorSlider.value = b;
+          updateEllipse();
+        }
+      });
+
+      // Major mode
+      areaForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
+      minorForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
+
+      areaForMajorInput.addEventListener('input', () => {
+        if (currentMode === 'major') {
+          const val = parseFloat(areaForMajorInput.value);
+          if (val && val > 0) { areaForMajorSlider.value = val; updateEllipse(); }
+        }
+      });
+      minorForMajorInput.addEventListener('input', () => {
+        if (currentMode === 'major') {
+          const val = parseFloat(minorForMajorInput.value);
+          if (val && val > 0) { minorForMajorSlider.value = val; updateEllipse(); }
+        }
+      });
+
+      document.getElementById('findMajorBtn').addEventListener('click', () => {
+        if (currentMode === 'major') {
+          const a = parseFloat(areaForMajorInput.value);
+          const b = parseFloat(minorForMajorInput.value);
+          if (!a || a <= 0 || !b || b <= 0) {
+            alert('Please enter valid positive numbers for area and semi-minor axis.');
+            return;
+          }
+          areaForMajorSlider.value = a;
+          minorForMajorSlider.value = b;
+          updateEllipse();
+        }
+      });
+
+      // Minor mode
+      areaForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
+      majorForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
+
+      areaForMinorInput.addEventListener('input', () => {
+        if (currentMode === 'minor') {
+          const val = parseFloat(areaForMinorInput.value);
+          if (val && val > 0) { areaForMinorSlider.value = val; updateEllipse(); }
+        }
+      });
+      majorForMinorInput.addEventListener('input', () => {
+        if (currentMode === 'minor') {
+          const val = parseFloat(majorForMinorInput.value);
+          if (val && val > 0) { majorForMinorSlider.value = val; updateEllipse(); }
+        }
+      });
+
+      document.getElementById('findMinorBtn').addEventListener('click', () => {
+        if (currentMode === 'minor') {
+          const a = parseFloat(areaForMinorInput.value);
+          const b = parseFloat(majorForMinorInput.value);
+          if (!a || a <= 0 || !b || b <= 0) {
+            alert('Please enter valid positive numbers for area and semi-major axis.');
+            return;
+          }
+          areaForMinorSlider.value = a;
+          majorForMinorSlider.value = b;
+          updateEllipse();
+        }
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      const maxArea = Math.PI * 15 * 15;
+      const formatted = formatArea(maxArea);
+      areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
+      areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
+      updateEllipse();
+    });
+  </script>
+</Layout>

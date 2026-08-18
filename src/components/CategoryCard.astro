@@ -1,0 +1,42 @@
+---
+// src/components/CategoryCard.astro
+export interface Props {
+  icon: string;
+  title: string;
+  count: number;
+  href: string;
+  color: 'emerald' | 'red' | 'blue' | 'orange' | 'purple' | 'pink';
+}
+
+const { icon, title, count, href, color } = Astro.props;
+
+const colorMap = {
+  emerald: 'from-emerald-500 to-teal-500 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400',
+  red: 'from-red-500 to-rose-500 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:border-red-400',
+  blue: 'from-blue-500 to-indigo-500 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-400',
+  orange: 'from-orange-500 to-amber-500 bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 hover:border-orange-400',
+  purple: 'from-purple-500 to-violet-500 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 hover:border-purple-400',
+  pink: 'from-pink-500 to-rose-500 bg-pink-50 dark:bg-pink-900/20 border-pink-200 dark:border-pink-800 hover:border-pink-400',
+};
+---
+
+<a href={href} class="group block card-tilt">
+  <div class={`relative overflow-hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 ${colorMap[color].split(' ').slice(2).join(' ')}`}>
+    <div class="flex items-center space-x-4">
+      <div class={`w-14 h-14 rounded-xl bg-gradient-to-br ${colorMap[color].split(' ').slice(0, 2).join(' ')} flex items-center justify-center text-2xl text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+        {icon}
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+          {title}
+        </h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">{count} calculators</p>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center text-sm text-emerald-600 dark:text-emerald-400 font-medium group-hover:translate-x-1 transition-transform">
+      Explore all <span class="ml-1">→</span>
+    </div>
+    <!-- Decorative corner gradient -->
+    <div class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-5 bg-gradient-to-br from-emerald-500 to-teal-500 pointer-events-none"></div>
+  </div>
+</a>

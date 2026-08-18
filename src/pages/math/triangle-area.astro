@@ -1,0 +1,1188 @@
+---
+// src/pages/math/triangle-area.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+---
+
+<Layout title="Triangle Calculator - Interactive Math Tool">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">△</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Triangle Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate area, find base, or find height
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Interactive Visualization -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Triangle Type Selector -->
+            <div class="mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                Select Triangle Type
+              </label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { id: 'right', label: 'Right', icon: '📐' },
+                  { id: 'equilateral', label: 'Equilateral', icon: '🔺' },
+                  { id: 'isosceles', label: 'Isosceles', icon: '📐' },
+                  { id: 'scalene', label: 'Scalene', icon: '△' },
+                ].map((type) => (
+                  <button
+                    class={`triangle-type-btn px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      type.id === 'right'
+                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    data-type={type.id}
+                  >
+                    <span class="block text-lg">{type.icon}</span>
+                    {type.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeAreaTri"
+                  class="tri-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📐 Find Area
+                </button>
+                <button 
+                  id="modeBaseTri"
+                  class="tri-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📏 Find Base
+                </button>
+                <button 
+                  id="modeHeightTri"
+                  class="tri-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📐 Find Height
+                </button>
+              </div>
+            </div>
+
+            <!-- SVG Triangle Visualization -->
+            <div class="relative w-full max-w-lg mx-auto aspect-square">
+              <svg viewBox="0 0 500 500" class="w-full h-full">
+                <defs>
+                  <pattern id="gridTri" width="25" height="25" patternUnits="userSpaceOnUse">
+                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#e5e7eb" stroke-width="0.5" class="dark:stroke-gray-700"/>
+                  </pattern>
+                  <linearGradient id="triGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#0d9488" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#0d9488" stop-opacity="0.05"/>
+                  </linearGradient>
+                </defs>
+                
+                <rect width="500" height="500" fill="url(#gridTri)"/>
+                
+                <polygon 
+                  id="triVisual"
+                  points="250,100 150,380 350,380"
+                  fill="url(#triGrad)"
+                  stroke="#0d9488"
+                  stroke-width="3"
+                  class="transition-all duration-500 ease-out"
+                />
+                
+                <text id="triLabel1" x="200" y="180" fill="#f59e0b" font-size="14" font-weight="bold"></text>
+                <text id="triLabel2" x="310" y="180" fill="#f59e0b" font-size="14" font-weight="bold"></text>
+                <text id="triLabel3" x="250" y="420" fill="#f59e0b" font-size="14" font-weight="bold" text-anchor="middle"></text>
+                
+                <text 
+                  id="areaLabelTri"
+                  x="250" 
+                  y="460" 
+                  fill="#0d9488" 
+                  font-size="18" 
+                  font-weight="bold"
+                  text-anchor="middle"
+                  class="transition-all duration-500 ease-out"
+                >
+                  A = <tspan id="areaLabelTriVal">30</tspan> cm²
+                </text>
+
+                <!-- Height Line for visualization -->
+                <line 
+                  id="heightLineTri"
+                  x1="250" 
+                  y1="100" 
+                  x2="250" 
+                  y2="380"
+                  stroke="#ef4444"
+                  stroke-width="2"
+                  stroke-dasharray="6,4"
+                  class="transition-all duration-500 ease-out"
+                />
+                <text id="heightLabelTri" x="255" y="240" fill="#ef4444" font-size="12" font-weight="bold">h</text>
+              </svg>
+            </div>
+
+            <!-- Controls -->
+            <div class="mt-6 space-y-4">
+              <!-- Unit Selector -->
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                  Unit System
+                </label>
+                <div class="flex flex-wrap gap-2">
+                  {['cm', 'm', 'in', 'ft'].map((unit) => (
+                    <button 
+                      class={`tri-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                        unit === 'cm' 
+                          ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25' 
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-unit={unit}
+                    >
+                      {unit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <!-- Dynamic Inputs -->
+              <div id="triInputContainer" class="space-y-3">
+                <!-- Right Triangle -->
+                <div id="triRightInputs">
+                  <div id="triRightAreaInputs">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Base = <span id="triBaseDisplay" class="text-emerald-600 font-bold">10</span> <span id="triBaseUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triBaseSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="10" />
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Height = <span id="triHeightDisplay" class="text-emerald-600 font-bold">6</span> <span id="triHeightUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triHeightSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="6" />
+                    </div>
+                  </div>
+                  <div id="triRightBaseInputs" class="hidden">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="triAreaForBaseDisplay" class="text-emerald-600 font-bold">30</span> <span id="triAreaForBaseUnit">cm²</span>
+                      </label>
+                      <input type="range" id="triAreaForBaseSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="400" step="0.5" value="30" />
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Height = <span id="triHeightForBaseDisplay" class="text-emerald-600 font-bold">6</span> <span id="triHeightForBaseUnit">cm</span>
+                      </label>
+                      <input type="range" id="triHeightForBaseSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="6" />
+                    </div>
+                  </div>
+                  <div id="triRightHeightInputs" class="hidden">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="triAreaForHeightDisplay" class="text-emerald-600 font-bold">30</span> <span id="triAreaForHeightUnit">cm²</span>
+                      </label>
+                      <input type="range" id="triAreaForHeightSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="400" step="0.5" value="30" />
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Base = <span id="triBaseForHeightDisplay" class="text-emerald-600 font-bold">10</span> <span id="triBaseForHeightUnit">cm</span>
+                      </label>
+                      <input type="range" id="triBaseForHeightSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="10" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Equilateral Triangle -->
+                <div id="triEquilateralInputs" class="hidden">
+                  <div id="triEquilateralAreaInputs">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Side = <span id="triSideDisplay" class="text-emerald-600 font-bold">8</span> <span id="triSideUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triSideSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="8" />
+                    </div>
+                  </div>
+                  <div id="triEquilateralReverseInputs" class="hidden">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="triEqAreaDisplay" class="text-emerald-600 font-bold">27.71</span> <span id="triEqAreaUnit">cm²</span>
+                      </label>
+                      <input type="range" id="triEqAreaSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="400" step="0.5" value="27.71" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Isosceles Triangle - simplified (just base & height) -->
+                <div id="triIsoscelesInputs" class="hidden">
+                  <div id="triIsoAreaInputs">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Base = <span id="triIsoBaseDisplay" class="text-emerald-600 font-bold">8</span> <span id="triIsoBaseUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triIsoBaseSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="8" />
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Height = <span id="triIsoHeightDisplay" class="text-emerald-600 font-bold">7</span> <span id="triIsoHeightUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triIsoHeightSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="7" />
+                    </div>
+                  </div>
+                  <div id="triIsoReverseInputs" class="hidden">
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Area = <span id="triIsoAreaDisplay" class="text-emerald-600 font-bold">28</span> <span id="triIsoAreaUnit">cm²</span>
+                      </label>
+                      <input type="range" id="triIsoAreaSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="400" step="0.5" value="28" />
+                    </div>
+                    <div>
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Other side = <span id="triIsoSideDisplay" class="text-emerald-600 font-bold">9</span> <span id="triIsoSideUnitDisplay">cm</span>
+                      </label>
+                      <input type="range" id="triIsoSideSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="9" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Scalene Triangle - Heron's formula is complex for reverse, so we skip -->
+                <div id="triScaleneInputs" class="hidden">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Side A = <span id="triSideADisplay" class="text-emerald-600 font-bold">8</span> <span id="triSideAUnitDisplay">cm</span>
+                    </label>
+                    <input type="range" id="triSideASlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="8" />
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Side B = <span id="triSideBDisplay" class="text-emerald-600 font-bold">10</span> <span id="triSideBUnitDisplay">cm</span>
+                    </label>
+                    <input type="range" id="triSideBSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="10" />
+                  </div>
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Side C = <span id="triSideCDisplay" class="text-emerald-600 font-bold">12</span> <span id="triSideCUnitDisplay">cm</span>
+                    </label>
+                    <input type="range" id="triSideCSlider" class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600" min="1" max="20" step="0.5" value="12" />
+                  </div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400 text-center p-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    ⚡ Reverse mode not available for scalene triangles (Heron's formula is complex)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Row for Right Triangle -->
+              <div id="triInputRow" class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="triInput1"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Value 1"
+                    value="10"
+                    step="0.5"
+                    min="1"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="triInput2"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Value 2"
+                    value="6"
+                    step="0.5"
+                    min="1"
+                  />
+                </div>
+                <button 
+                  id="triCalculateBtn"
+                  class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                >
+                  Calculate
+                </button>
+              </div>
+
+              <!-- Result Box -->
+              <div id="triResultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="triResultLabel">Area of Triangle</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="triResultValue">30.00</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="triResultType">Right Triangle</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400" id="triResultFormula">A = ½ × b × h</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Formula & Explanation -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-2xl font-mono text-gray-800 dark:text-gray-200" id="triFormulaDisplay">A = ½ × b × h</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="triFormulaDesc">Area = ½ × Base × Height</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400" id="triFormulaValues">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="triFormulaLabel1">Base</span>
+                <span class="font-mono" id="triFormulaVal1">10 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span id="triFormulaLabel2">Height</span>
+                <span class="font-mono" id="triFormulaVal2">6 cm</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span id="triFormulaResultLabel">Area</span>
+                <span class="font-mono" id="triFormulaResult">30.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step Solution -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div id="triStepsContainer" class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="triStep1">Formula: A = ½ × b × h</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="triStep2">Plug in: A = ½ × 10 × 6</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="triStep3">Calculate: A = 30</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="triStep4">Answer: A = 30.00 cm²</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fun Facts -->
+          <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 border border-amber-200 dark:border-amber-800">
+            <p class="text-sm text-gray-700 dark:text-gray-300" id="triFunFact">
+              💡 <span class="font-medium">Did you know?</span>
+              A triangle is the strongest shape in engineering and architecture!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'cm';
+      let currentType = 'right';
+      let currentMode = 'area'; // 'area', 'base', 'height'
+
+      // ============================================
+      // FUN FACTS
+      // ============================================
+      const funFacts = {
+        right: '💡 A right triangle has one 90° angle. The Pythagorean theorem (a² + b² = c²) applies to right triangles!',
+        equilateral: '💡 An equilateral triangle has all sides equal and all angles = 60°! It\'s the most symmetrical triangle.',
+        isosceles: '💡 An isosceles triangle has two equal sides and two equal angles. The base angles are always equal!',
+        scalene: '💡 A scalene triangle has all sides different. The longest side is opposite the largest angle!'
+      };
+
+      // ============================================
+      // DOM REFS
+      // ============================================
+      const triVisual = document.getElementById('triVisual');
+      const triLabel1 = document.getElementById('triLabel1');
+      const triLabel2 = document.getElementById('triLabel2');
+      const triLabel3 = document.getElementById('triLabel3');
+      const areaLabelTriVal = document.getElementById('areaLabelTriVal');
+      const triResultValue = document.getElementById('triResultValue');
+      const triResultLabel = document.getElementById('triResultLabel');
+      const triResultType = document.getElementById('triResultType');
+      const triResultFormula = document.getElementById('triResultFormula');
+      const triFormulaDisplay = document.getElementById('triFormulaDisplay');
+      const triFormulaDesc = document.getElementById('triFormulaDesc');
+      const triFormulaLabel1 = document.getElementById('triFormulaLabel1');
+      const triFormulaLabel2 = document.getElementById('triFormulaLabel2');
+      const triFormulaVal1 = document.getElementById('triFormulaVal1');
+      const triFormulaVal2 = document.getElementById('triFormulaVal2');
+      const triFormulaResultLabel = document.getElementById('triFormulaResultLabel');
+      const triFormulaResult = document.getElementById('triFormulaResult');
+      const triStep1 = document.getElementById('triStep1');
+      const triStep2 = document.getElementById('triStep2');
+      const triStep3 = document.getElementById('triStep3');
+      const triStep4 = document.getElementById('triStep4');
+      const triFunFact = document.getElementById('triFunFact');
+      const heightLineTri = document.getElementById('heightLineTri');
+      const heightLabelTri = document.getElementById('heightLabelTri');
+
+      // Input containers
+      const triRightInputs = document.getElementById('triRightInputs');
+      const triEquilateralInputs = document.getElementById('triEquilateralInputs');
+      const triIsoscelesInputs = document.getElementById('triIsoscelesInputs');
+      const triScaleneInputs = document.getElementById('triScaleneInputs');
+      const triRightAreaInputs = document.getElementById('triRightAreaInputs');
+      const triRightBaseInputs = document.getElementById('triRightBaseInputs');
+      const triRightHeightInputs = document.getElementById('triRightHeightInputs');
+      const triEquilateralAreaInputs = document.getElementById('triEquilateralAreaInputs');
+      const triEquilateralReverseInputs = document.getElementById('triEquilateralReverseInputs');
+      const triIsoAreaInputs = document.getElementById('triIsoAreaInputs');
+      const triIsoReverseInputs = document.getElementById('triIsoReverseInputs');
+
+      // Sliders - Right
+      const triBaseSlider = document.getElementById('triBaseSlider');
+      const triHeightSlider = document.getElementById('triHeightSlider');
+      const triAreaForBaseSlider = document.getElementById('triAreaForBaseSlider');
+      const triHeightForBaseSlider = document.getElementById('triHeightForBaseSlider');
+      const triAreaForHeightSlider = document.getElementById('triAreaForHeightSlider');
+      const triBaseForHeightSlider = document.getElementById('triBaseForHeightSlider');
+
+      // Sliders - Equilateral
+      const triSideSlider = document.getElementById('triSideSlider');
+      const triEqAreaSlider = document.getElementById('triEqAreaSlider');
+
+      // Sliders - Isosceles
+      const triIsoBaseSlider = document.getElementById('triIsoBaseSlider');
+      const triIsoHeightSlider = document.getElementById('triIsoHeightSlider');
+      const triIsoAreaSlider = document.getElementById('triIsoAreaSlider');
+      const triIsoSideSlider = document.getElementById('triIsoSideSlider');
+
+      // Sliders - Scalene
+      const triSideASlider = document.getElementById('triSideASlider');
+      const triSideBSlider = document.getElementById('triSideBSlider');
+      const triSideCSlider = document.getElementById('triSideCSlider');
+
+      // Displays
+      const triBaseDisplay = document.getElementById('triBaseDisplay');
+      const triHeightDisplay = document.getElementById('triHeightDisplay');
+      const triBaseUnitDisplay = document.getElementById('triBaseUnitDisplay');
+      const triHeightUnitDisplay = document.getElementById('triHeightUnitDisplay');
+      const triSideDisplay = document.getElementById('triSideDisplay');
+      const triSideUnitDisplay = document.getElementById('triSideUnitDisplay');
+      const triIsoBaseDisplay = document.getElementById('triIsoBaseDisplay');
+      const triIsoBaseUnitDisplay = document.getElementById('triIsoBaseUnitDisplay');
+      const triIsoHeightDisplay = document.getElementById('triIsoHeightDisplay');
+      const triIsoHeightUnitDisplay = document.getElementById('triIsoHeightUnitDisplay');
+      const triSideADisplay = document.getElementById('triSideADisplay');
+      const triSideBDisplay = document.getElementById('triSideBDisplay');
+      const triSideCDisplay = document.getElementById('triSideCDisplay');
+      const triSideAUnitDisplay = document.getElementById('triSideAUnitDisplay');
+      const triSideBUnitDisplay = document.getElementById('triSideBUnitDisplay');
+      const triSideCUnitDisplay = document.getElementById('triSideCUnitDisplay');
+
+      const triInput1 = document.getElementById('triInput1');
+      const triInput2 = document.getElementById('triInput2');
+
+      const unitConversions = {
+        cm: { label: 'cm', factor: 1, display: 'cm' },
+        m: { label: 'm', factor: 100, display: 'm' },
+        in: { label: 'in', factor: 2.54, display: 'in' },
+        ft: { label: 'ft', factor: 30.48, display: 'ft' }
+      };
+
+      // ============================================
+      // UPDATE UI HELPERS
+      // ============================================
+      function formatArea(area) {
+        let displayArea = area;
+        let areaUnit = 'cm²';
+        if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+        else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+        else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+        return { value: displayArea, unit: areaUnit };
+      }
+
+      function getUnit() {
+        return unitConversions[currentUnit];
+      }
+
+      function updateTriangleVisual(points, labels) {
+        triVisual.setAttribute('points', points);
+        if (labels) {
+          triLabel1.textContent = labels[0] || '';
+          triLabel2.textContent = labels[1] || '';
+          triLabel3.textContent = labels[2] || '';
+        }
+      }
+
+      function updateResult(value, label, type, formula) {
+        triResultValue.textContent = value;
+        triResultLabel.textContent = label;
+        triResultType.textContent = type;
+        triResultFormula.textContent = formula;
+      }
+
+      function updateFormula(val1, val2, result, label1, label2, resultLabel, display, desc) {
+        triFormulaVal1.textContent = val1;
+        triFormulaVal2.textContent = val2;
+        triFormulaResult.textContent = result;
+        triFormulaLabel1.textContent = label1;
+        triFormulaLabel2.textContent = label2;
+        triFormulaResultLabel.textContent = resultLabel;
+        if (display) triFormulaDisplay.textContent = display;
+        if (desc) triFormulaDesc.textContent = desc;
+      }
+
+      function updateSteps(s1, s2, s3, s4) {
+        triStep1.textContent = s1;
+        triStep2.textContent = s2;
+        triStep3.textContent = s3;
+        triStep4.textContent = s4;
+      }
+
+      // ============================================
+      // TRIANGLE TYPE SELECTOR
+      // ============================================
+      document.querySelectorAll('.triangle-type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.triangle-type-btn').forEach(b => {
+            b.className = 'triangle-type-btn px-3 py-2 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'triangle-type-btn px-3 py-2 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentType = btn.dataset.type;
+          
+          // Hide all input groups
+          triRightInputs.classList.add('hidden');
+          triEquilateralInputs.classList.add('hidden');
+          triIsoscelesInputs.classList.add('hidden');
+          triScaleneInputs.classList.add('hidden');
+          
+          // Show selected
+          if (currentType === 'right') triRightInputs.classList.remove('hidden');
+          else if (currentType === 'equilateral') triEquilateralInputs.classList.remove('hidden');
+          else if (currentType === 'isosceles') triIsoscelesInputs.classList.remove('hidden');
+          else if (currentType === 'scalene') triScaleneInputs.classList.remove('hidden');
+          
+          triFunFact.innerHTML = `<span class="font-medium">Did you know?</span> ${funFacts[currentType]}`;
+          
+          // Reset mode to area
+          setMode('area');
+          updateTriangle();
+        });
+      });
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      function setMode(mode) {
+        currentMode = mode;
+        document.querySelectorAll('.tri-mode-btn').forEach(b => {
+          b.className = 'tri-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        const btnMap = { area: 'modeAreaTri', base: 'modeBaseTri', height: 'modeHeightTri' };
+        document.getElementById(btnMap[mode]).className = 'tri-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+        // Show/hide inputs based on mode and type
+        if (currentType === 'right') {
+          triRightAreaInputs.classList.toggle('hidden', mode !== 'area');
+          triRightBaseInputs.classList.toggle('hidden', mode !== 'base');
+          triRightHeightInputs.classList.toggle('hidden', mode !== 'height');
+          
+          if (mode === 'area') {
+            triInput1.placeholder = 'Base';
+            triInput2.placeholder = 'Height';
+            triInput1.value = triBaseSlider.value;
+            triInput2.value = triHeightSlider.value;
+          } else if (mode === 'base') {
+            triInput1.placeholder = 'Area';
+            triInput2.placeholder = 'Height';
+            triInput1.value = triAreaForBaseSlider.value;
+            triInput2.value = triHeightForBaseSlider.value;
+          } else if (mode === 'height') {
+            triInput1.placeholder = 'Area';
+            triInput2.placeholder = 'Base';
+            triInput1.value = triAreaForHeightSlider.value;
+            triInput2.value = triBaseForHeightSlider.value;
+          }
+        } else if (currentType === 'equilateral') {
+          triEquilateralAreaInputs.classList.toggle('hidden', mode !== 'area');
+          triEquilateralReverseInputs.classList.toggle('hidden', mode === 'area');
+          if (mode === 'area') {
+            triInput1.placeholder = 'Side';
+            triInput2.placeholder = '';
+            triInput2.style.display = 'none';
+            triInput1.value = triSideSlider.value;
+          } else {
+            triInput1.placeholder = 'Area';
+            triInput2.placeholder = '';
+            triInput2.style.display = 'none';
+            triInput1.value = triEqAreaSlider.value;
+          }
+        } else if (currentType === 'isosceles') {
+          triIsoAreaInputs.classList.toggle('hidden', mode !== 'area');
+          triIsoReverseInputs.classList.toggle('hidden', mode === 'area');
+          if (mode === 'area') {
+            triInput1.placeholder = 'Base';
+            triInput2.placeholder = 'Height';
+            triInput1.value = triIsoBaseSlider.value;
+            triInput2.value = triIsoHeightSlider.value;
+          } else {
+            triInput1.placeholder = 'Area';
+            triInput2.placeholder = 'Other Side';
+            triInput1.value = triIsoAreaSlider.value;
+            triInput2.value = triIsoSideSlider.value;
+          }
+        }
+        if (currentType !== 'right' && currentType !== 'isosceles') {
+          triInput2.style.display = currentType === 'equilateral' ? 'none' : 'block';
+        } else {
+          triInput2.style.display = 'block';
+        }
+        updateTriangle();
+      }
+
+      document.getElementById('modeAreaTri').addEventListener('click', () => setMode('area'));
+      document.getElementById('modeBaseTri').addEventListener('click', () => setMode('base'));
+      document.getElementById('modeHeightTri').addEventListener('click', () => setMode('height'));
+
+      // ============================================
+      // UNIT SELECTOR
+      // ============================================
+      document.querySelectorAll('.tri-unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tri-unit-btn').forEach(b => {
+            b.className = 'tri-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'tri-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          currentUnit = btn.dataset.unit;
+          updateTriangle();
+        });
+      });
+
+      // ============================================
+      // UPDATE TRIANGLE
+      // ============================================
+      function updateTriangle() {
+        const unit = getUnit();
+        const displayUnit = unit.display;
+        let area = 0;
+        let resultLabel = 'Area';
+        let resultType = '';
+        let resultFormula = '';
+        let formulaDisplay = '';
+        let formulaDesc = '';
+        let val1 = '', val2 = '', result = '';
+        let label1 = '', label2 = '', resultLabelText = '';
+        let step1 = '', step2 = '', step3 = '', step4 = '';
+        let points = '';
+        let labels = ['', '', ''];
+
+        if (currentType === 'right') {
+          if (currentMode === 'area') {
+            const base = parseFloat(triBaseSlider.value);
+            const height = parseFloat(triHeightSlider.value);
+            area = 0.5 * base * height;
+            
+            const maxSize = 20;
+            const scaleX = Math.min(base / maxSize, 1);
+            const scaleY = Math.min(height / maxSize, 1);
+            const centerX = 250;
+            const topY = 100 + (1 - scaleY) * 150;
+            const bottomY = 100 + (1 + scaleY) * 150;
+            const rightX = 150 + (1 + scaleX) * 100;
+            const leftX = 150;
+            
+            points = `${leftX},${bottomY} ${rightX},${bottomY} ${rightX},${topY}`;
+            labels = [`b = ${base}`, `h = ${height}`, ''];
+            
+            triBaseDisplay.textContent = base;
+            triHeightDisplay.textContent = height;
+            triBaseUnitDisplay.textContent = displayUnit;
+            triHeightUnitDisplay.textContent = displayUnit;
+
+            val1 = `${base} ${displayUnit}`;
+            val2 = `${height} ${displayUnit}`;
+            label1 = 'Base';
+            label2 = 'Height';
+            resultLabelText = 'Area';
+            resultType = 'Right Triangle';
+            resultFormula = 'A = ½ × b × h';
+            formulaDisplay = 'A = ½ × b × h';
+            formulaDesc = 'Area = ½ × Base × Height';
+            step1 = 'Formula: A = ½ × b × h';
+            step2 = `Plug in: A = ½ × ${base} × ${height}`;
+            step3 = `Calculate: A = ${(0.5 * base * height).toFixed(2)}`;
+            step4 = `Answer: A = ${area.toFixed(2)} cm²`;
+            
+            // Update sliders visibility
+            document.querySelectorAll('#triRightInputs input[type="range"]').forEach(el => el.style.display = 'block');
+            
+          } else if (currentMode === 'base') {
+            const areaVal = parseFloat(triAreaForBaseSlider.value);
+            const height = parseFloat(triHeightForBaseSlider.value);
+            // Convert area to cm² if needed
+            let areaCm2 = areaVal;
+            if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+            else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+            else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+            const base = (2 * areaCm2) / height;
+            area = areaCm2;
+            
+            const maxSize = 20;
+            const scaleX = Math.min(base / maxSize, 1);
+            const scaleY = Math.min(height / maxSize, 1);
+            const centerX = 250;
+            const topY = 100 + (1 - scaleY) * 150;
+            const bottomY = 100 + (1 + scaleY) * 150;
+            const rightX = 150 + (1 + scaleX) * 100;
+            const leftX = 150;
+            
+            points = `${leftX},${bottomY} ${rightX},${bottomY} ${rightX},${topY}`;
+            labels = [`b = ${base.toFixed(2)}`, `h = ${height}`, ''];
+            
+            const formatted = formatArea(area);
+            val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+            val2 = `${height} ${displayUnit}`;
+            label1 = 'Area';
+            label2 = 'Height';
+            resultLabelText = 'Base';
+            resultType = 'Right Triangle';
+            resultFormula = 'b = 2A / h';
+            formulaDisplay = 'b = 2A / h';
+            formulaDesc = 'Base = 2 × Area ÷ Height';
+            step1 = 'Formula: b = 2A / h';
+            step2 = `Plug in: b = 2 × ${formatted.value.toFixed(2)} ÷ ${height}`;
+            step3 = `Calculate: b = ${base.toFixed(2)}`;
+            step4 = `Answer: Base = ${base.toFixed(2)} ${displayUnit}`;
+            
+            triAreaForBaseDisplay.textContent = formatted.value.toFixed(2);
+            triAreaForBaseUnit.textContent = formatted.unit;
+            triHeightForBaseDisplay.textContent = height;
+            triHeightForBaseUnit.textContent = displayUnit;
+            
+          } else if (currentMode === 'height') {
+            const areaVal = parseFloat(triAreaForHeightSlider.value);
+            const base = parseFloat(triBaseForHeightSlider.value);
+            let areaCm2 = areaVal;
+            if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+            else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+            else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+            const height = (2 * areaCm2) / base;
+            area = areaCm2;
+            
+            const maxSize = 20;
+            const scaleX = Math.min(base / maxSize, 1);
+            const scaleY = Math.min(height / maxSize, 1);
+            const centerX = 250;
+            const topY = 100 + (1 - scaleY) * 150;
+            const bottomY = 100 + (1 + scaleY) * 150;
+            const rightX = 150 + (1 + scaleX) * 100;
+            const leftX = 150;
+            
+            points = `${leftX},${bottomY} ${rightX},${bottomY} ${rightX},${topY}`;
+            labels = [`b = ${base}`, `h = ${height.toFixed(2)}`, ''];
+            
+            const formatted = formatArea(area);
+            val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+            val2 = `${base} ${displayUnit}`;
+            label1 = 'Area';
+            label2 = 'Base';
+            resultLabelText = 'Height';
+            resultType = 'Right Triangle';
+            resultFormula = 'h = 2A / b';
+            formulaDisplay = 'h = 2A / b';
+            formulaDesc = 'Height = 2 × Area ÷ Base';
+            step1 = 'Formula: h = 2A / b';
+            step2 = `Plug in: h = 2 × ${formatted.value.toFixed(2)} ÷ ${base}`;
+            step3 = `Calculate: h = ${height.toFixed(2)}`;
+            step4 = `Answer: Height = ${height.toFixed(2)} ${displayUnit}`;
+            
+            triAreaForHeightDisplay.textContent = formatted.value.toFixed(2);
+            triAreaForHeightUnit.textContent = formatted.unit;
+            triBaseForHeightDisplay.textContent = base;
+            triBaseForHeightUnit.textContent = displayUnit;
+          }
+          
+          updateTriangleVisual(points, labels);
+          
+        } else if (currentType === 'equilateral') {
+          if (currentMode === 'area') {
+            const side = parseFloat(triSideSlider.value);
+            area = (Math.sqrt(3) / 4) * side * side;
+            
+            const maxSize = 20;
+            const scale = Math.min(side / maxSize, 1);
+            const centerX = 250;
+            const topY = 80 + (1 - scale) * 180;
+            const bottomY = 80 + (1 + scale) * 180;
+            const halfBase = (centerX - 150) * scale;
+            
+            points = `${centerX},${topY} ${centerX - halfBase},${bottomY} ${centerX + halfBase},${bottomY}`;
+            labels = [`s = ${side}`, `s = ${side}`, `s = ${side}`];
+            
+            triSideDisplay.textContent = side;
+            triSideUnitDisplay.textContent = displayUnit;
+            
+            val1 = `${side} ${displayUnit}`;
+            val2 = `${side} ${displayUnit}`;
+            label1 = 'Side';
+            label2 = 'Side';
+            resultLabelText = 'Area';
+            resultType = 'Equilateral Triangle';
+            resultFormula = 'A = (√3/4) × s²';
+            formulaDisplay = 'A = (√3/4) × s²';
+            formulaDesc = 'Area = (√3/4) × Side²';
+            step1 = 'Formula: A = (√3/4) × s²';
+            step2 = `Plug in: A = (√3/4) × ${side}²`;
+            step3 = `Calculate: A = ${((Math.sqrt(3)/4) * side * side).toFixed(2)}`;
+            step4 = `Answer: A = ${area.toFixed(2)} cm²`;
+            
+          } else {
+            const areaVal = parseFloat(triEqAreaSlider.value);
+            let areaCm2 = areaVal;
+            if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+            else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+            else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+            const side = Math.sqrt((4 * areaCm2) / Math.sqrt(3));
+            area = areaCm2;
+            
+            const maxSize = 20;
+            const scale = Math.min(side / maxSize, 1);
+            const centerX = 250;
+            const topY = 80 + (1 - scale) * 180;
+            const bottomY = 80 + (1 + scale) * 180;
+            const halfBase = (centerX - 150) * scale;
+            
+            points = `${centerX},${topY} ${centerX - halfBase},${bottomY} ${centerX + halfBase},${bottomY}`;
+            labels = [`s = ${side.toFixed(2)}`, `s = ${side.toFixed(2)}`, `s = ${side.toFixed(2)}`];
+            
+            const formatted = formatArea(area);
+            triEqAreaDisplay.textContent = formatted.value.toFixed(2);
+            triEqAreaUnit.textContent = formatted.unit;
+            
+            val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+            val2 = '';
+            label1 = 'Area';
+            label2 = '';
+            resultLabelText = 'Side';
+            resultType = 'Equilateral Triangle';
+            resultFormula = 's = √(4A/√3)';
+            formulaDisplay = 's = √(4A/√3)';
+            formulaDesc = 'Side = √(4 × Area ÷ √3)';
+            step1 = 'Formula: s = √(4A/√3)';
+            step2 = `Plug in: s = √(4 × ${formatted.value.toFixed(2)} ÷ √3)`;
+            step3 = `Calculate: s = ${side.toFixed(2)}`;
+            step4 = `Answer: Side = ${side.toFixed(2)} ${displayUnit}`;
+          }
+          
+          updateTriangleVisual(points, labels);
+          
+        } else if (currentType === 'isosceles') {
+          if (currentMode === 'area') {
+            const base = parseFloat(triIsoBaseSlider.value);
+            const height = parseFloat(triIsoHeightSlider.value);
+            area = 0.5 * base * height;
+            
+            const maxSize = 20;
+            const scaleX = Math.min(base / maxSize, 1);
+            const scaleY = Math.min(height / maxSize, 1);
+            const centerX = 250;
+            const topY = 100 + (1 - scaleY) * 150;
+            const bottomY = 100 + (1 + scaleY) * 150;
+            const halfBase = (centerX - 150) * scaleX;
+            
+            points = `${centerX},${topY} ${centerX - halfBase},${bottomY} ${centerX + halfBase},${bottomY}`;
+            labels = [`s = ?`, `s = ?`, `b = ${base}`];
+            
+            triIsoBaseDisplay.textContent = base;
+            triIsoHeightDisplay.textContent = height;
+            triIsoBaseUnitDisplay.textContent = displayUnit;
+            triIsoHeightUnitDisplay.textContent = displayUnit;
+            
+            val1 = `${base} ${displayUnit}`;
+            val2 = `${height} ${displayUnit}`;
+            label1 = 'Base';
+            label2 = 'Height';
+            resultLabelText = 'Area';
+            resultType = 'Isosceles Triangle';
+            resultFormula = 'A = ½ × b × h';
+            formulaDisplay = 'A = ½ × b × h';
+            formulaDesc = 'Area = ½ × Base × Height';
+            step1 = 'Formula: A = ½ × b × h';
+            step2 = `Plug in: A = ½ × ${base} × ${height}`;
+            step3 = `Calculate: A = ${(0.5 * base * height).toFixed(2)}`;
+            step4 = `Answer: A = ${area.toFixed(2)} cm²`;
+            
+          } else {
+            const areaVal = parseFloat(triIsoAreaSlider.value);
+            const side = parseFloat(triIsoSideSlider.value);
+            let areaCm2 = areaVal;
+            if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+            else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+            else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+            // For isosceles: area = 0.5 * base * height, height = sqrt(side² - (base/2)²)
+            // Solve for base: A = 0.5 * b * sqrt(s² - (b/2)²)
+            // This is complex, so we approximate using numerical method
+            let base = side;
+            let found = false;
+            for (let b = 0.1; b < side * 2; b += 0.01) {
+              const h = Math.sqrt(side * side - (b/2) * (b/2));
+              if (h > 0 && Math.abs(0.5 * b * h - areaCm2) < 0.01) {
+                base = b;
+                found = true;
+                break;
+              }
+            }
+            if (!found) base = side;
+            const height = Math.sqrt(side * side - (base/2) * (base/2));
+            area = areaCm2;
+            
+            const maxSize = 20;
+            const scaleX = Math.min(base / maxSize, 1);
+            const scaleY = Math.min(height / maxSize, 1);
+            const centerX = 250;
+            const topY = 100 + (1 - scaleY) * 150;
+            const bottomY = 100 + (1 + scaleY) * 150;
+            const halfBase = (centerX - 150) * scaleX;
+            
+            points = `${centerX},${topY} ${centerX - halfBase},${bottomY} ${centerX + halfBase},${bottomY}`;
+            labels = [`s = ${side}`, `s = ${side}`, `b = ${base.toFixed(2)}`];
+            
+            const formatted = formatArea(area);
+            triIsoAreaDisplay.textContent = formatted.value.toFixed(2);
+            triIsoAreaUnit.textContent = formatted.unit;
+            triIsoSideDisplay.textContent = side;
+            triIsoSideUnitDisplay.textContent = displayUnit;
+            
+            val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+            val2 = `${side} ${displayUnit}`;
+            label1 = 'Area';
+            label2 = 'Other Side';
+            resultLabelText = 'Base';
+            resultType = 'Isosceles Triangle';
+            resultFormula = 'b = (from A and s)';
+            formulaDisplay = 'b = (from Area and side)';
+            formulaDesc = 'Base calculated from Area and other side';
+            step1 = 'Formula: Solve for base using Area and side';
+            step2 = `Using A = ${formatted.value.toFixed(2)} and s = ${side}`;
+            step3 = `Calculate: b = ${base.toFixed(2)}`;
+            step4 = `Answer: Base = ${base.toFixed(2)} ${displayUnit}`;
+          }
+          
+          updateTriangleVisual(points, labels);
+          
+        } else if (currentType === 'scalene') {
+          // Only area mode for scalene (Heron's formula is complex for reverse)
+          const a = parseFloat(triSideASlider.value);
+          const b = parseFloat(triSideBSlider.value);
+          const c = parseFloat(triSideCSlider.value);
+          const s = (a + b + c) / 2;
+          area = Math.sqrt(s * (s - a) * (s - b) * (s - c));
+          
+          const maxSize = 20;
+          const scale = Math.min(Math.max(a, b, c) / maxSize, 1);
+          const centerX = 250;
+          const bottomY = 380;
+          const topY = 100 + (1 - scale) * 150;
+          const leftX = 150 + (1 - scale) * 100;
+          const rightX = 350 + (1 - scale) * 100;
+          
+          points = `${centerX},${topY} ${leftX},${bottomY} ${rightX},${bottomY}`;
+          labels = [`a = ${a}`, `b = ${b}`, `c = ${c}`];
+          
+          triSideADisplay.textContent = a;
+          triSideBDisplay.textContent = b;
+          triSideCDisplay.textContent = c;
+          triSideAUnitDisplay.textContent = displayUnit;
+          triSideBUnitDisplay.textContent = displayUnit;
+          triSideCUnitDisplay.textContent = displayUnit;
+          
+          val1 = `${a}, ${b}, ${c} ${displayUnit}`;
+          val2 = `${s.toFixed(2)} ${displayUnit}`;
+          label1 = 'Sides (a, b, c)';
+          label2 = 'Semi-perimeter (s)';
+          resultLabelText = 'Area';
+          resultType = 'Scalene Triangle';
+          resultFormula = 'Heron\'s Formula';
+          formulaDisplay = 'A = √(s(s-a)(s-b)(s-c))';
+          formulaDesc = 'Area = Heron\'s Formula';
+          step1 = 'Formula: A = √(s(s-a)(s-b)(s-c))';
+          step2 = `s = (${a} + ${b} + ${c})/2 = ${s.toFixed(2)}`;
+          step3 = `Calculate: A = √(${s.toFixed(2)} × ${(s-a).toFixed(2)} × ${(s-b).toFixed(2)} × ${(s-c).toFixed(2)})`;
+          step4 = `Answer: A = ${area.toFixed(2)} cm²`;
+          
+          updateTriangleVisual(points, labels);
+        }
+
+        // Convert area to display unit
+        const formatted = formatArea(area);
+        const resultValue = formatted.value.toFixed(2);
+        const resultUnit = formatted.unit;
+
+        // Update area label on SVG
+        areaLabelTriVal.textContent = resultValue;
+
+        // Update result box
+        updateResult(
+          resultValue,
+          resultLabelText,
+          resultType,
+          resultFormula
+        );
+
+        // Update formula card
+        updateFormula(
+          val1,
+          val2,
+          `${resultValue} ${resultUnit}`,
+          label1,
+          label2,
+          resultLabelText,
+          formulaDisplay,
+          formulaDesc
+        );
+
+        // Update steps
+        updateSteps(step1, step2, step3, step4);
+
+        // Update height line
+        if (currentType === 'right' || currentType === 'isosceles') {
+          const baseVal = currentType === 'right' ? parseFloat(triBaseSlider.value) : parseFloat(triIsoBaseSlider.value);
+          const heightVal = currentType === 'right' ? parseFloat(triHeightSlider.value) : parseFloat(triIsoHeightSlider.value);
+          const maxSize = 20;
+          const scaleX = Math.min(baseVal / maxSize, 1);
+          const scaleY = Math.min(heightVal / maxSize, 1);
+          const centerX = 250;
+          const topY = 100 + (1 - scaleY) * 150;
+          const bottomY = 100 + (1 + scaleY) * 150;
+          const halfBase = (centerX - 150) * scaleX;
+          const leftX = centerX - halfBase;
+          heightLineTri.setAttribute('x1', centerX);
+          heightLineTri.setAttribute('y1', topY);
+          heightLineTri.setAttribute('x2', centerX);
+          heightLineTri.setAttribute('y2', bottomY);
+          heightLabelTri.setAttribute('x', centerX + 5);
+          heightLabelTri.setAttribute('y', (topY + bottomY) / 2);
+          heightLineTri.style.display = 'block';
+          heightLabelTri.style.display = 'block';
+        } else {
+          heightLineTri.style.display = 'none';
+          heightLabelTri.style.display = 'none';
+        }
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      // Right triangle sliders
+      triBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTriangle(); });
+      triHeightSlider.addEventListener('input', () => { if (currentMode === 'area') updateTriangle(); });
+      triAreaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTriangle(); });
+      triHeightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTriangle(); });
+      triAreaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTriangle(); });
+      triBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTriangle(); });
+
+      // Equilateral
+      triSideSlider.addEventListener('input', () => { if (currentMode === 'area') updateTriangle(); });
+      triEqAreaSlider.addEventListener('input', () => { if (currentMode !== 'area') updateTriangle(); });
+
+      // Isosceles
+      triIsoBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTriangle(); });
+      triIsoHeightSlider.addEventListener('input', () => { if (currentMode === 'area') updateTriangle(); });
+      triIsoAreaSlider.addEventListener('input', () => { if (currentMode !== 'area') updateTriangle(); });
+      triIsoSideSlider.addEventListener('input', () => { if (currentMode !== 'area') updateTriangle(); });
+
+      // Scalene
+      triSideASlider.addEventListener('input', updateTriangle);
+      triSideBSlider.addEventListener('input', updateTriangle);
+      triSideCSlider.addEventListener('input', updateTriangle);
+
+      // Input fields
+      triInput1.addEventListener('input', () => {
+        const val = parseFloat(triInput1.value);
+        if (val && val > 0) {
+          if (currentType === 'right') {
+            if (currentMode === 'area') { triBaseSlider.value = val; }
+            else if (currentMode === 'base') { triAreaForBaseSlider.value = val; }
+            else if (currentMode === 'height') { triAreaForHeightSlider.value = val; }
+          } else if (currentType === 'equilateral') {
+            if (currentMode === 'area') { triSideSlider.value = val; }
+            else { triEqAreaSlider.value = val; }
+          } else if (currentType === 'isosceles') {
+            if (currentMode === 'area') { triIsoBaseSlider.value = val; }
+            else { triIsoAreaSlider.value = val; }
+          }
+          updateTriangle();
+        }
+      });
+
+      triInput2.addEventListener('input', () => {
+        const val = parseFloat(triInput2.value);
+        if (val && val > 0) {
+          if (currentType === 'right') {
+            if (currentMode === 'area') { triHeightSlider.value = val; }
+            else if (currentMode === 'base') { triHeightForBaseSlider.value = val; }
+            else if (currentMode === 'height') { triBaseForHeightSlider.value = val; }
+          } else if (currentType === 'isosceles') {
+            if (currentMode === 'area') { triIsoHeightSlider.value = val; }
+            else { triIsoSideSlider.value = val; }
+          }
+          updateTriangle();
+        }
+      });
+
+      document.getElementById('triCalculateBtn').addEventListener('click', () => {
+        const v1 = parseFloat(triInput1.value);
+        const v2 = parseFloat(triInput2.value);
+        if (!v1 || v1 <= 0 || (triInput2.style.display !== 'none' && (!v2 || v2 <= 0))) {
+          alert('Please enter valid positive numbers.');
+          return;
+        }
+        if (currentType === 'right') {
+          if (currentMode === 'area') { triBaseSlider.value = v1; triHeightSlider.value = v2; }
+          else if (currentMode === 'base') { triAreaForBaseSlider.value = v1; triHeightForBaseSlider.value = v2; }
+          else if (currentMode === 'height') { triAreaForHeightSlider.value = v1; triBaseForHeightSlider.value = v2; }
+        } else if (currentType === 'equilateral') {
+          if (currentMode === 'area') { triSideSlider.value = v1; }
+          else { triEqAreaSlider.value = v1; }
+        } else if (currentType === 'isosceles') {
+          if (currentMode === 'area') { triIsoBaseSlider.value = v1; triIsoHeightSlider.value = v2; }
+          else { triIsoAreaSlider.value = v1; triIsoSideSlider.value = v2; }
+        }
+        updateTriangle();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      // Show right triangle by default
+      triRightInputs.classList.remove('hidden');
+      triEquilateralInputs.classList.add('hidden');
+      triIsoscelesInputs.classList.add('hidden');
+      triScaleneInputs.classList.add('hidden');
+      triRightAreaInputs.classList.remove('hidden');
+      triRightBaseInputs.classList.add('hidden');
+      triRightHeightInputs.classList.add('hidden');
+      
+      triFunFact.innerHTML = `<span class="font-medium">Did you know?</span> ${funFacts.right}`;
+      triInput2.style.display = 'block';
+      
+      updateTriangle();
+    });
+  </script>
+</Layout>
