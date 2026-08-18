@@ -1,0 +1,471 @@
+---
+// src/pages/finance/loan.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+---
+
+<Layout 
+  title="Loan Calculator - Free Online EMI Calculator" 
+  description="Calculate your monthly loan payments, total interest, and total payment. Free online loan calculator with amortization schedule and interactive charts."
+  keywords="loan calculator, EMI calculator, monthly payment, interest calculator, finance"
+>
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumb -->
+      <nav class="text-sm text-gray-500 dark:text-gray-400 mb-6 fade-in">
+        <a href="/" class="hover:text-emerald-600">Home</a>
+        <span class="mx-2">/</span>
+        <a href="/finance" class="hover:text-emerald-600">Finance</a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-700 dark:text-gray-300">Loan Calculator</span>
+      </nav>
+
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">🏦</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Loan Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate monthly payments, total interest, and total payment
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Loan Amount -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Loan Amount = <span id="loanAmountDisplay" class="text-emerald-600 font-bold">10,000</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="loanAmountSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="1000"
+                  max="1000000"
+                  step="1000"
+                  value="10000"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>$1,000</span>
+                  <span>$1,000,000</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="loanAmountInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Loan Amount"
+                  value="10000"
+                  step="1000"
+                  min="1000"
+                />
+              </div>
+
+              <!-- Interest Rate -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Interest Rate = <span id="interestDisplay" class="text-emerald-600 font-bold">7</span>%
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="interestSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="1"
+                  max="30"
+                  step="0.1"
+                  value="7"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>1%</span>
+                  <span>30%</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="interestInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Interest Rate"
+                  value="7"
+                  step="0.1"
+                  min="1"
+                  max="30"
+                />
+              </div>
+
+              <!-- Loan Term -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Loan Term = <span id="termDisplay" class="text-emerald-600 font-bold">5</span> years
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="termSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="1"
+                  max="30"
+                  step="1"
+                  value="5"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>1 year</span>
+                  <span>30 years</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="termInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Loan Term (years)"
+                  value="5"
+                  step="1"
+                  min="1"
+                  max="30"
+                />
+              </div>
+
+              <button 
+                id="loanCalculateBtn"
+                class="btn-primary w-full text-center"
+              >
+                Calculate Loan
+              </button>
+            </div>
+
+            <!-- Result Box -->
+            <div id="loanResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Monthly Payment</p>
+                  <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400" id="monthlyPayment">$0</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Total Interest</p>
+                  <p class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="totalInterest">$0</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Total Payment</p>
+                  <p class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="totalPayment">$0</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amortization Schedule -->
+            <div id="amortizationSection" class="mt-6 hidden">
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">📊 Amortization Schedule</h4>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm" id="amortizationTable">
+                  <thead>
+                    <tr class="border-b border-gray-200 dark:border-gray-700">
+                      <th class="text-left py-2 px-2 text-gray-600 dark:text-gray-400">Month</th>
+                      <th class="text-right py-2 px-2 text-gray-600 dark:text-gray-400">Payment</th>
+                      <th class="text-right py-2 px-2 text-gray-600 dark:text-gray-400">Principal</th>
+                      <th class="text-right py-2 px-2 text-gray-600 dark:text-gray-400">Interest</th>
+                      <th class="text-right py-2 px-2 text-gray-600 dark:text-gray-400">Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody id="amortizationBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-xl font-mono text-gray-800 dark:text-gray-200">EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">P = Loan Amount, r = Monthly Interest Rate, n = Number of Months</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Monthly Payment</span>
+                <span class="font-mono" id="formulaPayment">$0</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Total Interest</span>
+                <span class="font-mono" id="formulaInterest">$0</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>Total Payment</span>
+                <span class="font-mono" id="formulaTotal">$0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loan Summary -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📋 Loan Summary</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Loan Amount</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryAmount">$10,000</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Interest Rate</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryRate">7%</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Loan Term</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryTerm">5 years</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Total Months</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryMonths">60</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
+      <!-- ============================================ -->
+      <SEOContent 
+        title="What is a Loan Calculator?"
+        description="A loan calculator helps you estimate your monthly payments, total interest, and total loan cost. Whether you're planning a home loan, car loan, or personal loan, our free calculator gives you instant results."
+        formula="EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)"
+        formulaDescription="P = Loan Amount, r = Monthly Interest Rate, n = Number of Months"
+        example={{
+          title: "Example: Calculate EMI for a $10,000 loan at 7% interest for 5 years",
+          steps: [
+            "Monthly interest rate: 7% / 12 = 0.00583",
+            "Number of months: 5 × 12 = 60",
+            "EMI = 10000 × 0.00583 × (1.00583)^60 / ((1.00583)^60 - 1)"
+          ],
+          result: "Monthly Payment: $198.01 | Total Interest: $1,880.60 | Total Payment: $11,880.60"
+        }}
+        uses={[
+          "Home Loans: Calculate mortgage payments before buying a house",
+          "Car Loans: Plan your auto loan budget and compare rates",
+          "Personal Loans: Estimate monthly payments for personal expenses",
+          "Business Loans: Project loan costs for business investments",
+          "Financial Planning: Compare loan offers and make informed decisions"
+        ]}
+        faqs={[
+          {
+            question: "What is EMI (Equated Monthly Installment)?",
+            answer: "EMI is the fixed monthly payment you make to repay a loan. It includes both principal and interest components."
+          },
+          {
+            question: "How is the monthly payment calculated?",
+            answer: "The formula uses the loan amount, monthly interest rate, and number of months to calculate a fixed monthly payment that covers both principal and interest."
+          },
+          {
+            question: "What affects my monthly payment the most?",
+            answer: "The loan amount and interest rate have the biggest impact. A higher loan amount or higher interest rate increases your monthly payment. Longer terms reduce monthly payments but increase total interest paid."
+          }
+        ]}
+      />
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const loanAmountSlider = document.getElementById('loanAmountSlider');
+      const interestSlider = document.getElementById('interestSlider');
+      const termSlider = document.getElementById('termSlider');
+      const loanAmountInput = document.getElementById('loanAmountInput');
+      const interestInput = document.getElementById('interestInput');
+      const termInput = document.getElementById('termInput');
+      const loanAmountDisplay = document.getElementById('loanAmountDisplay');
+      const interestDisplay = document.getElementById('interestDisplay');
+      const termDisplay = document.getElementById('termDisplay');
+      const monthlyPayment = document.getElementById('monthlyPayment');
+      const totalInterest = document.getElementById('totalInterest');
+      const totalPayment = document.getElementById('totalPayment');
+      const formulaPayment = document.getElementById('formulaPayment');
+      const formulaInterest = document.getElementById('formulaInterest');
+      const formulaTotal = document.getElementById('formulaTotal');
+      const summaryAmount = document.getElementById('summaryAmount');
+      const summaryRate = document.getElementById('summaryRate');
+      const summaryTerm = document.getElementById('summaryTerm');
+      const summaryMonths = document.getElementById('summaryMonths');
+      const loanResultBox = document.getElementById('loanResultBox');
+      const amortizationSection = document.getElementById('amortizationSection');
+      const amortizationBody = document.getElementById('amortizationBody');
+
+      function formatCurrency(value) {
+        return '$' + Number(value).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function calculateLoan() {
+        const principal = parseFloat(loanAmountSlider.value);
+        const annualRate = parseFloat(interestSlider.value);
+        const years = parseFloat(termSlider.value);
+        
+        const monthlyRate = annualRate / 100 / 12;
+        const months = years * 12;
+
+        // Update displays
+        loanAmountDisplay.textContent = principal.toLocaleString();
+        interestDisplay.textContent = annualRate;
+        termDisplay.textContent = years;
+
+        // Calculate EMI
+        let emi, totalInterestAmount, totalPaymentAmount;
+        
+        if (monthlyRate === 0) {
+          emi = principal / months;
+          totalInterestAmount = 0;
+        } else {
+          const factor = Math.pow(1 + monthlyRate, months);
+          emi = principal * monthlyRate * factor / (factor - 1);
+          totalPaymentAmount = emi * months;
+          totalInterestAmount = totalPaymentAmount - principal;
+          totalPaymentAmount = totalPaymentAmount;
+        }
+
+        // Update results
+        monthlyPayment.textContent = formatCurrency(emi);
+        totalInterest.textContent = formatCurrency(totalInterestAmount);
+        totalPayment.textContent = formatCurrency(totalPaymentAmount);
+        
+        // Update formula
+        formulaPayment.textContent = formatCurrency(emi);
+        formulaInterest.textContent = formatCurrency(totalInterestAmount);
+        formulaTotal.textContent = formatCurrency(totalPaymentAmount);
+
+        // Update summary
+        summaryAmount.textContent = formatCurrency(principal);
+        summaryRate.textContent = annualRate + '%';
+        summaryTerm.textContent = years + ' year' + (years > 1 ? 's' : '');
+        summaryMonths.textContent = months;
+
+        // Show results
+        loanResultBox.classList.remove('hidden');
+
+        // Generate amortization schedule
+        generateAmortization(principal, monthlyRate, months, emi);
+      }
+
+      function generateAmortization(principal, monthlyRate, months, emi) {
+        amortizationBody.innerHTML = '';
+        let balance = principal;
+        let totalPrincipalPaid = 0;
+        let totalInterestPaid = 0;
+        let displayCount = Math.min(months, 60); // Show first 60 months
+
+        for (let i = 1; i <= displayCount; i++) {
+          const interestPayment = balance * monthlyRate;
+          const principalPayment = emi - interestPayment;
+          
+          if (i === displayCount && displayCount < months) {
+            // Show "..." for skipped months
+            const row = document.createElement('tr');
+            row.className = 'text-gray-500 dark:text-gray-400';
+            row.innerHTML = `
+              <td colspan="5" class="text-center py-2 text-xs">... ${months - displayCount} more months ...</td>
+            `;
+            amortizationBody.appendChild(row);
+            break;
+          }
+
+          balance -= principalPayment;
+          totalPrincipalPaid += principalPayment;
+          totalInterestPaid += interestPayment;
+
+          const row = document.createElement('tr');
+          row.className = 'border-b border-gray-100 dark:border-gray-700';
+          row.innerHTML = `
+            <td class="py-1.5 px-2 text-gray-700 dark:text-gray-300">${i}</td>
+            <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(emi)}</td>
+            <td class="text-right py-1.5 px-2 text-emerald-600 dark:text-emerald-400">${formatCurrency(principalPayment)}</td>
+            <td class="text-right py-1.5 px-2 text-amber-600 dark:text-amber-400">${formatCurrency(interestPayment)}</td>
+            <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(Math.max(balance, 0))}</td>
+          `;
+          amortizationBody.appendChild(row);
+        }
+
+        amortizationSection.classList.remove('hidden');
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      loanAmountSlider.addEventListener('input', () => {
+        loanAmountInput.value = loanAmountSlider.value;
+        calculateLoan();
+      });
+      interestSlider.addEventListener('input', () => {
+        interestInput.value = interestSlider.value;
+        calculateLoan();
+      });
+      termSlider.addEventListener('input', () => {
+        termInput.value = termSlider.value;
+        calculateLoan();
+      });
+
+      loanAmountInput.addEventListener('input', () => {
+        const val = parseFloat(loanAmountInput.value);
+        if (val && val >= 1000) {
+          loanAmountSlider.value = val;
+          calculateLoan();
+        }
+      });
+      interestInput.addEventListener('input', () => {
+        const val = parseFloat(interestInput.value);
+        if (val && val >= 1 && val <= 30) {
+          interestSlider.value = val;
+          calculateLoan();
+        }
+      });
+      termInput.addEventListener('input', () => {
+        const val = parseFloat(termInput.value);
+        if (val && val >= 1 && val <= 30) {
+          termSlider.value = val;
+          calculateLoan();
+        }
+      });
+
+      document.getElementById('loanCalculateBtn').addEventListener('click', () => {
+        const amount = parseFloat(loanAmountInput.value);
+        const rate = parseFloat(interestInput.value);
+        const term = parseFloat(termInput.value);
+        if (!amount || amount < 1000) {
+          alert('Please enter a valid loan amount (minimum $1,000).');
+          return;
+        }
+        if (!rate || rate < 1 || rate > 30) {
+          alert('Please enter a valid interest rate (1% - 30%).');
+          return;
+        }
+        if (!term || term < 1 || term > 30) {
+          alert('Please enter a valid loan term (1 - 30 years).');
+          return;
+        }
+        loanAmountSlider.value = amount;
+        interestSlider.value = rate;
+        termSlider.value = term;
+        calculateLoan();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      calculateLoan();
+    });
+  </script>
+</Layout>
