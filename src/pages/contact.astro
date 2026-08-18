@@ -1,39 +1,99 @@
 ---
+// src/pages/contact.astro
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 ---
 
-<Layout title="Contact - FindInCalc">
+<Layout title="Contact Us - Get in Touch">
   <Navbar />
 
-  <main class="pt-24 pb-16">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">Contact Us</h1>
-      
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12 fade-in">
+        <span class="text-5xl">📬</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Contact Us
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
           Have questions, suggestions, or feedback? We'd love to hear from you!
         </p>
-        
-        <div class="space-y-4">
-          <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-            <span class="text-2xl">📧</span>
-            <span>contact@findincalc.com</span>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Contact Cards -->
+        <div class="lg:col-span-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 card-hover">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl">📧</span>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Email</h3>
+                  <a href="mailto:contact@findincalc.com" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">
+                    contact@findincalc.com
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 card-hover">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl">🐦</span>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Twitter</h3>
+                  <a href="#" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">
+                    @findincalc
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 card-hover">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl">📘</span>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Facebook</h3>
+                  <a href="#" class="text-emerald-600 dark:text-emerald-400 hover:underline text-sm">
+                    facebook.com/findincalc
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300 card-hover">
+              <div class="flex items-center gap-4">
+                <span class="text-3xl">💬</span>
+                <div>
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Response Time</h3>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">24-48 hours</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-            <span class="text-2xl">🐦</span>
-            <span>@findincalc</span>
-          </div>
-          <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-            <span class="text-2xl">📘</span>
-            <span>facebook.com/findincalc</span>
+
+          <!-- Response Time Note -->
+          <div class="mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+            <p class="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+              💡 <span class="font-medium">We're here to help!</span>
+              We typically respond within 24-48 hours.
+            </p>
           </div>
         </div>
-        
-        <div class="mt-6 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-200 dark:border-emerald-800">
-          <p class="text-sm text-gray-600 dark:text-gray-300">
-            💡 <span class="font-medium">Response time:</span> We typically respond within 24-48 hours.
-          </p>
+
+        <!-- Contact Form (Coming Soon) -->
+        <div class="lg:col-span-1">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 sticky top-24">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Send a Message</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Contact form is coming soon. For now, feel free to reach out via email or social media.
+            </p>
+            <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600">
+              <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                🚀 We're working on adding a direct contact form.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

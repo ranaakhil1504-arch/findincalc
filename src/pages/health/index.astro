@@ -2,6 +2,11 @@
 // src/pages/health/index.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import { getCalculatorsByCategory, getCategoryCount } from '../../data/calculators';
+
+// Get all health calculators from the central registry
+const healthCalculators = getCalculatorsByCategory('health');
+const totalHealthCount = getCategoryCount('health');
 ---
 
 <Layout title="Health Calculators - BMI, BMR, and More">
@@ -16,45 +21,59 @@ import Navbar from '../../components/Navbar.astro';
           Health Calculators
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-          Tools to help you track and understand your health
+          {totalHealthCount} free online health calculators
         </p>
         <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
       </div>
 
-      <!-- Calculator Grid -->
+      <!-- Health Calculator Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- BMI Calculator -->
-        <a href="/health/bmi" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">⚖️</span>
-            <div>
-              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
-                BMI Calculator
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Body Mass Index</p>
+        {healthCalculators.map((calc) => (
+          <a
+            href={calc.url}
+            class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover"
+          >
+            <div class="flex items-center space-x-4">
+              <span class="text-4xl">{calc.icon}</span>
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {calc.name}
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{calc.description}</p>
+                {calc.formula && (
+                  <p class="text-xs text-gray-400 dark:text-gray-500 font-mono mt-1">{calc.formula}</p>
+                )}
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        ))}
+      </div>
 
-        <!-- Coming Soon -->
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">🔥</span>
-            <div>
-              <h3 class="font-semibold text-gray-500 dark:text-gray-400">BMR Calculator</h3>
-              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
+      <!-- Coming Soon -->
+      <div class="mt-12">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <span>🚀 Coming Soon</span>
+          <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+            In Development
+          </span>
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { name: "BMR Calculator", icon: "🔥", desc: "Basal Metabolic Rate" },
+            { name: "Body Fat Calculator", icon: "💧", desc: "Estimate body fat percentage" },
+            { name: "Calorie Calculator", icon: "🍎", desc: "Daily calorie needs" },
+            { name: "Ideal Weight Calculator", icon: "🎯", desc: "Find your ideal weight range" },
+          ].map((item) => (
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
+              <div class="flex items-center space-x-4">
+                <span class="text-4xl">{item.icon}</span>
+                <div>
+                  <h3 class="font-semibold text-gray-500 dark:text-gray-400">{item.name}</h3>
+                  <p class="text-sm text-gray-400 dark:text-gray-500">{item.desc}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">💧</span>
-            <div>
-              <h3 class="font-semibold text-gray-500 dark:text-gray-400">Body Fat Calculator</h3>
-              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

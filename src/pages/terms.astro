@@ -1,4 +1,5 @@
 ---
+// src/pages/terms.astro
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
 ---
@@ -6,27 +7,76 @@ import Navbar from '../components/Navbar.astro';
 <Layout title="Terms of Service - FindInCalc">
   <Navbar />
 
-  <main class="pt-24 pb-16">
+  <main class="pt-8 pb-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">Terms of Service</h1>
-      
-      <div class="prose prose-emerald dark:prose-invert max-w-none">
-        <p class="text-gray-600 dark:text-gray-300">Last updated: August 2026</p>
-        
-        <h2>Acceptance of Terms</h2>
-        <p>By using FindInCalc, you agree to these terms of service.</p>
-        
-        <h2>Use of Services</h2>
-        <p>FindInCalc provides free calculators and tools for educational and personal use. All tools are provided "as is" without warranties of any kind.</p>
-        
-        <h2>Disclaimer</h2>
-        <p>While we strive for accuracy, FindInCalc makes no guarantees about the accuracy of calculations. Always verify critical calculations independently.</p>
-        
-        <h2>Intellectual Property</h2>
-        <p>All content, design, and code on FindInCalc is owned by FindInCalc and may not be reproduced without permission.</p>
-        
-        <h2>Contact</h2>
-        <p>For questions about these terms, contact us at legal@findincalc.com</p>
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in">
+        <span class="text-5xl">📋</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Terms of Service
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Terms and conditions for using FindInCalc
+        </p>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Last updated: August 2026</p>
+
+        <div class="space-y-6">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Acceptance of Terms</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              By using FindInCalc, you agree to these terms of service. If you do not agree, please do not use our services.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Use of Services</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              FindInCalc provides free calculators and tools for educational and personal use. All tools are provided "as is" without warranties of any kind.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Disclaimer</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              While we strive for accuracy, FindInCalc makes no guarantees about the accuracy of calculations. Always verify critical calculations independently.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Intellectual Property</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              All content, design, and code on FindInCalc is owned by FindInCalc and may not be reproduced without permission.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Limitation of Liability</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              FindInCalc is not liable for any damages arising from the use of our calculators or tools. Use at your own risk.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Changes to Terms</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              We may update these terms at any time. Continued use of FindInCalc constitutes acceptance of the updated terms.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Contact</h2>
+            <p class="text-gray-600 dark:text-gray-400">
+              For questions about these terms, contact us at:
+              <a href="mailto:legal@findincalc.com" class="text-emerald-600 dark:text-emerald-400 hover:underline">
+                legal@findincalc.com
+              </a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   </main>

@@ -1,5 +1,9 @@
 ---
 // src/components/Navbar.astro
+import { CATEGORIES, getCategoryCount } from '../data/calculators';
+
+// Get only categories that have calculators
+const activeCategories = CATEGORIES.filter(cat => getCategoryCount(cat.id) > 0);
 ---
 
 <nav class="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-emerald-100/30 dark:border-gray-700/50">
@@ -17,22 +21,16 @@
       
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-6">
-        <a href="/math" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
-          📐 Math
-          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
-        </a>
-        <a href="/health" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
-          ❤️ Health
-          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
-        </a>
-        <a href="/finance" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
-          💰 Finance
-          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
-        </a>
-        <a href="/conversion" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group">
-          📊 Conversion
-          <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
-        </a>
+        {activeCategories.map((category) => (
+          <a
+            key={category.id}
+            href={`/${category.id}`}
+            class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors relative group"
+          >
+            {category.icon} {category.name}
+            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-emerald-500 transition-all group-hover:w-full"></span>
+          </a>
+        ))}
         
         <!-- Dark Mode Toggle - Desktop -->
         <button id="themeToggle" class="p-2 rounded-lg bg-emerald-50 dark:bg-gray-800 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-gray-700 transition-colors" aria-label="Toggle dark mode">
@@ -73,10 +71,15 @@
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="hidden md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
       <div class="flex flex-col space-y-3">
-        <a href="/math" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">📐 Math</a>
-        <a href="/health" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">❤️ Health</a>
-        <a href="/finance" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">💰 Finance</a>
-        <a href="/conversion" class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800">📊 Conversion</a>
+        {activeCategories.map((category) => (
+          <a
+            key={category.id}
+            href={`/${category.id}`}
+            class="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-2 px-3 rounded-lg hover:bg-emerald-50 dark:hover:bg-gray-800"
+          >
+            {category.icon} {category.name}
+          </a>
+        ))}
       </div>
     </div>
   </div>
@@ -208,5 +211,4 @@
 
     console.log('🌓 Dark mode initialized successfully!');
   })();
-  
 </script>

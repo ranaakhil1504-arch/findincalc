@@ -1,5 +1,10 @@
 ---
 // src/components/Footer.astro
+import { CATEGORIES, getCategoryCount, getTrendingCalculators } from '../data/calculators';
+
+// Get only categories that have calculators
+const activeCategories = CATEGORIES.filter(cat => getCategoryCount(cat.id) > 0);
+const trendingCalculators = getTrendingCalculators().slice(0, 4);
 ---
 
 <footer class="bg-gray-900 dark:bg-gray-950 text-gray-300 border-t border-gray-800 dark:border-gray-800">
@@ -36,33 +41,23 @@
         </div>
       </div>
 
-      <!-- Column 2: Quick Links -->
+      <!-- Column 2: Categories -->
       <div>
-        <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Quick Links</h3>
+        <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Categories</h3>
         <ul class="space-y-2 text-sm">
+          {activeCategories.map((category) => (
+            <li key={category.id}>
+              <a
+                href={`/${category.id}`}
+                class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2"
+              >
+                <span class="text-emerald-500">›</span> {category.icon} {category.name}
+              </a>
+            </li>
+          ))}
           <li>
             <a href="/" class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span class="text-emerald-500">›</span> Home
-            </a>
-          </li>
-          <li>
-            <a href="/math" class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span class="text-emerald-500">›</span> Math Calculators
-            </a>
-          </li>
-          <li>
-            <a href="/health" class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span class="text-emerald-500">›</span> Health Calculators
-            </a>
-          </li>
-          <li>
-            <a href="/finance" class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span class="text-emerald-500">›</span> Finance Calculators
-            </a>
-          </li>
-          <li>
-            <a href="/conversion" class="text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2">
-              <span class="text-emerald-500">›</span> Conversion Tools
+              <span class="text-emerald-500">›</span> 🏠 Home
             </a>
           </li>
         </ul>
@@ -105,22 +100,29 @@
         </ul>
       </div>
 
-      <!-- Column 4: Newsletter / Stats -->
+      <!-- Column 4: Trending Calculators -->
       <div>
-        <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">Quick Stats</h3>
+        <h3 class="text-white font-semibold text-sm uppercase tracking-wider mb-4">🔥 Trending</h3>
         <div class="space-y-3">
-          <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-            <p class="text-2xl font-bold text-emerald-400">50+</p>
-            <p class="text-xs text-gray-400">Free Calculators</p>
-          </div>
-          <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-            <p class="text-2xl font-bold text-emerald-400">12</p>
-            <p class="text-xs text-gray-400">Categories</p>
-          </div>
-          <div class="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
-            <p class="text-2xl font-bold text-emerald-400">100%</p>
-            <p class="text-xs text-gray-400">Free to Use</p>
-          </div>
+          {trendingCalculators.length > 0 ? (
+            trendingCalculators.map((calc) => (
+              <a
+                key={calc.id}
+                href={calc.url}
+                class="group flex items-center gap-3 bg-gray-800/50 rounded-lg p-3 border border-gray-700/50 hover:border-emerald-500/50 transition-all hover:bg-gray-800"
+              >
+                <span class="text-xl">{calc.icon}</span>
+                <div>
+                  <p class="text-sm font-medium text-gray-300 group-hover:text-emerald-400 transition-colors">
+                    {calc.name}
+                  </p>
+                  <p class="text-xs text-gray-500">{calc.description}</p>
+                </div>
+              </a>
+            ))
+          ) : (
+            <p class="text-sm text-gray-500">No trending calculators yet.</p>
+          )}
         </div>
       </div>
     </div>

@@ -1,29 +1,120 @@
 ---
+// src/pages/about.astro
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
+import { getTotalCalculatorCount } from '../data/calculators';
 ---
 
 <Layout title="About - FindInCalc">
   <Navbar />
 
-  <main class="pt-24 pb-16">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">About FindInCalc</h1>
-      
-      <div class="prose prose-emerald dark:prose-invert max-w-none">
-        <p class="text-lg text-gray-600 dark:text-gray-300">
-          FindInCalc was created with a simple mission: to make calculations accessible to everyone.
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12 fade-in">
+        <span class="text-5xl">🌟</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          About FindInCalc
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Making calculations accessible to everyone
         </p>
-        <p class="text-gray-600 dark:text-gray-300">
-          Whether you're a student learning geometry, a professional needing quick financial calculations, or someone tracking their health metrics, FindInCalc provides accurate, easy-to-use tools.
-        </p>
-        <h2>Our Values</h2>
-        <ul>
-          <li><strong>Free:</strong> All tools are completely free to use</li>
-          <li><strong>Accurate:</strong> Powered by precise mathematical formulas</li>
-          <li><strong>Simple:</strong> Clean, intuitive interface for everyone</li>
-          <li><strong>Private:</strong> No data storage or tracking of your calculations</li>
-        </ul>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Our Story -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">📖 Our Story</h2>
+            <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+              FindInCalc was created with a simple mission: to make calculations accessible to everyone. 
+              Whether you're a student learning geometry, a professional needing quick financial calculations, 
+              or someone tracking their health metrics, FindInCalc provides accurate, easy-to-use tools.
+            </p>
+          </div>
+
+          <!-- Our Values -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">💎 Our Values</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-2xl">💰</span>
+                <h3 class="font-semibold text-gray-900 dark:text-white mt-1">Free</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">All tools are completely free to use</p>
+              </div>
+              <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <span class="text-2xl">🎯</span>
+                <h3 class="font-semibold text-gray-900 dark:text-white mt-1">Accurate</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Powered by precise mathematical formulas</p>
+              </div>
+              <div class="p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800">
+                <span class="text-2xl">✨</span>
+                <h3 class="font-semibold text-gray-900 dark:text-white mt-1">Simple</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Clean, intuitive interface for everyone</p>
+              </div>
+              <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <span class="text-2xl">🔒</span>
+                <h3 class="font-semibold text-gray-900 dark:text-white mt-1">Private</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400">No data storage or tracking of your calculations</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-3">📊 By the Numbers</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div class="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{getTotalCalculatorCount()}+</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Calculators</p>
+              </div>
+              <div class="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">3</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Categories</p>
+              </div>
+              <div class="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">100%</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Free to Use</p>
+              </div>
+              <div class="text-center p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50">
+                <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400">🚀</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Always Improving</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-4">
+          <!-- Quick Links -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 sticky top-24">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">🔗 Quick Links</h3>
+            <ul class="space-y-2 text-sm">
+              <li>
+                <a href="/math" class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2">
+                  <span class="text-emerald-500">›</span> Math Calculators
+                </a>
+              </li>
+              <li>
+                <a href="/health" class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2">
+                  <span class="text-emerald-500">›</span> Health Calculators
+                </a>
+              </li>
+              <li>
+                <a href="/finance" class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-2">
+                  <span class="text-emerald-500">›</span> Finance Calculators
+                </a>
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <a href="/contact" class="text-sm text-emerald-600 dark:text-emerald-400 hover:underline">
+                📬 Contact Us →
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>

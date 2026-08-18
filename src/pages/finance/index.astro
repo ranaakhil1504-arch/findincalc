@@ -2,6 +2,11 @@
 // src/pages/finance/index.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import { getCalculatorsByCategory, getCategoryCount } from '../../data/calculators';
+
+// Get all finance calculators from the central registry
+const financeCalculators = getCalculatorsByCategory('finance');
+const totalFinanceCount = getCategoryCount('finance');
 ---
 
 <Layout title="Finance Calculators - Free Online Tools">
@@ -16,48 +21,61 @@ import Navbar from '../../components/Navbar.astro';
           Finance Calculators
         </h1>
         <p class="text-gray-600 dark:text-gray-400">
-          Plan your finances with our free calculators
+          {totalFinanceCount} free online finance calculators
         </p>
         <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
       </div>
 
-      <!-- Calculator Grid -->
+      <!-- Finance Calculator Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Loan Calculator -->
-        <a href="/finance/loan" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">🏦</span>
-            <div>
-              <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
-                Loan Calculator
-              </h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">EMI, Total Interest, Total Payment</p>
+        {financeCalculators.map((calc) => (
+          <a
+            href={calc.url}
+            class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover"
+          >
+            <div class="flex items-center space-x-4">
+              <span class="text-4xl">{calc.icon}</span>
+              <div>
+                <h3 class="font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {calc.name}
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{calc.description}</p>
+                {calc.formula && (
+                  <p class="text-xs text-gray-400 dark:text-gray-500 font-mono mt-1">{calc.formula}</p>
+                )}
+              </div>
             </div>
-          </div>
-        </a>
+          </a>
+        ))}
+      </div>
 
-        <!-- Coming Soon -->
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">📈</span>
-            <div>
-              <h3 class="font-semibold text-gray-500 dark:text-gray-400">EMI Calculator</h3>
-              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
+      <!-- Coming Soon -->
+      <div class="mt-12">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+          <span>🚀 Coming Soon</span>
+          <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+            In Development
+          </span>
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[
+            { name: "EMI Calculator", icon: "📈", desc: "Equated Monthly Installment" },
+            { name: "Mortgage Calculator", icon: "🏠", desc: "Home loan payments" },
+            { name: "SIP Calculator", icon: "📊", desc: "Systematic Investment Plan" },
+            { name: "Credit Card Calculator", icon: "💳", desc: "Credit card payments" },
+          ].map((item) => (
+            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
+              <div class="flex items-center space-x-4">
+                <span class="text-4xl">{item.icon}</span>
+                <div>
+                  <h3 class="font-semibold text-gray-500 dark:text-gray-400">{item.name}</h3>
+                  <p class="text-sm text-gray-400 dark:text-gray-500">{item.desc}</p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
-          <div class="flex items-center space-x-4">
-            <span class="text-4xl">🏠</span>
-            <div>
-              <h3 class="font-semibold text-gray-500 dark:text-gray-400">Mortgage Calculator</h3>
-              <p class="text-sm text-gray-400 dark:text-gray-500">Coming Soon</p>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
   </main>
-  
 </Layout>

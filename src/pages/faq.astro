@@ -1,29 +1,118 @@
 ---
+// src/pages/faq.astro
 import Layout from '../layouts/Layout.astro';
 import Navbar from '../components/Navbar.astro';
+import { getTotalCalculatorCount } from '../data/calculators';
 ---
 
 <Layout title="FAQ - Frequently Asked Questions">
   <Navbar />
 
-  <main class="pt-24 pb-16">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8">Frequently Asked Questions</h1>
-      
-      <div class="space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">What is FindInCalc?</h2>
-          <p class="text-gray-600 dark:text-gray-400">FindInCalc is a free online calculator hub offering math, health, finance, and conversion tools for students, professionals, and everyday users.</p>
+  <main class="pt-8 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-12 fade-in">
+        <span class="text-5xl">❓</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Frequently Asked Questions
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Find answers to the most common questions about FindInCalc
+        </p>
+        <div class="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto mt-4"></div>
+      </div>
+
+      <!-- FAQ Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- FAQ Item 1 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">What is FindInCalc?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                FindInCalc is a free online calculator hub offering math, health, finance, and conversion tools for students, professionals, and everyday users.
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Is FindInCalc free to use?</h2>
-          <p class="text-gray-600 dark:text-gray-400">Yes! All calculators on FindInCalc are completely free to use with no registration required.</p>
+
+        <!-- FAQ Item 2 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">Is FindInCalc free to use?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Yes! All {getTotalCalculatorCount()}+ calculators on FindInCalc are completely free to use with no registration required.
+              </p>
+            </div>
+          </div>
         </div>
-        
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">How accurate are the calculators?</h2>
-          <p class="text-gray-600 dark:text-gray-400">All calculators use precise mathematical formulas and are regularly tested for accuracy.</p>
+
+        <!-- FAQ Item 3 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">How accurate are the calculators?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                All calculators use precise mathematical formulas and are regularly tested for accuracy. However, always verify critical calculations independently.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 4 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">Do you store my data?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                No. All calculations are performed in your browser and never sent to our servers. Your privacy is important to us.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 5 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">Can I suggest a new calculator?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                Absolutely! We're always looking to add new tools. Contact us with your suggestion and we'll consider it.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Item 6 -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+          <div class="flex items-start gap-3">
+            <span class="text-emerald-500 font-bold text-lg">Q.</span>
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">What's coming next?</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                We're working on adding more calculators, including BMR, Body Fat, EMI, Mortgage, and many more. Stay tuned!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Still Have Questions? -->
+      <div class="mt-12 text-center">
+        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-2xl p-8 border border-emerald-200 dark:border-emerald-800">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">Still have questions?</h3>
+          <p class="text-gray-600 dark:text-gray-400 mt-2">
+            Can't find what you're looking for? Reach out to us directly.
+          </p>
+          <a href="/contact" class="inline-block mt-4 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition-all hover:shadow-lg">
+            📬 Contact Us
+          </a>
         </div>
       </div>
     </div>
