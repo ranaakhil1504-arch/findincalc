@@ -399,384 +399,466 @@ import SEOContent from '../../components/SEOContent.astro';
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ============================================
-      // STATE
-      // ============================================
-      let currentUnit = 'cm';
-      let currentRadius = 5;
-      let currentPiMode = '314';
-      let currentMode = 'area'; // 'area' or 'radius'
+  // ============================================
+  // STATE
+  // ============================================
+  let currentUnit = 'cm';
+  let currentRadius = 5;
+  let currentPiMode = '314';
+  let currentMode = 'area';
 
-      const piValues = {
-        '314': { label: '3.14', value: 3.14, display: '3.14' },
-        '227': { label: '22/7', value: 22/7, display: '22/7 ≈ 3.142857' },
-        'exact': { label: 'π', value: Math.PI, display: 'π ≈ 3.14159265' }
-      };
+  const piValues = {
+    '314': { label: '3.14', value: 3.14, display: '3.14' },
+    '227': { label: '22/7', value: 22/7, display: '22/7 ≈ 3.142857' },
+    'exact': { label: 'π', value: Math.PI, display: 'π ≈ 3.14159265' }
+  };
 
-      const unitConversions = {
-        cm: { label: 'cm', factor: 1, display: 'cm' },
-        m: { label: 'm', factor: 100, display: 'm' },
-        in: { label: 'in', factor: 2.54, display: 'in' },
-        ft: { label: 'ft', factor: 30.48, display: 'ft' }
-      };
+  const unitConversions = {
+    cm: { label: 'cm', factor: 1, display: 'cm' },
+    m: { label: 'm', factor: 100, display: 'm' },
+    in: { label: 'in', factor: 2.54, display: 'in' },
+    ft: { label: 'ft', factor: 30.48, display: 'ft' }
+  };
 
-      const funFacts = [
-        'The formula for circle area was discovered by ancient Greek mathematicians over 2,000 years ago!',
-        'A circle has the smallest perimeter for a given area of any shape!',
-        'The number π (pi) has been calculated to over 100 trillion digits!',
-        'The circle is the most symmetric shape in nature!',
-        'Earth is not a perfect circle - it\'s slightly elliptical!'
-      ];
+  const funFacts = [
+    'The formula for circle area was discovered by ancient Greek mathematicians over 2,000 years ago!',
+    'A circle has the smallest perimeter for a given area of any shape!',
+    'The number π (pi) has been calculated to over 100 trillion digits!',
+    'The circle is the most symmetric shape in nature!',
+    'Earth is not a perfect circle - it\'s slightly elliptical!'
+  ];
 
-      const piComparisons = {
-        '314': '3.14 is an approximation. 22/7 ≈ 3.142857. π ≈ 3.14159265 is the exact value.',
-        '227': '22/7 ≈ 3.142857 is a common fraction approximation. π ≈ 3.14159265 is the exact value. 22/7 is slightly larger than π.',
-        'exact': 'π ≈ 3.14159265 is the exact mathematical constant. It is irrational and has infinite decimal places!'
-      };
+  const piComparisons = {
+    '314': '3.14 is an approximation. 22/7 ≈ 3.142857. π ≈ 3.14159265 is the exact value.',
+    '227': '22/7 ≈ 3.142857 is a common fraction approximation. π ≈ 3.14159265 is the exact value. 22/7 is slightly larger than π.',
+    'exact': 'π ≈ 3.14159265 is the exact mathematical constant. It is irrational and has infinite decimal places!'
+  };
 
-      // ============================================
-      // DOM REFERENCES
-      // ============================================
-      const radiusSlider = document.getElementById('radiusSlider');
-      const radiusInput = document.getElementById('radiusInput');
-      const radiusDisplay = document.getElementById('radiusDisplay');
-      const radiusUnitDisplay = document.getElementById('radiusUnitDisplay');
-      const radiusLabelValue = document.getElementById('radiusLabelValue');
-      const radiusUnitLabel = document.getElementById('radiusUnitLabel');
-      const areaLabelValue = document.getElementById('areaLabelValue');
-      const areaUnitLabel = document.getElementById('areaUnitLabel');
-      const formulaPi = document.getElementById('formulaPi');
-      const formulaDisplay = document.getElementById('formulaDisplay');
-      const formulaDescription = document.getElementById('formulaDescription');
-      const formulaSecondary = document.getElementById('formulaSecondary');
-      const formulaSecondaryLabel = document.getElementById('formulaSecondaryLabel');
-      const formulaResult = document.getElementById('formulaResult');
-      const formulaResultLabel = document.getElementById('formulaResultLabel');
-      const resultValue = document.getElementById('resultValue');
-      const resultSecondary = document.getElementById('resultSecondary');
-      const resultSecondaryLabel = document.getElementById('resultSecondaryLabel');
-      const resultLabel = document.getElementById('resultLabel');
-      const resultPiInfo = document.getElementById('resultPiInfo');
-      const step1 = document.getElementById('step1');
-      const step2 = document.getElementById('step2');
-      const step3 = document.getElementById('step3');
-      const step4 = document.getElementById('step4');
-      const piComparison = document.getElementById('piComparison');
-      const circleVisual = document.getElementById('circleVisual');
-      const radiusLine = document.getElementById('radiusLine');
-      const radiusError = document.getElementById('radiusError');
-      const areaError = document.getElementById('areaError');
-      const funFact = document.getElementById('funFact');
-      const areaInput = document.getElementById('areaInput');
-      const areaInputDisplay = document.getElementById('areaInputDisplay');
-      const areaInputUnitDisplay = document.getElementById('areaInputUnitDisplay');
-      const areaSlider = document.getElementById('areaSlider');
-      const areaMaxLabel = document.getElementById('areaMaxLabel');
-      const areaModeInputs = document.getElementById('areaModeInputs');
-      const radiusModeInputs = document.getElementById('radiusModeInputs');
+  // ============================================
+  // DOM REFERENCES
+  // ============================================
+  const radiusSlider = document.getElementById('radiusSlider');
+  const radiusInput = document.getElementById('radiusInput');
+  const radiusDisplay = document.getElementById('radiusDisplay');
+  const radiusUnitDisplay = document.getElementById('radiusUnitDisplay');
+  const radiusLabelValue = document.getElementById('radiusLabelValue');
+  const radiusUnitLabel = document.getElementById('radiusUnitLabel');
+  const areaLabelValue = document.getElementById('areaLabelValue');
+  const areaUnitLabel = document.getElementById('areaUnitLabel');
+  const formulaPi = document.getElementById('formulaPi');
+  const formulaDisplay = document.getElementById('formulaDisplay');
+  const formulaDescription = document.getElementById('formulaDescription');
+  const formulaSecondary = document.getElementById('formulaSecondary');
+  const formulaSecondaryLabel = document.getElementById('formulaSecondaryLabel');
+  const formulaResult = document.getElementById('formulaResult');
+  const formulaResultLabel = document.getElementById('formulaResultLabel');
+  const resultValue = document.getElementById('resultValue');
+  const resultSecondary = document.getElementById('resultSecondary');
+  const resultSecondaryLabel = document.getElementById('resultSecondaryLabel');
+  const resultLabel = document.getElementById('resultLabel');
+  const resultPiInfo = document.getElementById('resultPiInfo');
+  const step1 = document.getElementById('step1');
+  const step2 = document.getElementById('step2');
+  const step3 = document.getElementById('step3');
+  const step4 = document.getElementById('step4');
+  const piComparison = document.getElementById('piComparison');
+  const circleVisual = document.getElementById('circleVisual');
+  const radiusLine = document.getElementById('radiusLine');
+  const radiusError = document.getElementById('radiusError');
+  const areaError = document.getElementById('areaError');
+  const funFact = document.getElementById('funFact');
+  const areaInput = document.getElementById('areaInput');
+  const areaInputDisplay = document.getElementById('areaInputDisplay');
+  const areaInputUnitDisplay = document.getElementById('areaInputUnitDisplay');
+  const areaSlider = document.getElementById('areaSlider');
+  const areaMaxLabel = document.getElementById('areaMaxLabel');
+  const areaModeInputs = document.getElementById('areaModeInputs');
+  const radiusModeInputs = document.getElementById('radiusModeInputs');
 
-      // ============================================
-      // FUNCTIONS
-      // ============================================
-      function updateFunFact() {
-        const randomIndex = Math.floor(Math.random() * funFacts.length);
-        funFact.textContent = funFacts[randomIndex];
-      }
+  // ============================================
+  // VALIDATION HELPERS
+  // ============================================
+  function validateRadius(value) {
+    // Empty or null
+    if (value === '' || value === null || value === undefined) {
+      return { valid: false, message: 'Please enter a radius' };
+    }
+    const num = parseFloat(value);
+    // Not a number
+    if (isNaN(num)) {
+      return { valid: false, message: 'Please enter a valid number' };
+    }
+    // Negative
+    if (num < 0) {
+      return { valid: false, message: 'Radius cannot be negative' };
+    }
+    // Too large (more than 1e10)
+    if (num > 1e10) {
+      return { valid: false, message: 'Radius is too large' };
+    }
+    // Valid
+    return { valid: true, value: num };
+  }
 
-      function getPiValue() {
-        return piValues[currentPiMode];
-      }
+  function validateArea(value) {
+    if (value === '' || value === null || value === undefined) {
+      return { valid: false, message: 'Please enter an area' };
+    }
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      return { valid: false, message: 'Please enter a valid number' };
+    }
+    if (num < 0) {
+      return { valid: false, message: 'Area cannot be negative' };
+    }
+    if (num > 1e20) {
+      return { valid: false, message: 'Area is too large' };
+    }
+    return { valid: true, value: num };
+  }
 
-      function getUnit() {
-        return unitConversions[currentUnit];
-      }
+  // ============================================
+  // FUNCTIONS
+  // ============================================
+  function updateFunFact() {
+    const randomIndex = Math.floor(Math.random() * funFacts.length);
+    funFact.textContent = funFacts[randomIndex];
+  }
 
-      function formatArea(areaCm2) {
-        const unit = getUnit();
-        let displayArea = areaCm2;
-        let areaUnit = 'cm²';
-        
-        if (currentUnit === 'm') {
-          displayArea = areaCm2 / 10000;
-          areaUnit = 'm²';
-        } else if (currentUnit === 'in') {
-          displayArea = areaCm2 / 6.4516;
-          areaUnit = 'in²';
-        } else if (currentUnit === 'ft') {
-          displayArea = areaCm2 / 929.0304;
-          areaUnit = 'ft²';
-        }
-        return { value: displayArea, unit: areaUnit };
-      }
+  function getPiValue() {
+    return piValues[currentPiMode];
+  }
 
-      function updateCircle(radius) {
-        currentRadius = radius;
-        const pi = getPiValue();
-        const unit = getUnit();
-        const displayRadius = radius;
-        const displayUnit = unit.display;
+  function getUnit() {
+    return unitConversions[currentUnit];
+  }
 
-        // Calculate area
-        const areaCm2 = pi.value * radius * radius;
-        const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
-        const formattedArea = displayArea.toFixed(4);
+  function formatArea(areaCm2) {
+    const unit = getUnit();
+    let displayArea = areaCm2;
+    let areaUnit = 'cm²';
+    
+    if (currentUnit === 'm') {
+      displayArea = areaCm2 / 10000;
+      areaUnit = 'm²';
+    } else if (currentUnit === 'in') {
+      displayArea = areaCm2 / 6.4516;
+      areaUnit = 'in²';
+    } else if (currentUnit === 'ft') {
+      displayArea = areaCm2 / 929.0304;
+      areaUnit = 'ft²';
+    }
+    return { value: displayArea, unit: areaUnit };
+  }
 
-        // Auto-scale SVG
-        const maxRadius = 20;
-        const scale = Math.min(radius / maxRadius, 1);
-        const svgRadius = 100 + (scale * 120);
-        const center = 250;
+  function updateCircle(radius) {
+    currentRadius = radius;
+    const pi = getPiValue();
+    const unit = getUnit();
+    const displayRadius = radius;
+    const displayUnit = unit.display;
 
-        // Update SVG
-        circleVisual.setAttribute('r', svgRadius);
-        radiusLine.setAttribute('x2', center + svgRadius);
+    const areaCm2 = pi.value * radius * radius;
+    const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
+    const formattedArea = displayArea.toFixed(4);
 
-        // Update labels
-        radiusLabelValue.textContent = displayRadius;
-        radiusUnitLabel.textContent = displayUnit;
-        radiusUnitDisplay.textContent = displayUnit;
-        areaLabelValue.textContent = formattedArea;
-        areaUnitLabel.textContent = areaUnit;
+    // Auto-scale SVG
+    const maxRadius = Math.max(radius, 20);
+    const scale = Math.min(radius / maxRadius, 1);
+    const svgRadius = 100 + (scale * 120);
+    const center = 250;
 
-        // Update formula
-        formulaPi.textContent = pi.display;
-        formulaSecondary.textContent = `${displayRadius} ${displayUnit}`;
-        formulaSecondaryLabel.textContent = 'Radius';
-        formulaResult.textContent = `${formattedArea} ${areaUnit}`;
-        formulaResultLabel.textContent = 'Area';
-        formulaDisplay.textContent = `A = ${pi.label} × r²`;
-        formulaDescription.textContent = `Area = ${pi.label} × radius²`;
+    circleVisual.setAttribute('r', svgRadius);
+    radiusLine.setAttribute('x2', center + svgRadius);
 
-        // Update result
-        resultValue.textContent = formattedArea;
-        resultSecondary.textContent = `${displayRadius} ${displayUnit}`;
-        resultSecondaryLabel.textContent = 'Radius';
-        resultLabel.textContent = 'Area of Circle';
-        resultPiInfo.textContent = `Using π = ${pi.label}`;
+    radiusLabelValue.textContent = displayRadius;
+    radiusUnitLabel.textContent = displayUnit;
+    radiusUnitDisplay.textContent = displayUnit;
+    areaLabelValue.textContent = formattedArea;
+    areaUnitLabel.textContent = areaUnit;
 
-        // Update steps
-        step1.textContent = `Formula: A = ${pi.label} × r²`;
-        step2.textContent = `Plug in: A = ${pi.label} × ${displayRadius}²`;
-        const radiusSquared = (radius * radius).toFixed(2);
-        step3.textContent = `Calculate: A = ${pi.value.toFixed(6)} × ${radiusSquared}`;
-        step4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
+    formulaPi.textContent = pi.display;
+    formulaSecondary.textContent = `${displayRadius} ${displayUnit}`;
+    formulaSecondaryLabel.textContent = 'Radius';
+    formulaResult.textContent = `${formattedArea} ${areaUnit}`;
+    formulaResultLabel.textContent = 'Area';
+    formulaDisplay.textContent = `A = ${pi.label} × r²`;
+    formulaDescription.textContent = `Area = ${pi.label} × radius²`;
 
-        // Update Pi comparison
-        piComparison.textContent = piComparisons[currentPiMode];
+    resultValue.textContent = formattedArea;
+    resultSecondary.textContent = `${displayRadius} ${displayUnit}`;
+    resultSecondaryLabel.textContent = 'Radius';
+    resultLabel.textContent = 'Area of Circle';
+    resultPiInfo.textContent = `Using π = ${pi.label}`;
 
-        // Update slider and input
-        radiusSlider.value = radius;
-        radiusInput.value = radius;
-        radiusDisplay.textContent = displayRadius;
+    step1.textContent = `Formula: A = ${pi.label} × r²`;
+    step2.textContent = `Plug in: A = ${pi.label} × ${displayRadius}²`;
+    const radiusSquared = (radius * radius).toFixed(2);
+    step3.textContent = `Calculate: A = ${pi.value.toFixed(6)} × ${radiusSquared}`;
+    step4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
 
-        // Update area slider for reverse mode
-        const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
-        areaSlider.max = areaSliderMax;
-        areaMaxLabel.textContent = areaSliderMax.toFixed(1);
-        areaSlider.value = displayArea;
-        areaInput.value = displayArea;
-        areaInputDisplay.textContent = displayArea.toFixed(2);
-        areaInputUnitDisplay.textContent = areaUnit;
-      }
+    piComparison.textContent = piComparisons[currentPiMode];
 
-      function updateFromArea(areaValue) {
-        const pi = getPiValue();
-        const unit = getUnit();
-        
-        // Convert area back to cm² if needed
-        let areaCm2 = areaValue;
-        if (currentUnit === 'm') areaCm2 = areaValue * 10000;
-        else if (currentUnit === 'in') areaCm2 = areaValue * 6.4516;
-        else if (currentUnit === 'ft') areaCm2 = areaValue * 929.0304;
-        
-        const radius = Math.sqrt(areaCm2 / pi.value);
-        if (radius > 0) {
-          updateCircle(radius);
-        }
-      }
+    radiusSlider.value = Math.min(radius, 20);
+    radiusInput.value = radius;
+    radiusDisplay.textContent = displayRadius;
 
-      // ============================================
-      // MODE TOGGLE
-      // ============================================
-      document.getElementById('modeArea').addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => {
-          b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-        });
-        document.getElementById('modeArea').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-        currentMode = 'area';
-        areaModeInputs.classList.remove('hidden');
-        radiusModeInputs.classList.add('hidden');
-        // Update with current radius
-        updateCircle(currentRadius);
-      });
+    const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
+    areaSlider.max = areaSliderMax;
+    areaMaxLabel.textContent = areaSliderMax.toFixed(1);
+    areaSlider.value = Math.min(displayArea, areaSliderMax);
+    areaInput.value = displayArea;
+    areaInputDisplay.textContent = displayArea.toFixed(2);
+    areaInputUnitDisplay.textContent = areaUnit;
+  }
 
-      document.getElementById('modeRadius').addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => {
-          b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-        });
-        document.getElementById('modeRadius').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-        currentMode = 'radius';
-        areaModeInputs.classList.add('hidden');
-        radiusModeInputs.classList.remove('hidden');
-        // Update area slider based on current radius
-        const pi = getPiValue();
-        const areaCm2 = pi.value * currentRadius * currentRadius;
-        const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
-        areaSlider.value = displayArea;
-        areaInput.value = displayArea;
-        areaInputDisplay.textContent = displayArea.toFixed(2);
-        areaInputUnitDisplay.textContent = areaUnit;
-        const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
-        areaSlider.max = areaSliderMax;
-        areaMaxLabel.textContent = areaSliderMax.toFixed(1);
-      });
+  function updateFromArea(areaValue) {
+    const pi = getPiValue();
+    const unit = getUnit();
+    
+    let areaCm2 = areaValue;
+    if (currentUnit === 'm') areaCm2 = areaValue * 10000;
+    else if (currentUnit === 'in') areaCm2 = areaValue * 6.4516;
+    else if (currentUnit === 'ft') areaCm2 = areaValue * 929.0304;
+    
+    const radius = Math.sqrt(areaCm2 / pi.value);
+    if (radius >= 0) {
+      updateCircle(radius);
+    }
+  }
 
-      // ============================================
-      // PI BUTTONS
-      // ============================================
-      document.querySelectorAll('.pi-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.pi-btn').forEach(b => {
-            b.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-          });
-          btn.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-          
-          if (btn.id === 'pi314') currentPiMode = '314';
-          else if (btn.id === 'pi227') currentPiMode = '227';
-          else if (btn.id === 'piExact') currentPiMode = 'exact';
-          
-          if (currentMode === 'area') {
-            updateCircle(currentRadius);
-          } else {
-            const areaVal = parseFloat(areaInput.value);
-            if (areaVal && areaVal > 0) {
-              updateFromArea(areaVal);
-            }
-          }
-        });
-      });
+  function resetCalculator() {
+    currentRadius = 5;
+    radiusInput.value = 5;
+    radiusSlider.value = 5;
+    radiusError.classList.add('hidden');
+    areaError.classList.add('hidden');
+    updateCircle(5);
+    if (window.showToast) {
+      window.showToast('🔄 Calculator reset to default values', 'info');
+    }
+  }
 
-      // ============================================
-      // UNIT BUTTONS
-      // ============================================
-      document.querySelectorAll('.unit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.unit-btn').forEach(b => {
-            b.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-          });
-          btn.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-          currentUnit = btn.dataset.unit;
-          
-          if (currentMode === 'area') {
-            updateCircle(currentRadius);
-          } else {
-            const areaVal = parseFloat(areaInput.value);
-            if (areaVal && areaVal > 0) {
-              updateFromArea(areaVal);
-            }
-          }
-        });
-      });
-
-      // ============================================
-      // AREA MODE EVENTS
-      // ============================================
-      radiusSlider.addEventListener('input', () => {
-        const radius = parseFloat(radiusSlider.value);
-        if (!radius || radius < 0.5) {
-          radiusError.classList.remove('hidden');
-          return;
-        }
-        radiusError.classList.add('hidden');
-        updateCircle(radius);
-        updateFunFact();
-      });
-
-      radiusInput.addEventListener('input', () => {
-        const radius = parseFloat(radiusInput.value);
-        if (!radius || radius < 0.5) {
-          radiusError.classList.remove('hidden');
-          return;
-        }
-        radiusError.classList.add('hidden');
-        radiusSlider.value = radius;
-        updateCircle(radius);
-        updateFunFact();
-      });
-
-      document.getElementById('calculateBtn').addEventListener('click', () => {
-        const radius = parseFloat(radiusInput.value);
-        if (!radius || radius < 0.5) {
-          radiusError.classList.remove('hidden');
-          radiusInput.focus();
-          return;
-        }
-        radiusError.classList.add('hidden');
-        radiusSlider.value = radius;
-        updateCircle(radius);
-        updateFunFact();
-      });
-
-      radiusInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          document.getElementById('calculateBtn').click();
-        }
-      });
-
-      // ============================================
-      // RADIUS MODE EVENTS
-      // ============================================
-      areaSlider.addEventListener('input', () => {
-        const areaVal = parseFloat(areaSlider.value);
-        if (!areaVal || areaVal <= 0) {
-          areaError.classList.remove('hidden');
-          return;
-        }
-        areaError.classList.add('hidden');
-        areaInput.value = areaVal;
-        areaInputDisplay.textContent = areaVal.toFixed(2);
-        updateFromArea(areaVal);
-        updateFunFact();
-      });
-
-      areaInput.addEventListener('input', () => {
-        const areaVal = parseFloat(areaInput.value);
-        if (!areaVal || areaVal <= 0) {
-          areaError.classList.remove('hidden');
-          return;
-        }
-        areaError.classList.add('hidden');
-        areaSlider.value = areaVal;
-        areaInputDisplay.textContent = areaVal.toFixed(2);
-        updateFromArea(areaVal);
-        updateFunFact();
-      });
-
-      document.getElementById('findRadiusBtn').addEventListener('click', () => {
-        const areaVal = parseFloat(areaInput.value);
-        if (!areaVal || areaVal <= 0) {
-          areaError.classList.remove('hidden');
-          areaInput.focus();
-          return;
-        }
-        areaError.classList.add('hidden');
-        areaSlider.value = areaVal;
-        areaInputDisplay.textContent = areaVal.toFixed(2);
-        updateFromArea(areaVal);
-        updateFunFact();
-      });
-
-      areaInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          document.getElementById('findRadiusBtn').click();
-        }
-      });
-
-      // ============================================
-      // INITIALIZE
-      // ============================================
-      updateCircle(5);
-      updateFunFact();
+  // ============================================
+  // MODE TOGGLE
+  // ============================================
+  document.getElementById('modeArea').addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => {
+      b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
     });
+    document.getElementById('modeArea').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+    currentMode = 'area';
+    areaModeInputs.classList.remove('hidden');
+    radiusModeInputs.classList.add('hidden');
+    updateCircle(currentRadius);
+  });
+
+  document.getElementById('modeRadius').addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => {
+      b.className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+    });
+    document.getElementById('modeRadius').className = 'mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+    currentMode = 'radius';
+    areaModeInputs.classList.add('hidden');
+    radiusModeInputs.classList.remove('hidden');
+    const pi = getPiValue();
+    const areaCm2 = pi.value * currentRadius * currentRadius;
+    const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
+    areaSlider.value = displayArea;
+    areaInput.value = displayArea;
+    areaInputDisplay.textContent = displayArea.toFixed(2);
+    areaInputUnitDisplay.textContent = areaUnit;
+    const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
+    areaSlider.max = areaSliderMax;
+    areaMaxLabel.textContent = areaSliderMax.toFixed(1);
+  });
+
+  // ============================================
+  // PI BUTTONS
+  // ============================================
+  document.querySelectorAll('.pi-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pi-btn').forEach(b => {
+        b.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      btn.className = 'pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      
+      if (btn.id === 'pi314') currentPiMode = '314';
+      else if (btn.id === 'pi227') currentPiMode = '227';
+      else if (btn.id === 'piExact') currentPiMode = 'exact';
+      
+      if (currentMode === 'area') {
+        updateCircle(currentRadius);
+      } else {
+        const areaVal = parseFloat(areaInput.value);
+        if (areaVal >= 0) {
+          updateFromArea(areaVal);
+        }
+      }
+    });
+  });
+
+  // ============================================
+  // UNIT BUTTONS
+  // ============================================
+  document.querySelectorAll('.unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.unit-btn').forEach(b => {
+        b.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      btn.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentUnit = btn.dataset.unit;
+      
+      if (currentMode === 'area') {
+        updateCircle(currentRadius);
+      } else {
+        const areaVal = parseFloat(areaInput.value);
+        if (areaVal >= 0) {
+          updateFromArea(areaVal);
+        }
+      }
+    });
+  });
+
+  // ============================================
+  // AREA MODE EVENTS
+  // ============================================
+  radiusSlider.addEventListener('input', () => {
+    const radius = parseFloat(radiusSlider.value);
+    const validation = validateRadius(radius);
+    if (!validation.valid) {
+      radiusError.textContent = validation.message;
+      radiusError.classList.remove('hidden');
+      return;
+    }
+    radiusError.classList.add('hidden');
+    updateCircle(validation.value);
+    updateFunFact();
+  });
+
+  radiusInput.addEventListener('input', () => {
+    const validation = validateRadius(radiusInput.value);
+    if (!validation.valid) {
+      radiusError.textContent = validation.message;
+      radiusError.classList.remove('hidden');
+      return;
+    }
+    radiusError.classList.add('hidden');
+    radiusSlider.value = Math.min(validation.value, 20);
+    updateCircle(validation.value);
+    updateFunFact();
+  });
+
+  document.getElementById('calculateBtn').addEventListener('click', () => {
+    const validation = validateRadius(radiusInput.value);
+    if (!validation.valid) {
+      radiusError.textContent = validation.message;
+      radiusError.classList.remove('hidden');
+      radiusInput.focus();
+      return;
+    }
+    radiusError.classList.add('hidden');
+    radiusSlider.value = Math.min(validation.value, 20);
+    updateCircle(validation.value);
+    updateFunFact();
+    if (window.showToast) {
+      window.showToast('✅ Calculation updated!', 'success');
+    }
+  });
+
+  radiusInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      document.getElementById('calculateBtn').click();
+    }
+  });
+
+  // ============================================
+  // RADIUS MODE EVENTS
+  // ============================================
+  areaSlider.addEventListener('input', () => {
+    const areaVal = parseFloat(areaSlider.value);
+    const validation = validateArea(areaVal);
+    if (!validation.valid) {
+      areaError.textContent = validation.message;
+      areaError.classList.remove('hidden');
+      return;
+    }
+    areaError.classList.add('hidden');
+    areaInput.value = areaVal;
+    areaInputDisplay.textContent = areaVal.toFixed(2);
+    updateFromArea(areaVal);
+    updateFunFact();
+  });
+
+  areaInput.addEventListener('input', () => {
+    const validation = validateArea(areaInput.value);
+    if (!validation.valid) {
+      areaError.textContent = validation.message;
+      areaError.classList.remove('hidden');
+      return;
+    }
+    areaError.classList.add('hidden');
+    areaSlider.value = areaVal;
+    areaInputDisplay.textContent = areaVal.toFixed(2);
+    updateFromArea(areaVal);
+    updateFunFact();
+  });
+
+  document.getElementById('findRadiusBtn').addEventListener('click', () => {
+    const validation = validateArea(areaInput.value);
+    if (!validation.valid) {
+      areaError.textContent = validation.message;
+      areaError.classList.remove('hidden');
+      areaInput.focus();
+      return;
+    }
+    areaError.classList.add('hidden');
+    areaSlider.value = validation.value;
+    areaInputDisplay.textContent = validation.value.toFixed(2);
+    updateFromArea(validation.value);
+    updateFunFact();
+    if (window.showToast) {
+      window.showToast('✅ Radius found!', 'success');
+    }
+  });
+
+  areaInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      document.getElementById('findRadiusBtn').click();
+    }
+  });
+
+  // ============================================
+  // RESET BUTTON
+  // ============================================
+  // Add reset button dynamically
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'resetBtn';
+  resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+  resetBtn.textContent = '🔄 Reset Calculator';
+  resetBtn.addEventListener('click', resetCalculator);
+  
+  // Insert reset button after the result box
+  const resultBox = document.getElementById('resultBox');
+  if (resultBox) {
+    resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
+  }
+
+  // ============================================
+  // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+  // ============================================
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+      e.preventDefault();
+      resetCalculator();
+    }
+  });
+
+  // ============================================
+  // INITIALIZE
+  // ============================================
+  updateCircle(5);
+  updateFunFact();
+});
   </script>
 </Layout>

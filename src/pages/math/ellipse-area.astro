@@ -555,473 +555,565 @@ import SEOContent from '../../components/SEOContent.astro';
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // ============================================
-      // STATE
-      // ============================================
-      let currentUnit = 'cm';
-      let currentPiMode = '314';
-      let currentMode = 'area'; // 'area', 'major', 'minor'
+   document.addEventListener('DOMContentLoaded', () => {
+  // ============================================
+  // STATE
+  // ============================================
+  let currentUnit = 'cm';
+  let currentPiMode = '314';
+  let currentMode = 'area'; // 'area', 'major', 'minor'
+  let currentA = 8;
+  let currentB = 5;
 
-      const piValues = {
-        '314': { label: '3.14', value: 3.14 },
-        '227': { label: '22/7', value: 22/7 },
-        'exact': { label: 'π', value: Math.PI }
-      };
+  const piValues = {
+    '314': { label: '3.14', value: 3.14 },
+    '227': { label: '22/7', value: 22/7 },
+    'exact': { label: 'π', value: Math.PI }
+  };
 
-      // ============================================
-      // DOM REFERENCES
-      // ============================================
-      // Area mode
-      const semiMajorSlider = document.getElementById('semiMajorSlider');
-      const semiMinorSlider = document.getElementById('semiMinorSlider');
-      const semiMajorInput = document.getElementById('semiMajorInput');
-      const semiMinorInput = document.getElementById('semiMinorInput');
-      const semiMajorDisplay = document.getElementById('semiMajorDisplay');
-      const semiMinorDisplay = document.getElementById('semiMinorDisplay');
-      const semiMajorUnitDisplay = document.getElementById('semiMajorUnitDisplay');
-      const semiMinorUnitDisplay = document.getElementById('semiMinorUnitDisplay');
+  // ============================================
+  // DOM REFERENCES
+  // ============================================
+  // Area mode
+  const semiMajorSlider = document.getElementById('semiMajorSlider');
+  const semiMinorSlider = document.getElementById('semiMinorSlider');
+  const semiMajorInput = document.getElementById('semiMajorInput');
+  const semiMinorInput = document.getElementById('semiMinorInput');
+  const semiMajorDisplay = document.getElementById('semiMajorDisplay');
+  const semiMinorDisplay = document.getElementById('semiMinorDisplay');
+  const semiMajorUnitDisplay = document.getElementById('semiMajorUnitDisplay');
+  const semiMinorUnitDisplay = document.getElementById('semiMinorUnitDisplay');
 
-      // Major mode
-      const areaForMajorSlider = document.getElementById('areaForMajorSlider');
-      const minorForMajorSlider = document.getElementById('minorForMajorSlider');
-      const areaForMajorInput = document.getElementById('areaForMajorInput');
-      const minorForMajorInput = document.getElementById('minorForMajorInput');
-      const areaForMajorDisplay = document.getElementById('areaForMajorDisplay');
-      const areaForMajorUnit = document.getElementById('areaForMajorUnit');
-      const minorForMajorDisplay = document.getElementById('minorForMajorDisplay');
-      const minorForMajorUnit = document.getElementById('minorForMajorUnit');
-      const areaMajorMaxLabel = document.getElementById('areaMajorMaxLabel');
+  // Major mode
+  const areaForMajorSlider = document.getElementById('areaForMajorSlider');
+  const minorForMajorSlider = document.getElementById('minorForMajorSlider');
+  const areaForMajorInput = document.getElementById('areaForMajorInput');
+  const minorForMajorInput = document.getElementById('minorForMajorInput');
+  const areaForMajorDisplay = document.getElementById('areaForMajorDisplay');
+  const areaForMajorUnit = document.getElementById('areaForMajorUnit');
+  const minorForMajorDisplay = document.getElementById('minorForMajorDisplay');
+  const minorForMajorUnit = document.getElementById('minorForMajorUnit');
+  const areaMajorMaxLabel = document.getElementById('areaMajorMaxLabel');
 
-      // Minor mode
-      const areaForMinorSlider = document.getElementById('areaForMinorSlider');
-      const majorForMinorSlider = document.getElementById('majorForMinorSlider');
-      const areaForMinorInput = document.getElementById('areaForMinorInput');
-      const majorForMinorInput = document.getElementById('majorForMinorInput');
-      const areaForMinorDisplay = document.getElementById('areaForMinorDisplay');
-      const areaForMinorUnit = document.getElementById('areaForMinorUnit');
-      const majorForMinorDisplay = document.getElementById('majorForMinorDisplay');
-      const majorForMinorUnit = document.getElementById('majorForMinorUnit');
-      const areaMinorMaxLabel = document.getElementById('areaMinorMaxLabel');
+  // Minor mode
+  const areaForMinorSlider = document.getElementById('areaForMinorSlider');
+  const majorForMinorSlider = document.getElementById('majorForMinorSlider');
+  const areaForMinorInput = document.getElementById('areaForMinorInput');
+  const majorForMinorInput = document.getElementById('majorForMinorInput');
+  const areaForMinorDisplay = document.getElementById('areaForMinorDisplay');
+  const areaForMinorUnit = document.getElementById('areaForMinorUnit');
+  const majorForMinorDisplay = document.getElementById('majorForMinorDisplay');
+  const majorForMinorUnit = document.getElementById('majorForMinorUnit');
+  const areaMinorMaxLabel = document.getElementById('areaMinorMaxLabel');
 
-      // SVG elements
-      const ellipseVisual = document.getElementById('ellipseVisual');
-      const semiMajorLine = document.getElementById('semiMajorLine');
-      const semiMinorLine = document.getElementById('semiMinorLine');
-      const semiMajorLabelValue = document.getElementById('semiMajorLabelValue');
-      const semiMinorLabelValue = document.getElementById('semiMinorLabelValue');
-      const areaLabelEllipseValue = document.getElementById('areaLabelEllipseValue');
-      const ellipseResultValue = document.getElementById('ellipseResultValue');
-      const ellipseResultLabel = document.getElementById('ellipseResultLabel');
-      const ellipseResultSecondaryLabel = document.getElementById('ellipseResultSecondaryLabel');
-      const ellipseResultFormula = document.getElementById('ellipseResultFormula');
-      const ellipseFormulaDisplay = document.getElementById('ellipseFormulaDisplay');
-      const ellipseFormulaDesc = document.getElementById('ellipseFormulaDesc');
-      const ellipseFormulaPi = document.getElementById('ellipseFormulaPi');
-      const ellipseFormulaLabel1 = document.getElementById('ellipseFormulaLabel1');
-      const ellipseFormulaLabel2 = document.getElementById('ellipseFormulaLabel2');
-      const ellipseFormulaVal1 = document.getElementById('ellipseFormulaVal1');
-      const ellipseFormulaVal2 = document.getElementById('ellipseFormulaVal2');
-      const ellipseFormulaResultLabel = document.getElementById('ellipseFormulaResultLabel');
-      const ellipseFormulaResult = document.getElementById('ellipseFormulaResult');
-      const ellipseStep1 = document.getElementById('ellipseStep1');
-      const ellipseStep2 = document.getElementById('ellipseStep2');
-      const ellipseStep3 = document.getElementById('ellipseStep3');
-      const ellipseStep4 = document.getElementById('ellipseStep4');
+  // SVG elements
+  const ellipseVisual = document.getElementById('ellipseVisual');
+  const semiMajorLine = document.getElementById('semiMajorLine');
+  const semiMinorLine = document.getElementById('semiMinorLine');
+  const semiMajorLabelValue = document.getElementById('semiMajorLabelValue');
+  const semiMinorLabelValue = document.getElementById('semiMinorLabelValue');
+  const areaLabelEllipseValue = document.getElementById('areaLabelEllipseValue');
+  const ellipseResultValue = document.getElementById('ellipseResultValue');
+  const ellipseResultLabel = document.getElementById('ellipseResultLabel');
+  const ellipseResultSecondaryLabel = document.getElementById('ellipseResultSecondaryLabel');
+  const ellipseResultFormula = document.getElementById('ellipseResultFormula');
+  const ellipseFormulaDisplay = document.getElementById('ellipseFormulaDisplay');
+  const ellipseFormulaDesc = document.getElementById('ellipseFormulaDesc');
+  const ellipseFormulaPi = document.getElementById('ellipseFormulaPi');
+  const ellipseFormulaLabel1 = document.getElementById('ellipseFormulaLabel1');
+  const ellipseFormulaLabel2 = document.getElementById('ellipseFormulaLabel2');
+  const ellipseFormulaVal1 = document.getElementById('ellipseFormulaVal1');
+  const ellipseFormulaVal2 = document.getElementById('ellipseFormulaVal2');
+  const ellipseFormulaResultLabel = document.getElementById('ellipseFormulaResultLabel');
+  const ellipseFormulaResult = document.getElementById('ellipseFormulaResult');
+  const ellipseStep1 = document.getElementById('ellipseStep1');
+  const ellipseStep2 = document.getElementById('ellipseStep2');
+  const ellipseStep3 = document.getElementById('ellipseStep3');
+  const ellipseStep4 = document.getElementById('ellipseStep4');
 
-      const ellipseAreaModeInputs = document.getElementById('ellipseAreaModeInputs');
-      const ellipseMajorModeInputs = document.getElementById('ellipseMajorModeInputs');
-      const ellipseMinorModeInputs = document.getElementById('ellipseMinorModeInputs');
+  const ellipseAreaModeInputs = document.getElementById('ellipseAreaModeInputs');
+  const ellipseMajorModeInputs = document.getElementById('ellipseMajorModeInputs');
+  const ellipseMinorModeInputs = document.getElementById('ellipseMinorModeInputs');
 
-      const unitConversions = {
-        cm: { label: 'cm', factor: 1, display: 'cm' },
-        m: { label: 'm', factor: 100, display: 'm' },
-        in: { label: 'in', factor: 2.54, display: 'in' },
-        ft: { label: 'ft', factor: 30.48, display: 'ft' }
-      };
+  const unitConversions = {
+    cm: { label: 'cm', factor: 1, display: 'cm' },
+    m: { label: 'm', factor: 100, display: 'm' },
+    in: { label: 'in', factor: 2.54, display: 'in' },
+    ft: { label: 'ft', factor: 30.48, display: 'ft' }
+  };
 
-      function getPi() { return piValues[currentPiMode]; }
-      function getUnit() { return unitConversions[currentUnit]; }
+  // ============================================
+  // VALIDATION HELPERS
+  // ============================================
+  function validatePositive(value, name) {
+    if (value === '' || value === null || value === undefined) {
+      return { valid: false, message: `Please enter a ${name}` };
+    }
+    const num = parseFloat(value);
+    if (isNaN(num)) {
+      return { valid: false, message: 'Please enter a valid number' };
+    }
+    if (num < 0) {
+      return { valid: false, message: `${name} cannot be negative` };
+    }
+    if (num > 1e10) {
+      return { valid: false, message: `${name} is too large` };
+    }
+    return { valid: true, value: num };
+  }
 
-      function formatArea(area) {
-        let displayArea = area;
-        let areaUnit = 'cm²';
-        if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
-        else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
-        else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
-        return { value: displayArea, unit: areaUnit };
-      }
+  function getPi() { return piValues[currentPiMode]; }
+  function getUnit() { return unitConversions[currentUnit]; }
 
-      function updateSVG(a, b, area) {
-        const maxSize = 15;
-        const scaleA = Math.min(a / maxSize, 1);
-        const scaleB = Math.min(b / maxSize, 1);
-        const rx = 80 + scaleA * 160;
-        const ry = 60 + scaleB * 120;
-        const cx = 250;
-        const cy = 250;
+  function formatArea(area) {
+    let displayArea = area;
+    let areaUnit = 'cm²';
+    if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+    else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+    else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+    return { value: displayArea, unit: areaUnit };
+  }
 
-        ellipseVisual.setAttribute('rx', rx);
-        ellipseVisual.setAttribute('ry', ry);
-        ellipseVisual.setAttribute('cx', cx);
-        ellipseVisual.setAttribute('cy', cy);
-        semiMajorLine.setAttribute('x2', cx + rx);
-        semiMajorLine.setAttribute('y2', cy);
-        semiMinorLine.setAttribute('x1', cx);
-        semiMinorLine.setAttribute('x2', cx);
-        semiMinorLine.setAttribute('y1', cy);
-        semiMinorLine.setAttribute('y2', cy - ry);
+  // ============================================
+  // UPDATE SVG
+  // ============================================
+  function updateSVG(a, b, area) {
+    const maxSize = Math.max(a, b, 15);
+    const scaleA = Math.min(a / maxSize, 1);
+    const scaleB = Math.min(b / maxSize, 1);
+    const rx = 80 + scaleA * 160;
+    const ry = 60 + scaleB * 120;
+    const cx = 250;
+    const cy = 250;
 
-        const formatted = formatArea(area);
-        semiMajorLabelValue.textContent = a.toFixed(2);
-        semiMinorLabelValue.textContent = b.toFixed(2);
-        areaLabelEllipseValue.textContent = formatted.value.toFixed(2);
-      }
+    ellipseVisual.setAttribute('rx', rx);
+    ellipseVisual.setAttribute('ry', ry);
+    ellipseVisual.setAttribute('cx', cx);
+    ellipseVisual.setAttribute('cy', cy);
+    semiMajorLine.setAttribute('x2', cx + rx);
+    semiMajorLine.setAttribute('y2', cy);
+    semiMinorLine.setAttribute('x1', cx);
+    semiMinorLine.setAttribute('x2', cx);
+    semiMinorLine.setAttribute('y1', cy);
+    semiMinorLine.setAttribute('y2', cy - ry);
 
-      function updateResult(value, label, secondaryLabel, formula) {
-        ellipseResultValue.textContent = value;
-        ellipseResultLabel.textContent = label;
-        ellipseResultSecondaryLabel.textContent = secondaryLabel;
-        ellipseResultFormula.textContent = formula;
-      }
+    const formatted = formatArea(area);
+    semiMajorLabelValue.textContent = a.toFixed(2);
+    semiMinorLabelValue.textContent = b.toFixed(2);
+    areaLabelEllipseValue.textContent = formatted.value.toFixed(2);
+  }
 
-      function updateFormula(pi, val1, val2, result, label1, label2, resultLabel, display, desc) {
-        ellipseFormulaPi.textContent = pi;
-        ellipseFormulaVal1.textContent = val1;
-        ellipseFormulaVal2.textContent = val2;
-        ellipseFormulaResult.textContent = result;
-        ellipseFormulaLabel1.textContent = label1;
-        ellipseFormulaLabel2.textContent = label2;
-        ellipseFormulaResultLabel.textContent = resultLabel;
-        if (display) ellipseFormulaDisplay.textContent = display;
-        if (desc) ellipseFormulaDesc.textContent = desc;
-      }
+  // ============================================
+  // UPDATE RESULT
+  // ============================================
+  function updateResult(value, label, secondaryLabel, formula) {
+    ellipseResultValue.textContent = value;
+    ellipseResultLabel.textContent = label;
+    ellipseResultSecondaryLabel.textContent = secondaryLabel;
+    ellipseResultFormula.textContent = formula;
+  }
 
-      function updateSteps(s1, s2, s3, s4) {
-        ellipseStep1.textContent = s1;
-        ellipseStep2.textContent = s2;
-        ellipseStep3.textContent = s3;
-        ellipseStep4.textContent = s4;
-      }
+  function updateFormula(pi, val1, val2, result, label1, label2, resultLabel, display, desc) {
+    ellipseFormulaPi.textContent = pi;
+    ellipseFormulaVal1.textContent = val1;
+    ellipseFormulaVal2.textContent = val2;
+    ellipseFormulaResult.textContent = result;
+    ellipseFormulaLabel1.textContent = label1;
+    ellipseFormulaLabel2.textContent = label2;
+    ellipseFormulaResultLabel.textContent = resultLabel;
+    if (display) ellipseFormulaDisplay.textContent = display;
+    if (desc) ellipseFormulaDesc.textContent = desc;
+  }
 
-      // ============================================
-      // MODE TOGGLE
-      // ============================================
-      function setMode(mode) {
-        currentMode = mode;
-        document.querySelectorAll('.ellipse-mode-btn').forEach(b => {
-          b.className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-        });
-        const btnMap = { area: 'modeAreaEllipse', major: 'modeMajorEllipse', minor: 'modeMinorEllipse' };
-        document.getElementById(btnMap[mode]).className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+  function updateSteps(s1, s2, s3, s4) {
+    ellipseStep1.textContent = s1;
+    ellipseStep2.textContent = s2;
+    ellipseStep3.textContent = s3;
+    ellipseStep4.textContent = s4;
+  }
 
-        ellipseAreaModeInputs.classList.toggle('hidden', mode !== 'area');
-        ellipseMajorModeInputs.classList.toggle('hidden', mode !== 'major');
-        ellipseMinorModeInputs.classList.toggle('hidden', mode !== 'minor');
+  // ============================================
+  // RESET FUNCTION
+  // ============================================
+  function resetEllipse() {
+    currentA = 8;
+    currentB = 5;
+    semiMajorSlider.value = 8;
+    semiMinorSlider.value = 5;
+    semiMajorInput.value = 8;
+    semiMinorInput.value = 5;
+    areaForMajorSlider.value = 125.66;
+    areaForMajorInput.value = 125.66;
+    minorForMajorSlider.value = 5;
+    minorForMajorInput.value = 5;
+    areaForMinorSlider.value = 125.66;
+    areaForMinorInput.value = 125.66;
+    majorForMinorSlider.value = 8;
+    majorForMinorInput.value = 8;
+    updateEllipse();
+    if (window.showToast) {
+      window.showToast('🔄 Ellipse calculator reset to default values', 'info');
+    }
+  }
 
-        if (mode === 'area') {
-          semiMajorInput.value = semiMajorSlider.value;
-          semiMinorInput.value = semiMinorSlider.value;
-        } else if (mode === 'major') {
-          areaForMajorInput.value = areaForMajorSlider.value;
-          minorForMajorInput.value = minorForMajorSlider.value;
-        } else if (mode === 'minor') {
-          areaForMinorInput.value = areaForMinorSlider.value;
-          majorForMinorInput.value = majorForMinorSlider.value;
-        }
-        updateEllipse();
-      }
+  // ============================================
+  // UPDATE ELLIPSE
+  // ============================================
+  function updateEllipse() {
+    const pi = getPi();
+    const unit = getUnit();
+    const displayUnit = unit.display;
+    let a, b, area, resultValue, resultLabel, resultSecondary, resultFormula;
+    let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
+    let val1, val2, result;
+    let step1, step2, step3, step4;
 
-      document.getElementById('modeAreaEllipse').addEventListener('click', () => setMode('area'));
-      document.getElementById('modeMajorEllipse').addEventListener('click', () => setMode('major'));
-      document.getElementById('modeMinorEllipse').addEventListener('click', () => setMode('minor'));
+    if (currentMode === 'area') {
+      a = parseFloat(semiMajorSlider.value);
+      b = parseFloat(semiMinorSlider.value);
+      area = pi.value * a * b;
+      
+      const formatted = formatArea(area);
+      resultValue = formatted.value.toFixed(2);
+      resultLabel = 'Area of Ellipse';
+      resultSecondary = 'A = π × a × b';
+      resultFormula = 'A = π × a × b';
+      formulaDisplay = 'A = π × a × b';
+      formulaDesc = 'Area = π × Semi-Major × Semi-Minor';
+      label1 = 'Semi-Major (a)';
+      label2 = 'Semi-Minor (b)';
+      resultLabelText = 'Area';
+      val1 = `${a} ${displayUnit}`;
+      val2 = `${b} ${displayUnit}`;
+      result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      step1 = `Formula: A = π × a × b`;
+      step2 = `Plug in: A = ${pi.label} × ${a} × ${b}`;
+      step3 = `Calculate: A = ${(pi.value * a * b).toFixed(4)}`;
+      step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
 
-      // ============================================
-      // PI BUTTONS
-      // ============================================
-      document.querySelectorAll('.ellipse-pi-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.ellipse-pi-btn').forEach(b => {
-            b.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-          });
-          btn.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-          if (btn.id === 'pi314Ellipse') currentPiMode = '314';
-          else if (btn.id === 'pi227Ellipse') currentPiMode = '227';
-          else if (btn.id === 'piExactEllipse') currentPiMode = 'exact';
-          updateEllipse();
-        });
+      semiMajorDisplay.textContent = a;
+      semiMinorDisplay.textContent = b;
+      semiMajorUnitDisplay.textContent = displayUnit;
+      semiMinorUnitDisplay.textContent = displayUnit;
+
+    } else if (currentMode === 'major') {
+      const areaVal = parseFloat(areaForMajorSlider.value);
+      b = parseFloat(minorForMajorSlider.value);
+      let areaCm2 = areaVal;
+      if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+      else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+      else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+      a = areaCm2 / (pi.value * b);
+      area = areaCm2;
+      
+      const formatted = formatArea(area);
+      resultValue = a.toFixed(2);
+      resultLabel = 'Semi-Major Axis (a)';
+      resultSecondary = 'a = A / (π × b)';
+      resultFormula = 'a = A / (π × b)';
+      formulaDisplay = 'a = A / (π × b)';
+      formulaDesc = 'Semi-Major = Area ÷ (π × Semi-Minor)';
+      label1 = 'Area';
+      label2 = 'Semi-Minor (b)';
+      resultLabelText = 'Semi-Major (a)';
+      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      val2 = `${b} ${displayUnit}`;
+      result = `${a.toFixed(2)} ${displayUnit}`;
+      step1 = `Formula: a = A / (π × b)`;
+      step2 = `Plug in: a = ${formatted.value.toFixed(2)} / (${pi.label} × ${b})`;
+      step3 = `Calculate: a = ${a.toFixed(2)}`;
+      step4 = `Answer: a = ${a.toFixed(2)} ${displayUnit}`;
+
+      areaForMajorDisplay.textContent = formatted.value.toFixed(2);
+      areaForMajorUnit.textContent = formatted.unit;
+      minorForMajorDisplay.textContent = b;
+      minorForMajorUnit.textContent = displayUnit;
+
+    } else if (currentMode === 'minor') {
+      const areaVal = parseFloat(areaForMinorSlider.value);
+      a = parseFloat(majorForMinorSlider.value);
+      let areaCm2 = areaVal;
+      if (currentUnit === 'm') areaCm2 = areaVal * 10000;
+      else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
+      else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
+      b = areaCm2 / (pi.value * a);
+      area = areaCm2;
+      
+      const formatted = formatArea(area);
+      resultValue = b.toFixed(2);
+      resultLabel = 'Semi-Minor Axis (b)';
+      resultSecondary = 'b = A / (π × a)';
+      resultFormula = 'b = A / (π × a)';
+      formulaDisplay = 'b = A / (π × a)';
+      formulaDesc = 'Semi-Minor = Area ÷ (π × Semi-Major)';
+      label1 = 'Area';
+      label2 = 'Semi-Major (a)';
+      resultLabelText = 'Semi-Minor (b)';
+      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      val2 = `${a} ${displayUnit}`;
+      result = `${b.toFixed(2)} ${displayUnit}`;
+      step1 = `Formula: b = A / (π × a)`;
+      step2 = `Plug in: b = ${formatted.value.toFixed(2)} / (${pi.label} × ${a})`;
+      step3 = `Calculate: b = ${b.toFixed(2)}`;
+      step4 = `Answer: b = ${b.toFixed(2)} ${displayUnit}`;
+
+      areaForMinorDisplay.textContent = formatted.value.toFixed(2);
+      areaForMinorUnit.textContent = formatted.unit;
+      majorForMinorDisplay.textContent = a;
+      majorForMinorUnit.textContent = displayUnit;
+    }
+
+    // Update SVG
+    updateSVG(a, b, area);
+
+    // Update result
+    updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
+
+    // Update formula
+    const formattedArea = formatArea(area);
+    updateFormula(
+      pi.label,
+      val1,
+      val2,
+      result,
+      label1,
+      label2,
+      resultLabelText,
+      formulaDisplay,
+      formulaDesc
+    );
+
+    // Update steps
+    updateSteps(step1, step2, step3, step4);
+
+    // Update inputs
+    if (currentMode === 'area') {
+      semiMajorInput.value = a;
+      semiMinorInput.value = b;
+    } else if (currentMode === 'major') {
+      areaForMajorInput.value = areaForMajorSlider.value;
+      minorForMajorInput.value = minorForMajorSlider.value;
+    } else if (currentMode === 'minor') {
+      areaForMinorInput.value = areaForMinorSlider.value;
+      majorForMinorInput.value = majorForMinorSlider.value;
+    }
+  }
+
+  // ============================================
+  // MODE TOGGLE
+  // ============================================
+  function setMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.ellipse-mode-btn').forEach(b => {
+      b.className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+    });
+    const btnMap = { area: 'modeAreaEllipse', major: 'modeMajorEllipse', minor: 'modeMinorEllipse' };
+    document.getElementById(btnMap[mode]).className = 'ellipse-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+    ellipseAreaModeInputs.classList.toggle('hidden', mode !== 'area');
+    ellipseMajorModeInputs.classList.toggle('hidden', mode !== 'major');
+    ellipseMinorModeInputs.classList.toggle('hidden', mode !== 'minor');
+
+    if (mode === 'area') {
+      semiMajorInput.value = semiMajorSlider.value;
+      semiMinorInput.value = semiMinorSlider.value;
+    } else if (mode === 'major') {
+      areaForMajorInput.value = areaForMajorSlider.value;
+      minorForMajorInput.value = minorForMajorSlider.value;
+    } else if (mode === 'minor') {
+      areaForMinorInput.value = areaForMinorSlider.value;
+      majorForMinorInput.value = majorForMinorSlider.value;
+    }
+    updateEllipse();
+  }
+
+  document.getElementById('modeAreaEllipse').addEventListener('click', () => setMode('area'));
+  document.getElementById('modeMajorEllipse').addEventListener('click', () => setMode('major'));
+  document.getElementById('modeMinorEllipse').addEventListener('click', () => setMode('minor'));
+
+  // ============================================
+  // PI BUTTONS
+  // ============================================
+  document.querySelectorAll('.ellipse-pi-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ellipse-pi-btn').forEach(b => {
+        b.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
+      btn.className = 'ellipse-pi-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      if (btn.id === 'pi314Ellipse') currentPiMode = '314';
+      else if (btn.id === 'pi227Ellipse') currentPiMode = '227';
+      else if (btn.id === 'piExactEllipse') currentPiMode = 'exact';
+      updateEllipse();
+    });
+  });
 
-      // ============================================
-      // UNIT TOGGLE
-      // ============================================
-      document.querySelectorAll('.ellipse-unit-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.ellipse-unit-btn').forEach(b => {
-            b.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-          });
-          btn.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-          currentUnit = btn.dataset.unit;
-          
-          // Update max labels
-          const unit = getUnit();
-          const maxArea = Math.PI * 15 * 15;
-          const formatted = formatArea(maxArea);
-          areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
-          areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
-          
-          updateEllipse();
-        });
+  // ============================================
+  // UNIT TOGGLE
+  // ============================================
+  document.querySelectorAll('.ellipse-unit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ellipse-unit-btn').forEach(b => {
+        b.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
-
-      // ============================================
-      // UPDATE ELLIPSE
-      // ============================================
-      function updateEllipse() {
-        const pi = getPi();
-        const unit = getUnit();
-        const displayUnit = unit.display;
-        let a, b, area, resultValue, resultLabel, resultSecondary, resultFormula;
-        let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
-        let val1, val2, result;
-        let step1, step2, step3, step4;
-
-        if (currentMode === 'area') {
-          a = parseFloat(semiMajorSlider.value);
-          b = parseFloat(semiMinorSlider.value);
-          area = pi.value * a * b;
-          
-          const formatted = formatArea(area);
-          resultValue = formatted.value.toFixed(2);
-          resultLabel = 'Area of Ellipse';
-          resultSecondary = 'A = π × a × b';
-          resultFormula = 'A = π × a × b';
-          formulaDisplay = 'A = π × a × b';
-          formulaDesc = 'Area = π × Semi-Major × Semi-Minor';
-          label1 = 'Semi-Major (a)';
-          label2 = 'Semi-Minor (b)';
-          resultLabelText = 'Area';
-          val1 = `${a} ${displayUnit}`;
-          val2 = `${b} ${displayUnit}`;
-          result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-          step1 = `Formula: A = π × a × b`;
-          step2 = `Plug in: A = ${pi.label} × ${a} × ${b}`;
-          step3 = `Calculate: A = ${(pi.value * a * b).toFixed(4)}`;
-          step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
-
-          semiMajorDisplay.textContent = a;
-          semiMinorDisplay.textContent = b;
-          semiMajorUnitDisplay.textContent = displayUnit;
-          semiMinorUnitDisplay.textContent = displayUnit;
-
-        } else if (currentMode === 'major') {
-          const areaVal = parseFloat(areaForMajorSlider.value);
-          b = parseFloat(minorForMajorSlider.value);
-          // Convert area to cm² if needed
-          let areaCm2 = areaVal;
-          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
-          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
-          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
-          a = areaCm2 / (pi.value * b);
-          area = areaCm2;
-          
-          const formatted = formatArea(area);
-          resultValue = a.toFixed(2);
-          resultLabel = 'Semi-Major Axis (a)';
-          resultSecondary = 'a = A / (π × b)';
-          resultFormula = 'a = A / (π × b)';
-          formulaDisplay = 'a = A / (π × b)';
-          formulaDesc = 'Semi-Major = Area ÷ (π × Semi-Minor)';
-          label1 = 'Area';
-          label2 = 'Semi-Minor (b)';
-          resultLabelText = 'Semi-Major (a)';
-          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-          val2 = `${b} ${displayUnit}`;
-          result = `${a.toFixed(2)} ${displayUnit}`;
-          step1 = `Formula: a = A / (π × b)`;
-          step2 = `Plug in: a = ${formatted.value.toFixed(2)} / (${pi.label} × ${b})`;
-          step3 = `Calculate: a = ${a.toFixed(2)}`;
-          step4 = `Answer: a = ${a.toFixed(2)} ${displayUnit}`;
-
-          areaForMajorDisplay.textContent = formatted.value.toFixed(2);
-          areaForMajorUnit.textContent = formatted.unit;
-          minorForMajorDisplay.textContent = b;
-          minorForMajorUnit.textContent = displayUnit;
-
-        } else if (currentMode === 'minor') {
-          const areaVal = parseFloat(areaForMinorSlider.value);
-          a = parseFloat(majorForMinorSlider.value);
-          let areaCm2 = areaVal;
-          if (currentUnit === 'm') areaCm2 = areaVal * 10000;
-          else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
-          else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
-          b = areaCm2 / (pi.value * a);
-          area = areaCm2;
-          
-          const formatted = formatArea(area);
-          resultValue = b.toFixed(2);
-          resultLabel = 'Semi-Minor Axis (b)';
-          resultSecondary = 'b = A / (π × a)';
-          resultFormula = 'b = A / (π × a)';
-          formulaDisplay = 'b = A / (π × a)';
-          formulaDesc = 'Semi-Minor = Area ÷ (π × Semi-Major)';
-          label1 = 'Area';
-          label2 = 'Semi-Major (a)';
-          resultLabelText = 'Semi-Minor (b)';
-          val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-          val2 = `${a} ${displayUnit}`;
-          result = `${b.toFixed(2)} ${displayUnit}`;
-          step1 = `Formula: b = A / (π × a)`;
-          step2 = `Plug in: b = ${formatted.value.toFixed(2)} / (${pi.label} × ${a})`;
-          step3 = `Calculate: b = ${b.toFixed(2)}`;
-          step4 = `Answer: b = ${b.toFixed(2)} ${displayUnit}`;
-
-          areaForMinorDisplay.textContent = formatted.value.toFixed(2);
-          areaForMinorUnit.textContent = formatted.unit;
-          majorForMinorDisplay.textContent = a;
-          majorForMinorUnit.textContent = displayUnit;
-        }
-
-        // Update SVG
-        updateSVG(a, b, area);
-
-        // Update result
-        updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
-
-        // Update formula
-        const formattedArea = formatArea(area);
-        updateFormula(
-          pi.label,
-          val1,
-          val2,
-          result,
-          label1,
-          label2,
-          resultLabelText,
-          formulaDisplay,
-          formulaDesc
-        );
-
-        // Update steps
-        updateSteps(step1, step2, step3, step4);
-
-        // Update inputs
-        if (currentMode === 'area') {
-          semiMajorInput.value = a;
-          semiMinorInput.value = b;
-        } else if (currentMode === 'major') {
-          areaForMajorInput.value = areaForMajorSlider.value;
-          minorForMajorInput.value = minorForMajorSlider.value;
-        } else if (currentMode === 'minor') {
-          areaForMinorInput.value = areaForMinorSlider.value;
-          majorForMinorInput.value = majorForMinorSlider.value;
-        }
-      }
-
-      // ============================================
-      // EVENT LISTENERS
-      // ============================================
-      // Area mode
-      semiMajorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
-      semiMinorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
-
-      semiMajorInput.addEventListener('input', () => {
-        if (currentMode === 'area') {
-          const val = parseFloat(semiMajorInput.value);
-          if (val && val > 0) { semiMajorSlider.value = val; updateEllipse(); }
-        }
-      });
-      semiMinorInput.addEventListener('input', () => {
-        if (currentMode === 'area') {
-          const val = parseFloat(semiMinorInput.value);
-          if (val && val > 0) { semiMinorSlider.value = val; updateEllipse(); }
-        }
-      });
-
-      document.getElementById('ellipseCalculateBtn').addEventListener('click', () => {
-        if (currentMode === 'area') {
-          const a = parseFloat(semiMajorInput.value);
-          const b = parseFloat(semiMinorInput.value);
-          if (!a || a <= 0 || !b || b <= 0) {
-            alert('Please enter valid positive numbers for both axes.');
-            return;
-          }
-          semiMajorSlider.value = a;
-          semiMinorSlider.value = b;
-          updateEllipse();
-        }
-      });
-
-      // Major mode
-      areaForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
-      minorForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
-
-      areaForMajorInput.addEventListener('input', () => {
-        if (currentMode === 'major') {
-          const val = parseFloat(areaForMajorInput.value);
-          if (val && val > 0) { areaForMajorSlider.value = val; updateEllipse(); }
-        }
-      });
-      minorForMajorInput.addEventListener('input', () => {
-        if (currentMode === 'major') {
-          const val = parseFloat(minorForMajorInput.value);
-          if (val && val > 0) { minorForMajorSlider.value = val; updateEllipse(); }
-        }
-      });
-
-      document.getElementById('findMajorBtn').addEventListener('click', () => {
-        if (currentMode === 'major') {
-          const a = parseFloat(areaForMajorInput.value);
-          const b = parseFloat(minorForMajorInput.value);
-          if (!a || a <= 0 || !b || b <= 0) {
-            alert('Please enter valid positive numbers for area and semi-minor axis.');
-            return;
-          }
-          areaForMajorSlider.value = a;
-          minorForMajorSlider.value = b;
-          updateEllipse();
-        }
-      });
-
-      // Minor mode
-      areaForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
-      majorForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
-
-      areaForMinorInput.addEventListener('input', () => {
-        if (currentMode === 'minor') {
-          const val = parseFloat(areaForMinorInput.value);
-          if (val && val > 0) { areaForMinorSlider.value = val; updateEllipse(); }
-        }
-      });
-      majorForMinorInput.addEventListener('input', () => {
-        if (currentMode === 'minor') {
-          const val = parseFloat(majorForMinorInput.value);
-          if (val && val > 0) { majorForMinorSlider.value = val; updateEllipse(); }
-        }
-      });
-
-      document.getElementById('findMinorBtn').addEventListener('click', () => {
-        if (currentMode === 'minor') {
-          const a = parseFloat(areaForMinorInput.value);
-          const b = parseFloat(majorForMinorInput.value);
-          if (!a || a <= 0 || !b || b <= 0) {
-            alert('Please enter valid positive numbers for area and semi-major axis.');
-            return;
-          }
-          areaForMinorSlider.value = a;
-          majorForMinorSlider.value = b;
-          updateEllipse();
-        }
-      });
-
-      // ============================================
-      // INITIALIZE
-      // ============================================
+      btn.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentUnit = btn.dataset.unit;
+      const unit = getUnit();
       const maxArea = Math.PI * 15 * 15;
       const formatted = formatArea(maxArea);
       areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
       areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
       updateEllipse();
     });
+  });
+
+  // ============================================
+  // AREA MODE EVENTS
+  // ============================================
+  semiMajorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
+  semiMinorSlider.addEventListener('input', () => { if (currentMode === 'area') updateEllipse(); });
+
+  semiMajorInput.addEventListener('input', () => {
+    if (currentMode === 'area') {
+      const validation = validatePositive(semiMajorInput.value, 'Semi-Major axis');
+      if (validation.valid) {
+        semiMajorSlider.value = Math.min(validation.value, 15);
+        updateEllipse();
+      }
+    }
+  });
+  semiMinorInput.addEventListener('input', () => {
+    if (currentMode === 'area') {
+      const validation = validatePositive(semiMinorInput.value, 'Semi-Minor axis');
+      if (validation.valid) {
+        semiMinorSlider.value = Math.min(validation.value, 15);
+        updateEllipse();
+      }
+    }
+  });
+
+  document.getElementById('ellipseCalculateBtn').addEventListener('click', () => {
+    if (currentMode === 'area') {
+      const aVal = validatePositive(semiMajorInput.value, 'Semi-Major axis');
+      const bVal = validatePositive(semiMinorInput.value, 'Semi-Minor axis');
+      if (!aVal.valid) {
+        alert(aVal.message);
+        semiMajorInput.focus();
+        return;
+      }
+      if (!bVal.valid) {
+        alert(bVal.message);
+        semiMinorInput.focus();
+        return;
+      }
+      semiMajorSlider.value = Math.min(aVal.value, 15);
+      semiMinorSlider.value = Math.min(bVal.value, 15);
+      updateEllipse();
+      if (window.showToast) {
+        window.showToast('✅ Calculation updated!', 'success');
+      }
+    }
+  });
+
+  // ============================================
+  // MAJOR MODE EVENTS
+  // ============================================
+  areaForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
+  minorForMajorSlider.addEventListener('input', () => { if (currentMode === 'major') updateEllipse(); });
+
+  areaForMajorInput.addEventListener('input', () => {
+    if (currentMode === 'major') {
+      const validation = validatePositive(areaForMajorInput.value, 'Area');
+      if (validation.valid) { areaForMajorSlider.value = validation.value; updateEllipse(); }
+    }
+  });
+  minorForMajorInput.addEventListener('input', () => {
+    if (currentMode === 'major') {
+      const validation = validatePositive(minorForMajorInput.value, 'Semi-Minor axis');
+      if (validation.valid) { minorForMajorSlider.value = validation.value; updateEllipse(); }
+    }
+  });
+
+  document.getElementById('findMajorBtn').addEventListener('click', () => {
+    if (currentMode === 'major') {
+      const aVal = validatePositive(areaForMajorInput.value, 'Area');
+      const bVal = validatePositive(minorForMajorInput.value, 'Semi-Minor axis');
+      if (!aVal.valid) { alert(aVal.message); areaForMajorInput.focus(); return; }
+      if (!bVal.valid) { alert(bVal.message); minorForMajorInput.focus(); return; }
+      areaForMajorSlider.value = aVal.value;
+      minorForMajorSlider.value = bVal.value;
+      updateEllipse();
+      if (window.showToast) {
+        window.showToast('✅ Semi-Major axis found!', 'success');
+      }
+    }
+  });
+
+  // ============================================
+  // MINOR MODE EVENTS
+  // ============================================
+  areaForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
+  majorForMinorSlider.addEventListener('input', () => { if (currentMode === 'minor') updateEllipse(); });
+
+  areaForMinorInput.addEventListener('input', () => {
+    if (currentMode === 'minor') {
+      const validation = validatePositive(areaForMinorInput.value, 'Area');
+      if (validation.valid) { areaForMinorSlider.value = validation.value; updateEllipse(); }
+    }
+  });
+  majorForMinorInput.addEventListener('input', () => {
+    if (currentMode === 'minor') {
+      const validation = validatePositive(majorForMinorInput.value, 'Semi-Major axis');
+      if (validation.valid) { majorForMinorSlider.value = validation.value; updateEllipse(); }
+    }
+  });
+
+  document.getElementById('findMinorBtn').addEventListener('click', () => {
+    if (currentMode === 'minor') {
+      const aVal = validatePositive(areaForMinorInput.value, 'Area');
+      const bVal = validatePositive(majorForMinorInput.value, 'Semi-Major axis');
+      if (!aVal.valid) { alert(aVal.message); areaForMinorInput.focus(); return; }
+      if (!bVal.valid) { alert(bVal.message); majorForMinorInput.focus(); return; }
+      areaForMinorSlider.value = aVal.value;
+      majorForMinorSlider.value = bVal.value;
+      updateEllipse();
+      if (window.showToast) {
+        window.showToast('✅ Semi-Minor axis found!', 'success');
+      }
+    }
+  });
+
+  // ============================================
+  // RESET BUTTON
+  // ============================================
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'resetEllipseBtn';
+  resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+  resetBtn.textContent = '🔄 Reset Calculator';
+  resetBtn.addEventListener('click', resetEllipse);
+  
+  const resultBox = document.getElementById('ellipseResultBox');
+  if (resultBox) {
+    resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
+  }
+
+  // ============================================
+  // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+  // ============================================
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+      e.preventDefault();
+      resetEllipse();
+    }
+  });
+
+  // ============================================
+  // INITIALIZE
+  // ============================================
+  const maxArea = Math.PI * 15 * 15;
+  const formatted = formatArea(maxArea);
+  areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
+  areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
+  updateEllipse();
+});
   </script>
 </Layout>
