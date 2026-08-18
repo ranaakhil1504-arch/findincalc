@@ -311,8 +311,113 @@ import Navbar from '../../components/Navbar.astro';
             </div>
           </div>
         </div>
+            </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
+    <!-- ============================================ -->
+    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
+      <h2>What is a BMI Calculator?</h2>
+      <p>
+        A BMI (Body Mass Index) calculator is a tool that helps you determine if your weight is healthy for your height. 
+        It's a widely used screening tool that gives you a quick estimate of your body fat based on your height and weight.
+      </p>
+
+      <h2>How to Calculate Your BMI</h2>
+      <p>
+        BMI is calculated using the formula:
+      </p>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
+        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">BMI = weight / (height)²</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Weight in kg, Height in meters</p>
+      </div>
+      <p>
+        For imperial units (lbs and inches), the formula is:
+      </p>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
+        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">BMI = 703 × weight / (height)²</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Weight in lbs, Height in inches</p>
+      </div>
+      <p>
+        To calculate your BMI:
+      </p>
+      <ol class="list-decimal pl-6 space-y-2">
+        <li>Measure your weight accurately</li>
+        <li>Measure your height accurately</li>
+        <li>Apply the formula above</li>
+        <li>Compare your result with the BMI categories below</li>
+      </ol>
+
+      <h2>Example: Calculating BMI</h2>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
+        <p class="font-semibold">Example 1: A person weighs 70 kg and is 175 cm tall</p>
+        <p class="mt-2">Height in meters = 175 ÷ 100 = 1.75 m</p>
+        <p>BMI = 70 ÷ (1.75)²</p>
+        <p>BMI = 70 ÷ 3.06</p>
+        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">BMI = 22.9 (Normal Weight)</p>
+      </div>
+
+      <h2>BMI Categories</h2>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <div class="p-2 rounded bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+            <span class="font-bold">Underweight</span>
+            <span class="block text-blue-600 dark:text-blue-400">&lt; 18.5</span>
+          </div>
+          <div class="p-2 rounded bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+            <span class="font-bold">Normal Weight</span>
+            <span class="block text-green-600 dark:text-green-400">18.5 – 24.9</span>
+          </div>
+          <div class="p-2 rounded bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+            <span class="font-bold">Overweight</span>
+            <span class="block text-yellow-600 dark:text-yellow-400">25.0 – 29.9</span>
+          </div>
+          <div class="p-2 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+            <span class="font-bold">Obese</span>
+            <span class="block text-red-600 dark:text-red-400">≥ 30.0</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>Why is BMI Important?</h2>
+      <ul class="list-disc pl-6 space-y-1">
+        <li><strong>Health Screening:</strong> BMI is a quick and easy way to identify potential weight-related health risks</li>
+        <li><strong>Tracking Progress:</strong> Monitor your BMI over time to see how lifestyle changes affect your health</li>
+        <li><strong>Doctor Visits:</strong> Healthcare professionals use BMI as one of many tools to assess overall health</li>
+        <li><strong>Awareness:</strong> Helps you understand where you stand and make informed health decisions</li>
+      </ul>
+
+      <h2>Limitations of BMI</h2>
+      <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 my-4">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+          ⚠️ BMI is a general screening tool and has limitations:
+        </p>
+        <ul class="list-disc pl-6 text-sm text-gray-600 dark:text-gray-400 mt-2">
+          <li>Doesn't account for muscle mass (athletes may have high BMI but low body fat)</li>
+          <li>Doesn't consider bone density or body composition</li>
+          <li>May not be accurate for older adults, pregnant women, or certain ethnic groups</li>
+          <li>Should be used alongside other health measurements</li>
+        </ul>
+      </div>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-lg font-semibold">What is a healthy BMI range?</h3>
+          <p>A healthy BMI range is typically between 18.5 and 24.9. This is associated with the lowest risk of weight-related health problems.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">Is BMI the same for men and women?</h3>
+          <p>Yes, the BMI formula is the same for both men and women. However, the interpretation may vary slightly due to differences in body composition.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">What should I do if my BMI is outside the healthy range?</h3>
+          <p>If your BMI is outside the healthy range, consider consulting with a healthcare professional. They can provide personalized advice and help you create a plan for better health.</p>
+        </div>
       </div>
     </div>
+
   </main>
 
   <script>

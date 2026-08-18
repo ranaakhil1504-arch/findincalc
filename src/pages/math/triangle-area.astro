@@ -390,8 +390,84 @@ import Navbar from '../../components/Navbar.astro';
             </p>
           </div>
         </div>
+            </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
+    <!-- ============================================ -->
+    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
+      <h2>What is a Triangle Area Calculator?</h2>
+      <p>
+        A triangle area calculator is a tool that helps you find the area of a triangle quickly and accurately. 
+        Whether you're a student learning geometry, a teacher preparing lessons, or a professional needing 
+        quick calculations, this tool makes it easy.
+      </p>
+
+      <h2>How to Calculate Triangle Area</h2>
+      <p>
+        The area of a triangle is calculated using the formula:
+      </p>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
+        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">A = ½ × b × h</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Where A = Area, b = Base, h = Height</p>
+      </div>
+      <p>
+        To calculate the area:
+      </p>
+      <ol class="list-decimal pl-6 space-y-2">
+        <li>Measure the base of the triangle</li>
+        <li>Measure the height (perpendicular distance from base to opposite vertex)</li>
+        <li>Multiply base × height</li>
+        <li>Divide by 2</li>
+        <li>The result is the area of the triangle</li>
+      </ol>
+
+      <h2>Example: Calculating Triangle Area</h2>
+      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
+        <p class="font-semibold">Example 1: Find the area of a triangle with base 10 cm and height 6 cm</p>
+        <p class="mt-2">A = ½ × b × h</p>
+        <p>A = ½ × 10 × 6</p>
+        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">A = 30 cm²</p>
+      </div>
+
+      <h2>Types of Triangles</h2>
+      <p>
+        Our calculator supports four types of triangles, each with its own formula:
+      </p>
+      <ul class="list-disc pl-6 space-y-2">
+        <li><strong>Right Triangle:</strong> A = ½ × base × height (uses the two perpendicular sides)</li>
+        <li><strong>Equilateral Triangle:</strong> A = (√3/4) × side² (all sides equal)</li>
+        <li><strong>Isosceles Triangle:</strong> A = ½ × base × height (two equal sides)</li>
+        <li><strong>Scalene Triangle:</strong> Heron's Formula A = √(s(s-a)(s-b)(s-c)) (all sides different)</li>
+      </ul>
+
+      <h2>Common Uses for Triangle Area Calculations</h2>
+      <ul class="list-disc pl-6 space-y-1">
+        <li><strong>Construction:</strong> Calculating triangular roofs, trusses, and land plots</li>
+        <li><strong>Architecture:</strong> Designing triangular facades, windows, and structures</li>
+        <li><strong>Engineering:</strong> Calculating triangular cross-sections and components</li>
+        <li><strong>Art & Design:</strong> Creating triangular patterns and compositions</li>
+        <li><strong>Education:</strong> Students learning geometry and trigonometry</li>
+      </ul>
+
+      <h2>Frequently Asked Questions</h2>
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-lg font-semibold">Why do we divide by 2 in the triangle area formula?</h3>
+          <p>A triangle is exactly half of a rectangle or parallelogram with the same base and height. That's why we multiply base × height and then divide by 2.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">What if I don't know the height?</h3>
+          <p>If you know all three sides of the triangle, you can use Heron's formula. If you have a right triangle, you can also use the Pythagorean theorem to find the height.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold">What is Heron's formula?</h3>
+          <p>Heron's formula allows you to calculate the area of any triangle when you know all three side lengths. It is: A = √(s(s-a)(s-b)(s-c)), where s is the semi-perimeter.</p>
+        </div>
       </div>
     </div>
+
   </main>
 
   <script>
