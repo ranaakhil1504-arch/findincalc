@@ -162,7 +162,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="20"
-                      step="0.5"
+                      step="any"
                       value="10"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -183,7 +183,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="20"
-                      step="0.5"
+                      step="any"
                       value="6"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -200,7 +200,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Length"
                         value="10"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -211,7 +211,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Width"
                         value="6"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -238,7 +238,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="400"
-                      step="0.5"
+                      step="any"
                       value="60"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -259,7 +259,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="20"
-                      step="0.5"
+                      step="any"
                       value="6"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -276,7 +276,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Area"
                         value="60"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -287,7 +287,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Width"
                         value="6"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -314,7 +314,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="400"
-                      step="0.5"
+                      step="any"
                       value="60"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -335,7 +335,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="20"
-                      step="0.5"
+                      step="any"
                       value="10"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -352,7 +352,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Area"
                         value="60"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -363,7 +363,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Length"
                         value="10"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -575,8 +575,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (isNaN(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
-    if (num < 0) {
-      return { valid: false, message: `${name} cannot be negative` };
+    if (num <= 0) {
+      return { valid: false, message: `${name} must be greater than 0` };
     }
     if (num > 1e10) {
       return { valid: false, message: `${name} is too large` };
@@ -585,6 +585,25 @@ import SEOContent from '../../components/SEOContent.astro';
   }
 
   function getUnit() { return unitConversions[currentUnit]; }
+
+  // Convert a displayed linear value to centimeters.
+  function linearToCm(value) {
+    return value * unitConversions[currentUnit].factor;
+  }
+
+  // Convert a displayed area value to square centimeters.
+  function areaToCm2(value) {
+    const factor = unitConversions[currentUnit].factor;
+    return value * factor * factor;
+  }
+
+  // Keep the slider synchronized without rounding or clamping manual input.
+  function setSliderValue(slider, value, defaultMax = 20) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return;
+    slider.max = String(Math.max(defaultMax, num));
+    slider.value = String(num);
+  }
 
   // ============================================
   // RESET FUNCTION
@@ -653,7 +672,7 @@ import SEOContent from '../../components/SEOContent.astro';
     const unit = getUnit();
     const displayUnit = unit.display;
 
-    const area = length * width;
+    const area = linearToCm(length) * linearToCm(width);
     const formatted = formatArea(area);
     const formattedArea = formatted.value.toFixed(2);
 
@@ -696,12 +715,9 @@ import SEOContent from '../../components/SEOContent.astro';
     const unit = getUnit();
     const displayUnit = unit.display;
 
-    let areaCm2 = area;
-    if (currentUnit === 'm') areaCm2 = area * 10000;
-    else if (currentUnit === 'in') areaCm2 = area * 6.4516;
-    else if (currentUnit === 'ft') areaCm2 = area * 929.0304;
+    const areaCm2 = areaToCm2(area);
 
-    const length = areaCm2 / width;
+    const length = areaCm2 / linearToCm(width) / unitConversions[currentUnit].factor;
     const formatted = formatArea(area);
     const formattedLength = length.toFixed(2);
     const formattedArea = formatted.value.toFixed(2);
@@ -744,12 +760,9 @@ import SEOContent from '../../components/SEOContent.astro';
     const unit = getUnit();
     const displayUnit = unit.display;
 
-    let areaCm2 = area;
-    if (currentUnit === 'm') areaCm2 = area * 10000;
-    else if (currentUnit === 'in') areaCm2 = area * 6.4516;
-    else if (currentUnit === 'ft') areaCm2 = area * 929.0304;
+    const areaCm2 = areaToCm2(area);
 
-    const width = areaCm2 / length;
+    const width = areaCm2 / linearToCm(length) / unitConversions[currentUnit].factor;
     const formatted = formatArea(area);
     const formattedWidth = width.toFixed(2);
     const formattedArea = formatted.value.toFixed(2);
@@ -846,22 +859,12 @@ import SEOContent from '../../components/SEOContent.astro';
   widthSlider.addEventListener('input', updateRectangle);
 
   lengthInput.addEventListener('input', () => {
-    if (currentMode === 'area') {
-      const validation = validatePositive(lengthInput.value, 'Length');
-      if (validation.valid) {
-        lengthSlider.value = Math.min(validation.value, 20);
-        updateRectangle();
-      }
-    }
+    // Manual input is intentionally not synchronized to the slider while typing.
+    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
   });
   widthInput.addEventListener('input', () => {
-    if (currentMode === 'area') {
-      const validation = validatePositive(widthInput.value, 'Width');
-      if (validation.valid) {
-        widthSlider.value = Math.min(validation.value, 20);
-        updateRectangle();
-      }
-    }
+    // Manual input is intentionally not synchronized to the slider while typing.
+    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
   });
 
   document.getElementById('rectCalculateBtn').addEventListener('click', () => {
@@ -870,8 +873,8 @@ import SEOContent from '../../components/SEOContent.astro';
       const wVal = validatePositive(widthInput.value, 'Width');
       if (!lVal.valid) { alert(lVal.message); lengthInput.focus(); return; }
       if (!wVal.valid) { alert(wVal.message); widthInput.focus(); return; }
-      lengthSlider.value = Math.min(lVal.value, 20);
-      widthSlider.value = Math.min(wVal.value, 20);
+      setSliderValue(lengthSlider, lVal.value);
+      setSliderValue(widthSlider, wVal.value);
       updateRectangle();
       if (window.showToast) {
         window.showToast('✅ Calculation updated!', 'success');
@@ -886,16 +889,10 @@ import SEOContent from '../../components/SEOContent.astro';
   widthForLengthSlider.addEventListener('input', updateFindLength);
 
   areaInputLength.addEventListener('input', () => {
-    if (currentMode === 'length') {
-      const validation = validatePositive(areaInputLength.value, 'Area');
-      if (validation.valid) { areaSliderLength.value = validation.value; updateFindLength(); }
-    }
+    // Wait for the action button so manual decimals are not overwritten.
   });
   widthForLengthInput.addEventListener('input', () => {
-    if (currentMode === 'length') {
-      const validation = validatePositive(widthForLengthInput.value, 'Width');
-      if (validation.valid) { widthForLengthSlider.value = validation.value; updateFindLength(); }
-    }
+    // Wait for the action button so manual decimals are not overwritten.
   });
 
   document.getElementById('findLengthBtn').addEventListener('click', () => {
@@ -904,8 +901,8 @@ import SEOContent from '../../components/SEOContent.astro';
       const wVal = validatePositive(widthForLengthInput.value, 'Width');
       if (!aVal.valid) { alert(aVal.message); areaInputLength.focus(); return; }
       if (!wVal.valid) { alert(wVal.message); widthForLengthInput.focus(); return; }
-      areaSliderLength.value = aVal.value;
-      widthForLengthSlider.value = wVal.value;
+      setSliderValue(areaSliderLength, aVal.value, 400);
+      setSliderValue(widthForLengthSlider, wVal.value);
       updateFindLength();
       if (window.showToast) {
         window.showToast('✅ Length found!', 'success');
@@ -920,16 +917,10 @@ import SEOContent from '../../components/SEOContent.astro';
   lengthForWidthSlider.addEventListener('input', updateFindWidth);
 
   areaInputWidth.addEventListener('input', () => {
-    if (currentMode === 'width') {
-      const validation = validatePositive(areaInputWidth.value, 'Area');
-      if (validation.valid) { areaSliderWidth.value = validation.value; updateFindWidth(); }
-    }
+    // Wait for the action button so manual decimals are not overwritten.
   });
   lengthForWidthInput.addEventListener('input', () => {
-    if (currentMode === 'width') {
-      const validation = validatePositive(lengthForWidthInput.value, 'Length');
-      if (validation.valid) { lengthForWidthSlider.value = validation.value; updateFindWidth(); }
-    }
+    // Wait for the action button so manual decimals are not overwritten.
   });
 
   document.getElementById('findWidthBtn').addEventListener('click', () => {
@@ -938,8 +929,8 @@ import SEOContent from '../../components/SEOContent.astro';
       const lVal = validatePositive(lengthForWidthInput.value, 'Length');
       if (!aVal.valid) { alert(aVal.message); areaInputWidth.focus(); return; }
       if (!lVal.valid) { alert(lVal.message); lengthForWidthInput.focus(); return; }
-      areaSliderWidth.value = aVal.value;
-      lengthForWidthSlider.value = lVal.value;
+      setSliderValue(areaSliderWidth, aVal.value, 400);
+      setSliderValue(lengthForWidthSlider, lVal.value);
       updateFindWidth();
       if (window.showToast) {
         window.showToast('✅ Width found!', 'success');

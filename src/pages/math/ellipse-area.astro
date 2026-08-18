@@ -247,7 +247,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Semi-Major (a)"
                         value="8"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -258,7 +258,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Semi-Minor (b)"
                         value="5"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -323,7 +323,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Area"
                         value="125.66"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -334,7 +334,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Semi-Minor (b)"
                         value="5"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -399,7 +399,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Area"
                         value="125.66"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -410,7 +410,7 @@ import SEOContent from '../../components/SEOContent.astro';
                         class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                         placeholder="Semi-Major (a)"
                         value="8"
-                        step="0.5"
+                        step="any"
                         min="1"
                       />
                     </div>
@@ -653,7 +653,7 @@ import SEOContent from '../../components/SEOContent.astro';
     if (isNaN(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
-    if (num < 0) {
+    if (num <= 0) {
       return { valid: false, message: `${name} cannot be negative` };
     }
     if (num > 1e10) {
@@ -677,7 +677,7 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // UPDATE SVG
   // ============================================
-  function updateSVG(a, b, area) {
+  function updateSVG(a, b, areaDisplay, areaUnit) {
     const maxSize = Math.max(a, b, 15);
     const scaleA = Math.min(a / maxSize, 1);
     const scaleB = Math.min(b / maxSize, 1);
@@ -697,10 +697,9 @@ import SEOContent from '../../components/SEOContent.astro';
     semiMinorLine.setAttribute('y1', cy);
     semiMinorLine.setAttribute('y2', cy - ry);
 
-    const formatted = formatArea(area);
-    semiMajorLabelValue.textContent = a.toFixed(2);
-    semiMinorLabelValue.textContent = b.toFixed(2);
-    areaLabelEllipseValue.textContent = formatted.value.toFixed(2);
+    semiMajorLabelValue.textContent = Number(a).toFixed(2);
+    semiMinorLabelValue.textContent = Number(b).toFixed(2);
+    areaLabelEllipseValue.textContent = Number(areaDisplay).toFixed(2);
   }
 
   // ============================================
@@ -759,22 +758,29 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // UPDATE ELLIPSE
   // ============================================
-  function updateEllipse() {
+  function updateEllipse(manualValues = null) {
     const pi = getPi();
     const unit = getUnit();
+    const factor = unit.factor; // 1 display unit = factor cm
     const displayUnit = unit.display;
-    let a, b, area, resultValue, resultLabel, resultSecondary, resultFormula;
+    const areaFactor = factor * factor;
+
+    let a, b, areaCm2, areaDisplay;
+    let resultValue, resultLabel, resultSecondary, resultFormula;
     let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
     let val1, val2, result;
     let step1, step2, step3, step4;
 
     if (currentMode === 'area') {
-      a = parseFloat(semiMajorSlider.value);
-      b = parseFloat(semiMinorSlider.value);
-      area = pi.value * a * b;
-      
-      const formatted = formatArea(area);
-      resultValue = formatted.value.toFixed(2);
+      a = manualValues?.a ?? parseFloat(semiMajorSlider.value);
+      b = manualValues?.b ?? parseFloat(semiMinorSlider.value);
+
+      const aCm = a * factor;
+      const bCm = b * factor;
+      areaCm2 = pi.value * aCm * bCm;
+      areaDisplay = areaCm2 / areaFactor;
+
+      resultValue = areaDisplay.toFixed(2);
       resultLabel = 'Area of Ellipse';
       resultSecondary = 'A = π × a × b';
       resultFormula = 'A = π × a × b';
@@ -785,11 +791,11 @@ import SEOContent from '../../components/SEOContent.astro';
       resultLabelText = 'Area';
       val1 = `${a} ${displayUnit}`;
       val2 = `${b} ${displayUnit}`;
-      result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      result = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
       step1 = `Formula: A = π × a × b`;
       step2 = `Plug in: A = ${pi.label} × ${a} × ${b}`;
-      step3 = `Calculate: A = ${(pi.value * a * b).toFixed(4)}`;
-      step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
+      step3 = `Calculate: A = ${areaDisplay.toFixed(4)}`;
+      step4 = `Answer: A = ${areaDisplay.toFixed(2)} ${displayUnit}²`;
 
       semiMajorDisplay.textContent = a;
       semiMinorDisplay.textContent = b;
@@ -797,16 +803,15 @@ import SEOContent from '../../components/SEOContent.astro';
       semiMinorUnitDisplay.textContent = displayUnit;
 
     } else if (currentMode === 'major') {
-      const areaVal = parseFloat(areaForMajorSlider.value);
-      b = parseFloat(minorForMajorSlider.value);
-      let areaCm2 = areaVal;
-      if (currentUnit === 'm') areaCm2 = areaVal * 10000;
-      else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
-      else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
-      a = areaCm2 / (pi.value * b);
-      area = areaCm2;
-      
-      const formatted = formatArea(area);
+      const areaVal = manualValues?.area ?? parseFloat(areaForMajorSlider.value);
+      b = manualValues?.b ?? parseFloat(minorForMajorSlider.value);
+
+      areaCm2 = areaVal * areaFactor;
+      const bCm = b * factor;
+      const aCm = areaCm2 / (pi.value * bCm);
+      a = aCm / factor;
+      areaDisplay = areaVal;
+
       resultValue = a.toFixed(2);
       resultLabel = 'Semi-Major Axis (a)';
       resultSecondary = 'a = A / (π × b)';
@@ -816,30 +821,29 @@ import SEOContent from '../../components/SEOContent.astro';
       label1 = 'Area';
       label2 = 'Semi-Minor (b)';
       resultLabelText = 'Semi-Major (a)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      val1 = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
       val2 = `${b} ${displayUnit}`;
       result = `${a.toFixed(2)} ${displayUnit}`;
       step1 = `Formula: a = A / (π × b)`;
-      step2 = `Plug in: a = ${formatted.value.toFixed(2)} / (${pi.label} × ${b})`;
-      step3 = `Calculate: a = ${a.toFixed(2)}`;
+      step2 = `Plug in: a = ${areaDisplay.toFixed(2)} / (${pi.label} × ${b})`;
+      step3 = `Calculate: a = ${a.toFixed(4)}`;
       step4 = `Answer: a = ${a.toFixed(2)} ${displayUnit}`;
 
-      areaForMajorDisplay.textContent = formatted.value.toFixed(2);
-      areaForMajorUnit.textContent = formatted.unit;
+      areaForMajorDisplay.textContent = areaDisplay.toFixed(2);
+      areaForMajorUnit.textContent = `${displayUnit}²`;
       minorForMajorDisplay.textContent = b;
       minorForMajorUnit.textContent = displayUnit;
 
-    } else if (currentMode === 'minor') {
-      const areaVal = parseFloat(areaForMinorSlider.value);
-      a = parseFloat(majorForMinorSlider.value);
-      let areaCm2 = areaVal;
-      if (currentUnit === 'm') areaCm2 = areaVal * 10000;
-      else if (currentUnit === 'in') areaCm2 = areaVal * 6.4516;
-      else if (currentUnit === 'ft') areaCm2 = areaVal * 929.0304;
-      b = areaCm2 / (pi.value * a);
-      area = areaCm2;
-      
-      const formatted = formatArea(area);
+    } else {
+      const areaVal = manualValues?.area ?? parseFloat(areaForMinorSlider.value);
+      a = manualValues?.a ?? parseFloat(majorForMinorSlider.value);
+
+      areaCm2 = areaVal * areaFactor;
+      const aCm = a * factor;
+      const bCm = areaCm2 / (pi.value * aCm);
+      b = bCm / factor;
+      areaDisplay = areaVal;
+
       resultValue = b.toFixed(2);
       resultLabel = 'Semi-Minor Axis (b)';
       resultSecondary = 'b = A / (π × a)';
@@ -849,28 +853,40 @@ import SEOContent from '../../components/SEOContent.astro';
       label1 = 'Area';
       label2 = 'Semi-Major (a)';
       resultLabelText = 'Semi-Minor (b)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
+      val1 = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
       val2 = `${a} ${displayUnit}`;
       result = `${b.toFixed(2)} ${displayUnit}`;
       step1 = `Formula: b = A / (π × a)`;
-      step2 = `Plug in: b = ${formatted.value.toFixed(2)} / (${pi.label} × ${a})`;
-      step3 = `Calculate: b = ${b.toFixed(2)}`;
+      step2 = `Plug in: b = ${areaDisplay.toFixed(2)} / (${pi.label} × ${a})`;
+      step3 = `Calculate: b = ${b.toFixed(4)}`;
       step4 = `Answer: b = ${b.toFixed(2)} ${displayUnit}`;
 
-      areaForMinorDisplay.textContent = formatted.value.toFixed(2);
-      areaForMinorUnit.textContent = formatted.unit;
+      areaForMinorDisplay.textContent = areaDisplay.toFixed(2);
+      areaForMinorUnit.textContent = `${displayUnit}²`;
       majorForMinorDisplay.textContent = a;
       majorForMinorUnit.textContent = displayUnit;
     }
 
-    // Update SVG
-    updateSVG(a, b, area);
+    // Keep sliders useful for visual adjustment, but never let them overwrite
+    // a manually entered decimal value.
+    if (!manualValues) {
+      if (currentMode === 'area') {
+        semiMajorInput.value = a;
+        semiMinorInput.value = b;
+      } else if (currentMode === 'major') {
+        areaForMajorInput.value = areaForMajorSlider.value;
+        minorForMajorInput.value = minorForMajorSlider.value;
+      } else {
+        areaForMinorInput.value = areaForMinorSlider.value;
+        majorForMinorInput.value = majorForMinorSlider.value;
+      }
+    }
 
-    // Update result
+    // Update SVG using values in the currently selected display unit.
+    updateSVG(a, b, areaDisplay, `${displayUnit}²`);
+
     updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
 
-    // Update formula
-    const formattedArea = formatArea(area);
     updateFormula(
       pi.label,
       val1,
@@ -883,20 +899,7 @@ import SEOContent from '../../components/SEOContent.astro';
       formulaDesc
     );
 
-    // Update steps
     updateSteps(step1, step2, step3, step4);
-
-    // Update inputs
-    if (currentMode === 'area') {
-      semiMajorInput.value = a;
-      semiMinorInput.value = b;
-    } else if (currentMode === 'major') {
-      areaForMajorInput.value = areaForMajorSlider.value;
-      minorForMajorInput.value = minorForMajorSlider.value;
-    } else if (currentMode === 'minor') {
-      areaForMinorInput.value = areaForMinorSlider.value;
-      majorForMinorInput.value = majorForMinorSlider.value;
-    }
   }
 
   // ============================================
@@ -976,17 +979,16 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'area') {
       const validation = validatePositive(semiMajorInput.value, 'Semi-Major axis');
       if (validation.valid) {
-        semiMajorSlider.value = Math.min(validation.value, 15);
-        updateEllipse();
+        updateEllipse({ a: validation.value, b: parseFloat(semiMinorInput.value) });
       }
     }
   });
+
   semiMinorInput.addEventListener('input', () => {
     if (currentMode === 'area') {
       const validation = validatePositive(semiMinorInput.value, 'Semi-Minor axis');
       if (validation.valid) {
-        semiMinorSlider.value = Math.min(validation.value, 15);
-        updateEllipse();
+        updateEllipse({ a: parseFloat(semiMajorInput.value), b: validation.value });
       }
     }
   });
@@ -995,6 +997,7 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'area') {
       const aVal = validatePositive(semiMajorInput.value, 'Semi-Major axis');
       const bVal = validatePositive(semiMinorInput.value, 'Semi-Minor axis');
+
       if (!aVal.valid) {
         alert(aVal.message);
         semiMajorInput.focus();
@@ -1005,9 +1008,16 @@ import SEOContent from '../../components/SEOContent.astro';
         semiMinorInput.focus();
         return;
       }
-      semiMajorSlider.value = Math.min(aVal.value, 15);
-      semiMinorSlider.value = Math.min(bVal.value, 15);
-      updateEllipse();
+
+      currentA = aVal.value;
+      currentB = bVal.value;
+
+      // Slider is only a visual control; manual input remains exact.
+      semiMajorSlider.value = Math.min(Math.max(aVal.value, 1), 15);
+      semiMinorSlider.value = Math.min(Math.max(bVal.value, 1), 15);
+
+      updateEllipse({ a: aVal.value, b: bVal.value });
+
       if (window.showToast) {
         window.showToast('✅ Calculation updated!', 'success');
       }
@@ -1023,13 +1033,20 @@ import SEOContent from '../../components/SEOContent.astro';
   areaForMajorInput.addEventListener('input', () => {
     if (currentMode === 'major') {
       const validation = validatePositive(areaForMajorInput.value, 'Area');
-      if (validation.valid) { areaForMajorSlider.value = validation.value; updateEllipse(); }
+      const b = parseFloat(minorForMajorInput.value);
+      if (validation.valid && Number.isFinite(b) && b > 0) {
+        updateEllipse({ area: validation.value, b });
+      }
     }
   });
+
   minorForMajorInput.addEventListener('input', () => {
     if (currentMode === 'major') {
       const validation = validatePositive(minorForMajorInput.value, 'Semi-Minor axis');
-      if (validation.valid) { minorForMajorSlider.value = validation.value; updateEllipse(); }
+      const area = parseFloat(areaForMajorInput.value);
+      if (validation.valid && Number.isFinite(area) && area > 0) {
+        updateEllipse({ area, b: validation.value });
+      }
     }
   });
 
@@ -1037,11 +1054,22 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'major') {
       const aVal = validatePositive(areaForMajorInput.value, 'Area');
       const bVal = validatePositive(minorForMajorInput.value, 'Semi-Minor axis');
-      if (!aVal.valid) { alert(aVal.message); areaForMajorInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); minorForMajorInput.focus(); return; }
-      areaForMajorSlider.value = aVal.value;
-      minorForMajorSlider.value = bVal.value;
-      updateEllipse();
+
+      if (!aVal.valid) {
+        alert(aVal.message);
+        areaForMajorInput.focus();
+        return;
+      }
+      if (!bVal.valid) {
+        alert(bVal.message);
+        minorForMajorInput.focus();
+        return;
+      }
+
+      areaForMajorSlider.value = Math.min(Math.max(aVal.value, 1), 706);
+      minorForMajorSlider.value = Math.min(Math.max(bVal.value, 1), 15);
+      updateEllipse({ area: aVal.value, b: bVal.value });
+
       if (window.showToast) {
         window.showToast('✅ Semi-Major axis found!', 'success');
       }
@@ -1057,13 +1085,20 @@ import SEOContent from '../../components/SEOContent.astro';
   areaForMinorInput.addEventListener('input', () => {
     if (currentMode === 'minor') {
       const validation = validatePositive(areaForMinorInput.value, 'Area');
-      if (validation.valid) { areaForMinorSlider.value = validation.value; updateEllipse(); }
+      const a = parseFloat(majorForMinorInput.value);
+      if (validation.valid && Number.isFinite(a) && a > 0) {
+        updateEllipse({ area: validation.value, a });
+      }
     }
   });
+
   majorForMinorInput.addEventListener('input', () => {
     if (currentMode === 'minor') {
       const validation = validatePositive(majorForMinorInput.value, 'Semi-Major axis');
-      if (validation.valid) { majorForMinorSlider.value = validation.value; updateEllipse(); }
+      const area = parseFloat(areaForMinorInput.value);
+      if (validation.valid && Number.isFinite(area) && area > 0) {
+        updateEllipse({ area, a: validation.value });
+      }
     }
   });
 
@@ -1071,11 +1106,22 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'minor') {
       const aVal = validatePositive(areaForMinorInput.value, 'Area');
       const bVal = validatePositive(majorForMinorInput.value, 'Semi-Major axis');
-      if (!aVal.valid) { alert(aVal.message); areaForMinorInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); majorForMinorInput.focus(); return; }
-      areaForMinorSlider.value = aVal.value;
-      majorForMinorSlider.value = bVal.value;
-      updateEllipse();
+
+      if (!aVal.valid) {
+        alert(aVal.message);
+        areaForMinorInput.focus();
+        return;
+      }
+      if (!bVal.valid) {
+        alert(bVal.message);
+        majorForMinorInput.focus();
+        return;
+      }
+
+      areaForMinorSlider.value = Math.min(Math.max(aVal.value, 1), 706);
+      majorForMinorSlider.value = Math.min(Math.max(bVal.value, 1), 15);
+      updateEllipse({ area: aVal.value, a: bVal.value });
+
       if (window.showToast) {
         window.showToast('✅ Semi-Minor axis found!', 'success');
       }

@@ -798,9 +798,9 @@ import SEOContent from '../../components/SEOContent.astro';
       return;
     }
     areaError.classList.add('hidden');
-    areaSlider.value = areaVal;
-    areaInputDisplay.textContent = areaVal.toFixed(2);
-    updateFromArea(areaVal);
+    areaSlider.value = validation.value;
+    areaInputDisplay.textContent = validation.value.toFixed(2);
+    updateFromArea(validation.value);
     updateFunFact();
   });
 
