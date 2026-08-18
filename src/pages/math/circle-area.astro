@@ -2,6 +2,7 @@
 // src/pages/math/circle-area.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
 ---
 
 <Layout title="Circle Area Calculator - Interactive Math Tool">
@@ -351,73 +352,49 @@ import Navbar from '../../components/Navbar.astro';
             </p>
           </div>
         </div>
-            </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SEO CONTENT - USING THE COMPONENT            -->
+      <!-- ============================================ -->
+      <SEOContent 
+        title="What is a Circle Area Calculator?"
+        description="A circle area calculator is a tool that helps you find the area of a circle quickly and accurately. Whether you're a student learning geometry, a teacher preparing lessons, or a professional needing quick calculations, this tool makes it easy."
+        formula="A = π × r²"
+        formulaDescription="Where A = Area, π = Pi (3.14159), r = Radius"
+        example={{
+          title: "Example: Find the area of a circle with radius 5 cm",
+          steps: [
+            "A = π × r²",
+            "A = 3.14159 × 5²",
+            "A = 3.14159 × 25"
+          ],
+          result: "A = 78.54 cm²"
+        }}
+        uses={[
+          "Geometry Homework: Students use circle area formulas in math class",
+          "Construction: Calculating circular spaces, columns, or foundations",
+          "Gardening: Finding the area of circular garden beds or pools",
+          "Engineering: Designing circular components and parts",
+          "Science: Calculating cross-sections and circular measurements"
+        ]}
+        faqs={[
+          {
+            question: "What if I only know the diameter?",
+            answer: "The radius is half the diameter. Simply divide the diameter by 2 to get the radius, then use the formula."
+          },
+          {
+            question: "What is the difference between radius and diameter?",
+            answer: "The radius is the distance from the center to the edge. The diameter is the distance across the circle through the center (2 × radius)."
+          },
+          {
+            question: "Why use π (Pi)?",
+            answer: "Pi is a mathematical constant that represents the ratio of a circle's circumference to its diameter. It's approximately 3.14159."
+          }
+        ]}
+      />
+
     </div>
-
-    <!-- ============================================ -->
-    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
-    <!-- ============================================ -->
-    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
-      <h2>What is a Circle Area Calculator?</h2>
-      <p>
-        A circle area calculator is a tool that helps you find the area of a circle quickly and accurately. 
-        Whether you're a student learning geometry, a teacher preparing lessons, or a professional needing 
-        quick calculations, this tool makes it easy.
-      </p>
-
-      <h2>How to Calculate Circle Area</h2>
-      <p>
-        The area of a circle is calculated using the formula:
-      </p>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
-        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">A = π × r²</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Where A = Area, π = Pi (3.14159), r = Radius</p>
-      </div>
-      <p>
-        To calculate the area:
-      </p>
-      <ol class="list-decimal pl-6 space-y-2">
-        <li>Measure the radius of the circle (distance from center to edge)</li>
-        <li>Square the radius (multiply it by itself)</li>
-        <li>Multiply by π (3.14159)</li>
-        <li>The result is the area of the circle</li>
-      </ol>
-
-      <h2>Example: Calculating Circle Area</h2>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
-        <p class="font-semibold">Example 1: Find the area of a circle with radius 5 cm</p>
-        <p class="mt-2">A = π × r²</p>
-        <p>A = 3.14159 × 5²</p>
-        <p>A = 3.14159 × 25</p>
-        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">A = 78.54 cm²</p>
-      </div>
-
-      <h2>Common Uses for Circle Area Calculations</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        <li><strong>Geometry Homework:</strong> Students use circle area formulas in math class</li>
-        <li><strong>Construction:</strong> Calculating circular spaces, columns, or foundations</li>
-        <li><strong>Gardening:</strong> Finding the area of circular garden beds or pools</li>
-        <li><strong>Engineering:</strong> Designing circular components and parts</li>
-        <li><strong>Science:</strong> Calculating cross-sections and circular measurements</li>
-      </ul>
-
-      <h2>Frequently Asked Questions</h2>
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-lg font-semibold">What if I only know the diameter?</h3>
-          <p>The radius is half the diameter. Simply divide the diameter by 2 to get the radius, then use the formula.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">What is the difference between radius and diameter?</h3>
-          <p>The radius is the distance from the center to the edge. The diameter is the distance across the circle through the center (2 × radius).</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">Why use π (Pi)?</h3>
-          <p>Pi is a mathematical constant that represents the ratio of a circle's circumference to its diameter. It's approximately 3.14159.</p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script>

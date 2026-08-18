@@ -2,6 +2,7 @@
 // src/pages/health/bmi.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
 ---
 
 <Layout title="BMI Calculator - Body Mass Index Calculator">
@@ -134,7 +135,7 @@ import Navbar from '../../components/Navbar.astro';
                   <!-- Gauge Background -->
                   <path d="M 20 160 A 130 130 0 0 1 280 160" fill="none" stroke="#e5e7eb" stroke-width="20" stroke-linecap="round" class="dark:stroke-gray-700"/>
                   
-                  <!-- Colored Zones (boundaries match BMI 18.5 / 25 / 30, same pivot+radius as the needle) -->
+                  <!-- Colored Zones -->
                   <path d="M 20 160 A 130 130 0 0 1 134.72 30.9" fill="none" stroke="#3b82f6" stroke-width="20" stroke-linecap="round"/>
                   <path d="M 134.72 30.9 A 130 130 0 0 1 199.75 39.9" fill="none" stroke="#22c55e" stroke-width="20" stroke-linecap="round"/>
                   <path d="M 199.75 39.9 A 130 130 0 0 1 241.92 68.08" fill="none" stroke="#eab308" stroke-width="20" stroke-linecap="round"/>
@@ -221,7 +222,7 @@ import Navbar from '../../components/Navbar.astro';
               </div>
             </div>
 
-            <!-- Motivational Message - Moved here, below all results -->
+            <!-- Motivational Message -->
             <div id="motivationalBox" class="mt-4 rounded-2xl p-5 border border-emerald-200 dark:border-emerald-800 transition-all duration-500 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20">
               <div class="flex items-start gap-3">
                 <span class="text-2xl">💪</span>
@@ -311,113 +312,49 @@ import Navbar from '../../components/Navbar.astro';
             </div>
           </div>
         </div>
-            </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SEO CONTENT - USING THE COMPONENT            -->
+      <!-- ============================================ -->
+      <SEOContent 
+        title="What is a BMI Calculator?"
+        description="A BMI (Body Mass Index) calculator is a tool that helps you determine if your weight is healthy for your height. It's a widely used screening tool that gives you a quick estimate of your body fat based on your height and weight."
+        formula="BMI = weight / (height)²"
+        formulaDescription="Weight in kg, Height in meters"
+        example={{
+          title: "Example: A person weighs 70 kg and is 175 cm tall",
+          steps: [
+            "Height in meters = 175 ÷ 100 = 1.75 m",
+            "BMI = 70 ÷ (1.75)²",
+            "BMI = 70 ÷ 3.06"
+          ],
+          result: "BMI = 22.9 (Normal Weight)"
+        }}
+        uses={[
+          "Health Screening: BMI is a quick and easy way to identify potential weight-related health risks",
+          "Tracking Progress: Monitor your BMI over time to see how lifestyle changes affect your health",
+          "Doctor Visits: Healthcare professionals use BMI as one of many tools to assess overall health",
+          "Awareness: Helps you understand where you stand and make informed health decisions"
+        ]}
+        faqs={[
+          {
+            question: "What is a healthy BMI range?",
+            answer: "A healthy BMI range is typically between 18.5 and 24.9. This is associated with the lowest risk of weight-related health problems."
+          },
+          {
+            question: "Is BMI the same for men and women?",
+            answer: "Yes, the BMI formula is the same for both men and women. However, the interpretation may vary slightly due to differences in body composition."
+          },
+          {
+            question: "What should I do if my BMI is outside the healthy range?",
+            answer: "If your BMI is outside the healthy range, consider consulting with a healthcare professional. They can provide personalized advice and help you create a plan for better health."
+          }
+        ]}
+        note="BMI is a general screening tool and has limitations. It doesn't account for muscle mass (athletes may have high BMI but low body fat), bone density, or body composition. May not be accurate for older adults, pregnant women, or certain ethnic groups. Should be used alongside other health measurements."
+      />
+
     </div>
-
-    <!-- ============================================ -->
-    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
-    <!-- ============================================ -->
-    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
-      <h2>What is a BMI Calculator?</h2>
-      <p>
-        A BMI (Body Mass Index) calculator is a tool that helps you determine if your weight is healthy for your height. 
-        It's a widely used screening tool that gives you a quick estimate of your body fat based on your height and weight.
-      </p>
-
-      <h2>How to Calculate Your BMI</h2>
-      <p>
-        BMI is calculated using the formula:
-      </p>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
-        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">BMI = weight / (height)²</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Weight in kg, Height in meters</p>
-      </div>
-      <p>
-        For imperial units (lbs and inches), the formula is:
-      </p>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
-        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">BMI = 703 × weight / (height)²</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Weight in lbs, Height in inches</p>
-      </div>
-      <p>
-        To calculate your BMI:
-      </p>
-      <ol class="list-decimal pl-6 space-y-2">
-        <li>Measure your weight accurately</li>
-        <li>Measure your height accurately</li>
-        <li>Apply the formula above</li>
-        <li>Compare your result with the BMI categories below</li>
-      </ol>
-
-      <h2>Example: Calculating BMI</h2>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
-        <p class="font-semibold">Example 1: A person weighs 70 kg and is 175 cm tall</p>
-        <p class="mt-2">Height in meters = 175 ÷ 100 = 1.75 m</p>
-        <p>BMI = 70 ÷ (1.75)²</p>
-        <p>BMI = 70 ÷ 3.06</p>
-        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">BMI = 22.9 (Normal Weight)</p>
-      </div>
-
-      <h2>BMI Categories</h2>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <div class="p-2 rounded bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-            <span class="font-bold">Underweight</span>
-            <span class="block text-blue-600 dark:text-blue-400">&lt; 18.5</span>
-          </div>
-          <div class="p-2 rounded bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-            <span class="font-bold">Normal Weight</span>
-            <span class="block text-green-600 dark:text-green-400">18.5 – 24.9</span>
-          </div>
-          <div class="p-2 rounded bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
-            <span class="font-bold">Overweight</span>
-            <span class="block text-yellow-600 dark:text-yellow-400">25.0 – 29.9</span>
-          </div>
-          <div class="p-2 rounded bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-            <span class="font-bold">Obese</span>
-            <span class="block text-red-600 dark:text-red-400">≥ 30.0</span>
-          </div>
-        </div>
-      </div>
-
-      <h2>Why is BMI Important?</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        <li><strong>Health Screening:</strong> BMI is a quick and easy way to identify potential weight-related health risks</li>
-        <li><strong>Tracking Progress:</strong> Monitor your BMI over time to see how lifestyle changes affect your health</li>
-        <li><strong>Doctor Visits:</strong> Healthcare professionals use BMI as one of many tools to assess overall health</li>
-        <li><strong>Awareness:</strong> Helps you understand where you stand and make informed health decisions</li>
-      </ul>
-
-      <h2>Limitations of BMI</h2>
-      <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 my-4">
-        <p class="text-sm text-gray-700 dark:text-gray-300">
-          ⚠️ BMI is a general screening tool and has limitations:
-        </p>
-        <ul class="list-disc pl-6 text-sm text-gray-600 dark:text-gray-400 mt-2">
-          <li>Doesn't account for muscle mass (athletes may have high BMI but low body fat)</li>
-          <li>Doesn't consider bone density or body composition</li>
-          <li>May not be accurate for older adults, pregnant women, or certain ethnic groups</li>
-          <li>Should be used alongside other health measurements</li>
-        </ul>
-      </div>
-
-      <h2>Frequently Asked Questions</h2>
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-lg font-semibold">What is a healthy BMI range?</h3>
-          <p>A healthy BMI range is typically between 18.5 and 24.9. This is associated with the lowest risk of weight-related health problems.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">Is BMI the same for men and women?</h3>
-          <p>Yes, the BMI formula is the same for both men and women. However, the interpretation may vary slightly due to differences in body composition.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">What should I do if my BMI is outside the healthy range?</h3>
-          <p>If your BMI is outside the healthy range, consider consulting with a healthcare professional. They can provide personalized advice and help you create a plan for better health.</p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script>
@@ -556,9 +493,7 @@ import Navbar from '../../components/Navbar.astro';
       }
 
       // ============================================
-      // ANIMATED NEEDLE ROTATION (JS-driven, avoids
-      // CSS transform-origin/transition ambiguity on
-      // the SVG "transform" attribute)
+      // ANIMATED NEEDLE ROTATION (JS-driven)
       // ============================================
       function animateNeedle(start, end, duration = 500) {
         const startTime = performance.now();
@@ -666,59 +601,39 @@ import Navbar from '../../components/Navbar.astro';
           heightInput.step = 0.5;
         }
 
-        // Calculate BMI (guard against 0/blank values while the user is still typing)
         const safeWeightVal = weightVal > 0 ? weightVal : 0;
         const safeHeightVal = heightVal > 0 ? heightVal : 0;
         const bmi = safeHeightVal > 0 ? safeWeightVal / (safeHeightVal * safeHeightVal) : 0;
         const formattedBMI = bmi.toFixed(1);
 
-        // Determine category
         let categoryKey;
-        if (bmi < 18.5) {
-          categoryKey = 'underweight';
-        } else if (bmi >= 18.5 && bmi < 25) {
-          categoryKey = 'normal';
-        } else if (bmi >= 25 && bmi < 30) {
-          categoryKey = 'overweight';
-        } else {
-          categoryKey = 'obese';
-        }
+        if (bmi < 18.5) categoryKey = 'underweight';
+        else if (bmi >= 18.5 && bmi < 25) categoryKey = 'normal';
+        else if (bmi >= 25 && bmi < 30) categoryKey = 'overweight';
+        else categoryKey = 'obese';
 
         const data = bmiData[categoryKey];
 
-        // Update Emoji + glowing ring color
         emojiDisplay.textContent = data.emoji;
         emojiRing.className = `relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 ${ringClasses[categoryKey]}`;
 
-        // Update BMI Value (animated count-up)
         animateValue(bmiResultValue, lastBMI, bmi);
         bmiResultValue.className = `text-5xl font-bold ${data.textColor}`;
 
-        // Update Category
         bmiCategory.textContent = data.label;
         bmiCategory.className = `text-xl font-bold ${data.textColor} transition-all duration-500`;
 
-        // Update Description
         bmiDescription.textContent = data.description;
-
-        // Update Result Box
         bmiResultBox.className = `mt-4 rounded-xl p-4 border transition-all duration-500 ${data.bgColor}`;
-
-        // Update motivational message
         motivationalMessage.innerHTML = data.motivational;
-
-        // Update BMI Prime (ratio of BMI to the upper limit of normal, 25)
         bmiPrime.textContent = (bmi / 25).toFixed(2);
 
-        // Update gauge (JS-animated needle rotation — see animateNeedle)
         const angle = Math.min(Math.max(-90 + (bmi / 40) * 180, -90), 90);
         animateNeedle(lastAngle, angle);
         animateValue(gaugeValue, lastBMI, bmi);
         lastAngle = angle;
-
         lastBMI = bmi;
 
-        // Update formula card
         bmiWeight.textContent = `${weight} ${weightLabel}`;
         if (currentUnit === 'metric') {
           bmiHeight.textContent = `${height} cm (${heightVal.toFixed(2)} m)`;
@@ -727,7 +642,6 @@ import Navbar from '../../components/Navbar.astro';
         }
         bmiResultFormula.textContent = formattedBMI;
 
-        // Update healthy weight range
         const minWeight = 18.5 * heightVal * heightVal;
         const maxWeight = 24.9 * heightVal * heightVal;
         if (currentUnit === 'metric') {
@@ -736,7 +650,6 @@ import Navbar from '../../components/Navbar.astro';
           healthyRange.textContent = `${(minWeight / 0.453592).toFixed(1)} – ${(maxWeight / 0.453592).toFixed(1)} lbs`;
         }
 
-        // Update steps
         if (currentUnit === 'metric') {
           step1.textContent = `Convert height to meters: ${height} cm = ${heightVal.toFixed(2)} m`;
         } else {
@@ -746,13 +659,9 @@ import Navbar from '../../components/Navbar.astro';
         step3.textContent = `BMI = ${weightVal.toFixed(1)} ÷ ${(heightVal * heightVal).toFixed(2)} = ${formattedBMI}`;
         step4.textContent = `Result: BMI = ${formattedBMI} (${data.label})`;
 
-        // Keep sliders in sync (browsers clamp these to min/max automatically)
         weightSlider.value = weight;
         heightSlider.value = height;
 
-        // Only overwrite the text inputs when the change came from the slider,
-        // the unit toggle, or the Calculate button — never while the user is
-        // actively typing in the field, or every keystroke gets clobbered.
         if (syncInputs) {
           weightInput.value = weight;
           heightInput.value = height;
@@ -765,7 +674,7 @@ import Navbar from '../../components/Navbar.astro';
       function scrollToResults() {
         const resultBox = document.getElementById('bmiResultBox');
         if (resultBox) {
-          const yOffset = -80; // Offset for fixed navbar
+          const yOffset = -80;
           const y = resultBox.getBoundingClientRect().top + window.pageYOffset + yOffset;
           window.scrollTo({ top: y, behavior: 'smooth' });
         }
@@ -787,18 +696,17 @@ import Navbar from '../../components/Navbar.astro';
         const val = parseFloat(weightInput.value);
         if (!isNaN(val) && val >= 0) {
           rawWeight = val;
-          updateBMI(false); // don't rewrite the field while the user is typing
+          updateBMI(false);
         }
       });
       heightInput.addEventListener('input', () => {
         const val = parseFloat(heightInput.value);
         if (!isNaN(val) && val >= 0) {
           rawHeight = val;
-          updateBMI(false); // don't rewrite the field while the user is typing
+          updateBMI(false);
         }
       });
 
-      // Calculate button - Update BMI AND scroll to results
       document.getElementById('bmiCalculateBtn').addEventListener('click', () => {
         const w = parseFloat(weightInput.value);
         const h = parseFloat(heightInput.value);
@@ -809,12 +717,8 @@ import Navbar from '../../components/Navbar.astro';
         rawWeight = w;
         rawHeight = h;
         updateBMI();
-        // Scroll to results after a tiny delay to let DOM update
         setTimeout(scrollToResults, 100);
       });
-
-      // Also scroll when sliders change (optional, but nice)
-      // We'll only scroll on button click to avoid annoying behavior
 
       // ============================================
       // SHARE / COPY RESULT

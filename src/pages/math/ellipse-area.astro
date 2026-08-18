@@ -2,6 +2,7 @@
 // src/pages/math/ellipse-area.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
 ---
 
 <Layout title="Ellipse Calculator - Interactive Math Tool">
@@ -508,72 +509,49 @@ import Navbar from '../../components/Navbar.astro';
             </div>
           </div>
         </div>
-            </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SEO CONTENT - USING THE COMPONENT            -->
+      <!-- ============================================ -->
+      <SEOContent 
+        title="What is an Ellipse Area Calculator?"
+        description="An ellipse area calculator is a tool that helps you find the area of an ellipse quickly and accurately. Whether you're a student learning conic sections, a teacher preparing lessons, or a professional needing quick calculations, this tool makes it easy."
+        formula="A = π × a × b"
+        formulaDescription="Where A = Area, a = Semi-Major Axis, b = Semi-Minor Axis"
+        example={{
+          title: "Example: Find the area of an ellipse with semi-major axis 8 cm and semi-minor axis 5 cm",
+          steps: [
+            "A = π × a × b",
+            "A = 3.14159 × 8 × 5",
+            "A = 3.14159 × 40"
+          ],
+          result: "A = 125.66 cm²"
+        }}
+        uses={[
+          "Engineering: Calculating cross-sections of elliptical pipes and tanks",
+          "Architecture: Designing elliptical arches, domes, and windows",
+          "Astronomy: Understanding planetary orbits (Kepler's laws)",
+          "Sports: Calculating the area of athletic tracks and stadiums",
+          "Gardening: Designing elliptical garden beds and features"
+        ]}
+        faqs={[
+          {
+            question: "What is the difference between an ellipse and a circle?",
+            answer: "A circle is a special type of ellipse where the semi-major axis (a) equals the semi-minor axis (b). In other words, a circle is an ellipse with equal axes."
+          },
+          {
+            question: "What are the foci of an ellipse?",
+            answer: "An ellipse has two foci (plural of focus). The sum of the distances from any point on the ellipse to the two foci is constant. This property makes ellipses unique!"
+          },
+          {
+            question: "Where are ellipses used in real life?",
+            answer: "Ellipses are used in astronomy (planetary orbits), architecture (elliptical arches), engineering (elliptical gears), and even in medicine (lithotripsy machines that break kidney stones)."
+          }
+        ]}
+      />
+
     </div>
-
-    <!-- ============================================ -->
-    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
-    <!-- ============================================ -->
-    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
-      <h2>What is an Ellipse Area Calculator?</h2>
-      <p>
-        An ellipse area calculator is a tool that helps you find the area of an ellipse quickly and accurately. 
-        Whether you're a student learning conic sections, a teacher preparing lessons, or a professional needing 
-        quick calculations, this tool makes it easy.
-      </p>
-
-      <h2>How to Calculate Ellipse Area</h2>
-      <p>
-        The area of an ellipse is calculated using the formula:
-      </p>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
-        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">A = π × a × b</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Where A = Area, a = Semi-Major Axis, b = Semi-Minor Axis</p>
-      </div>
-      <p>
-        To calculate the area:
-      </p>
-      <ol class="list-decimal pl-6 space-y-2">
-        <li>Measure the semi-major axis (a) — the longest radius of the ellipse</li>
-        <li>Measure the semi-minor axis (b) — the shortest radius of the ellipse</li>
-        <li>Multiply a × b × π</li>
-        <li>The result is the area of the ellipse</li>
-      </ol>
-
-      <h2>Example: Calculating Ellipse Area</h2>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
-        <p class="font-semibold">Example 1: Find the area of an ellipse with semi-major axis 8 cm and semi-minor axis 5 cm</p>
-        <p class="mt-2">A = π × a × b</p>
-        <p>A = 3.14159 × 8 × 5</p>
-        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">A = 125.66 cm²</p>
-      </div>
-
-      <h2>Common Uses for Ellipse Area Calculations</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        <li><strong>Engineering:</strong> Calculating cross-sections of elliptical pipes and tanks</li>
-        <li><strong>Architecture:</strong> Designing elliptical arches, domes, and windows</li>
-        <li><strong>Astronomy:</strong> Understanding planetary orbits (Kepler's laws)</li>
-        <li><strong>Sports:</strong> Calculating the area of athletic tracks and stadiums</li>
-        <li><strong>Gardening:</strong> Designing elliptical garden beds and features</li>
-      </ul>
-
-      <h2>Frequently Asked Questions</h2>
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-lg font-semibold">What is the difference between an ellipse and a circle?</h3>
-          <p>A circle is a special type of ellipse where the semi-major axis (a) equals the semi-minor axis (b). In other words, a circle is an ellipse with equal axes.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">What are the foci of an ellipse?</h3>
-          <p>An ellipse has two foci (plural of focus). The sum of the distances from any point on the ellipse to the two foci is constant. This property makes ellipses unique!</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">Where are ellipses used in real life?</h3>
-          <p>Ellipses are used in astronomy (planetary orbits), architecture (elliptical arches), engineering (elliptical gears), and even in medicine (lithotripsy machines that break kidney stones).</p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script>

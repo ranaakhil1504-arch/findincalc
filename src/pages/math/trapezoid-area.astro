@@ -2,6 +2,7 @@
 // src/pages/math/trapezoid-area.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
 ---
 
 <Layout title="Trapezoid Calculator - Interactive Math Tool">
@@ -581,76 +582,49 @@ import Navbar from '../../components/Navbar.astro';
             </p>
           </div>
         </div>
-            </div>
+      </div>
+
+      <!-- ============================================ -->
+      <!-- SEO CONTENT - USING THE COMPONENT            -->
+      <!-- ============================================ -->
+      <SEOContent 
+        title="What is a Trapezoid Area Calculator?"
+        description="A trapezoid area calculator is a tool that helps you find the area of a trapezoid quickly and accurately. Whether you're a student learning geometry, a teacher preparing lessons, or a professional needing quick calculations, this tool makes it easy."
+        formula="A = ½ × (a + b) × h"
+        formulaDescription="Where A = Area, a = Top Base, b = Bottom Base, h = Height"
+        example={{
+          title: "Example: Find the area of a trapezoid with top base 8 cm, bottom base 12 cm, and height 6 cm",
+          steps: [
+            "A = ½ × (a + b) × h",
+            "A = ½ × (8 + 12) × 6",
+            "A = ½ × 20 × 6"
+          ],
+          result: "A = 60 cm²"
+        }}
+        uses={[
+          "Construction: Calculating areas for roofs, foundations, and irregular lots",
+          "Architecture: Designing trapezoidal windows, doors, and building features",
+          "Engineering: Calculating cross-sections of beams and channels",
+          "Land Surveying: Measuring irregular land plots and boundaries",
+          "Education: Students learning geometry and area calculations"
+        ]}
+        faqs={[
+          {
+            question: "What is the difference between a trapezoid and a parallelogram?",
+            answer: "A trapezoid has exactly one pair of parallel sides (the bases). A parallelogram has two pairs of parallel sides. They are different types of quadrilaterals."
+          },
+          {
+            question: "Why do we divide by 2 in the formula?",
+            answer: "Dividing by 2 comes from the fact that a trapezoid's area is the average of the two bases multiplied by the height. It's essentially the average of the top and bottom lengths."
+          },
+          {
+            question: "Is a trapezoid called a trapezium in some countries?",
+            answer: "Yes! In British English and many other countries, a trapezoid is called a 'trapezium.' The terminology varies by region."
+          }
+        ]}
+      />
+
     </div>
-
-    <!-- ============================================ -->
-    <!-- SEO CONTENT - BELOW THE CALCULATOR           -->
-    <!-- ============================================ -->
-    <div class="mt-16 max-w-4xl mx-auto prose prose-emerald dark:prose-invert">
-      <h2>What is a Trapezoid Area Calculator?</h2>
-      <p>
-        A trapezoid area calculator is a tool that helps you find the area of a trapezoid quickly and accurately. 
-        Whether you're a student learning geometry, a teacher preparing lessons, or a professional needing 
-        quick calculations, this tool makes it easy.
-      </p>
-
-      <h2>How to Calculate Trapezoid Area</h2>
-      <p>
-        The area of a trapezoid is calculated using the formula:
-      </p>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center my-4">
-        <p class="text-2xl font-mono text-gray-800 dark:text-gray-200">A = ½ × (a + b) × h</p>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Where A = Area, a = Top Base, b = Bottom Base, h = Height</p>
-      </div>
-      <p>
-        To calculate the area:
-      </p>
-      <ol class="list-decimal pl-6 space-y-2">
-        <li>Measure the top base (a) of the trapezoid</li>
-        <li>Measure the bottom base (b) of the trapezoid</li>
-        <li>Measure the height (h) — the perpendicular distance between the bases</li>
-        <li>Add the bases together</li>
-        <li>Multiply by the height</li>
-        <li>Divide by 2</li>
-        <li>The result is the area of the trapezoid</li>
-      </ol>
-
-      <h2>Example: Calculating Trapezoid Area</h2>
-      <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg my-4">
-        <p class="font-semibold">Example 1: Find the area of a trapezoid with top base 8 cm, bottom base 12 cm, and height 6 cm</p>
-        <p class="mt-2">A = ½ × (a + b) × h</p>
-        <p>A = ½ × (8 + 12) × 6</p>
-        <p>A = ½ × 20 × 6</p>
-        <p class="font-bold text-emerald-600 dark:text-emerald-400 mt-2">A = 60 cm²</p>
-      </div>
-
-      <h2>Common Uses for Trapezoid Area Calculations</h2>
-      <ul class="list-disc pl-6 space-y-1">
-        <li><strong>Construction:</strong> Calculating areas for roofs, foundations, and irregular lots</li>
-        <li><strong>Architecture:</strong> Designing trapezoidal windows, doors, and building features</li>
-        <li><strong>Engineering:</strong> Calculating cross-sections of beams and channels</li>
-        <li><strong>Land Surveying:</strong> Measuring irregular land plots and boundaries</li>
-        <li><strong>Education:</strong> Students learning geometry and area calculations</li>
-      </ul>
-
-      <h2>Frequently Asked Questions</h2>
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-lg font-semibold">What is the difference between a trapezoid and a parallelogram?</h3>
-          <p>A trapezoid has exactly one pair of parallel sides (the bases). A parallelogram has two pairs of parallel sides. They are different types of quadrilaterals.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">Why do we divide by 2 in the formula?</h3>
-          <p>Dividing by 2 comes from the fact that a trapezoid's area is the average of the two bases multiplied by the height. It's essentially the average of the top and bottom lengths.</p>
-        </div>
-        <div>
-          <h3 class="text-lg font-semibold">Is a trapezoid called a trapezium in some countries?</h3>
-          <p>Yes! In British English and many other countries, a trapezoid is called a "trapezium." The terminology varies by region.</p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
   <script>
