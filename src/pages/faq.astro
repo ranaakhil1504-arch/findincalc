@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="FAQ - Frequently Asked Questions">
+  <Navbar />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8">Frequently Asked Questions</h1>
+      
+      <div class="space-y-6">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">What is FindInCalc?</h2>
+          <p class="text-gray-600 dark:text-gray-400">FindInCalc is a free online calculator hub offering math, health, finance, and conversion tools for students, professionals, and everyday users.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Is FindInCalc free to use?</h2>
+          <p class="text-gray-600 dark:text-gray-400">Yes! All calculators on FindInCalc are completely free to use with no registration required.</p>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">How accurate are the calculators?</h2>
+          <p class="text-gray-600 dark:text-gray-400">All calculators use precise mathematical formulas and are regularly tested for accuracy.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

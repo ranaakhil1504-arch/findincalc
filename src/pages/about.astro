@@ -1,0 +1,30 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Navbar from '../components/Navbar.astro';
+---
+
+<Layout title="About - FindInCalc">
+  <Navbar />
+
+  <main class="pt-24 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">About FindInCalc</h1>
+      
+      <div class="prose prose-emerald dark:prose-invert max-w-none">
+        <p class="text-lg text-gray-600 dark:text-gray-300">
+          FindInCalc was created with a simple mission: to make calculations accessible to everyone.
+        </p>
+        <p class="text-gray-600 dark:text-gray-300">
+          Whether you're a student learning geometry, a professional needing quick financial calculations, or someone tracking their health metrics, FindInCalc provides accurate, easy-to-use tools.
+        </p>
+        <h2>Our Values</h2>
+        <ul>
+          <li><strong>Free:</strong> All tools are completely free to use</li>
+          <li><strong>Accurate:</strong> Powered by precise mathematical formulas</li>
+          <li><strong>Simple:</strong> Clean, intuitive interface for everyone</li>
+          <li><strong>Private:</strong> No data storage or tracking of your calculations</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+</Layout>
