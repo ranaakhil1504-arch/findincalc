@@ -282,293 +282,293 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   </main>
 
   <script>
-  import { validatePositiveNumber } from '../../lib/calculator/validation';
-  import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    // ============================================
-    // DOM REFERENCES
-    // ============================================
-    const loanAmountSlider = document.getElementById('loanAmountSlider');
-    const interestSlider = document.getElementById('interestSlider');
-    const termSlider = document.getElementById('termSlider');
-    const loanAmountInput = document.getElementById('loanAmountInput');
-    const interestInput = document.getElementById('interestInput');
-    const termInput = document.getElementById('termInput');
-    const loanAmountDisplay = document.getElementById('loanAmountDisplay');
-    const interestDisplay = document.getElementById('interestDisplay');
-    const termDisplay = document.getElementById('termDisplay');
-    const monthlyPayment = document.getElementById('monthlyPayment');
-    const totalInterest = document.getElementById('totalInterest');
-    const totalPayment = document.getElementById('totalPayment');
-    const formulaPayment = document.getElementById('formulaPayment');
-    const formulaInterest = document.getElementById('formulaInterest');
-    const formulaTotal = document.getElementById('formulaTotal');
-    const summaryAmount = document.getElementById('summaryAmount');
-    const summaryRate = document.getElementById('summaryRate');
-    const summaryTerm = document.getElementById('summaryTerm');
-    const summaryMonths = document.getElementById('summaryMonths');
-    const loanResultBox = document.getElementById('loanResultBox');
-    const amortizationSection = document.getElementById('amortizationSection');
-    const amortizationBody = document.getElementById('amortizationBody');
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const loanAmountSlider = document.getElementById('loanAmountSlider');
+      const interestSlider = document.getElementById('interestSlider');
+      const termSlider = document.getElementById('termSlider');
+      const loanAmountInput = document.getElementById('loanAmountInput');
+      const interestInput = document.getElementById('interestInput');
+      const termInput = document.getElementById('termInput');
+      const loanAmountDisplay = document.getElementById('loanAmountDisplay');
+      const interestDisplay = document.getElementById('interestDisplay');
+      const termDisplay = document.getElementById('termDisplay');
+      const monthlyPayment = document.getElementById('monthlyPayment');
+      const totalInterest = document.getElementById('totalInterest');
+      const totalPayment = document.getElementById('totalPayment');
+      const formulaPayment = document.getElementById('formulaPayment');
+      const formulaInterest = document.getElementById('formulaInterest');
+      const formulaTotal = document.getElementById('formulaTotal');
+      const summaryAmount = document.getElementById('summaryAmount');
+      const summaryRate = document.getElementById('summaryRate');
+      const summaryTerm = document.getElementById('summaryTerm');
+      const summaryMonths = document.getElementById('summaryMonths');
+      const loanResultBox = document.getElementById('loanResultBox');
+      const amortizationSection = document.getElementById('amortizationSection');
+      const amortizationBody = document.getElementById('amortizationBody');
 
-    function showValidationError(message) {
-      if (window.showToast) window.showToast(message, 'error');
-      else window.alert(message);
-    }
-
-    // ============================================
-    // VALIDATION HELPERS - Using imported validation
-    // ============================================
-    function validatePositive(value, name) {
-      const result = validatePositiveNumber(value, name, 1e12);
-      if (!result.valid) {
-        return { valid: false, message: result.message };
-      }
-      return { valid: true, value: result.value };
-    }
-
-    function setSliderValue(slider, value, defaultMax) {
-      const num = Number(value);
-      if (!Number.isFinite(num)) return;
-      if (defaultMax !== undefined) slider.max = String(Math.max(defaultMax, num));
-      slider.value = String(num);
-    }
-
-    function formatCurrency(value) {
-      return '$' + formatNumber(value, { 
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-        useGrouping: true
-      });
-    }
-
-    // ============================================
-    // RESET FUNCTION
-    // ============================================
-    function resetLoan() {
-      loanAmountSlider.value = 10000;
-      interestSlider.value = 7;
-      termSlider.value = 5;
-      loanAmountInput.value = 10000;
-      interestInput.value = 7;
-      termInput.value = 5;
-      calculateLoan();
-      if (window.showToast) {
-        window.showToast('🔄 Loan calculator reset to default values', 'info');
-      }
-    }
-
-    function calculateLoan() {
-      const principal = parseFloat(loanAmountSlider.value) || 0;
-      const annualRate = parseFloat(interestSlider.value) || 0;
-      const years = parseFloat(termSlider.value) || 1;
-      
-      const monthlyRate = annualRate / 100 / 12;
-      const months = years * 12;
-
-      // Update displays
-      loanAmountDisplay.textContent = formatNumber(principal, { useGrouping: true, maximumFractionDigits: 0 });
-      interestDisplay.textContent = formatNumber(annualRate, { maximumFractionDigits: 1 });
-      termDisplay.textContent = formatNumber(years, { maximumFractionDigits: 0 });
-
-      // Calculate EMI
-      let emi, totalInterestAmount, totalPaymentAmount;
-      
-      if (principal === 0) {
-        emi = 0;
-        totalInterestAmount = 0;
-        totalPaymentAmount = 0;
-      } else if (monthlyRate === 0 || annualRate === 0) {
-        emi = principal / months;
-        totalInterestAmount = 0;
-        totalPaymentAmount = principal;
-      } else {
-        const factor = Math.pow(1 + monthlyRate, months);
-        emi = principal * monthlyRate * factor / (factor - 1);
-        totalPaymentAmount = emi * months;
-        totalInterestAmount = totalPaymentAmount - principal;
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
       }
 
-      // Update results
-      monthlyPayment.textContent = formatCurrency(emi);
-      totalInterest.textContent = formatCurrency(totalInterestAmount);
-      totalPayment.textContent = formatCurrency(totalPaymentAmount);
-      
-      // Update formula
-      formulaPayment.textContent = formatCurrency(emi);
-      formulaInterest.textContent = formatCurrency(totalInterestAmount);
-      formulaTotal.textContent = formatCurrency(totalPaymentAmount);
-
-      // Update summary
-      summaryAmount.textContent = formatCurrency(principal);
-      summaryRate.textContent = formatNumber(annualRate, { maximumFractionDigits: 1 }) + '%';
-      summaryTerm.textContent = formatNumber(years, { maximumFractionDigits: 0 }) + ' year' + (years > 1 ? 's' : '');
-      summaryMonths.textContent = formatNumber(months, { maximumFractionDigits: 0 });
-
-      // Show results if principal > 0
-      if (principal > 0) {
-        loanResultBox.classList.remove('hidden');
-        generateAmortization(principal, monthlyRate, months, emi);
-      } else {
-        loanResultBox.classList.add('hidden');
-        amortizationSection.classList.add('hidden');
-      }
-    }
-
-    function generateAmortization(principal, monthlyRate, months, emi) {
-      amortizationBody.innerHTML = '';
-      let balance = principal;
-      let displayCount = Math.min(months, 60);
-
-      if (months === 0 || principal === 0) {
-        amortizationSection.classList.add('hidden');
-        return;
+      // ============================================
+      // VALIDATION HELPERS - Using imported validation
+      // ============================================
+      function validatePositive(value, name) {
+        const result = validatePositiveNumber(value, name, 1e12);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
       }
 
-      for (let i = 1; i <= displayCount; i++) {
-        const interestPayment = balance * monthlyRate;
-        const principalPayment = emi - interestPayment;
+      function setSliderValue(slider, value, defaultMax) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) return;
+        if (defaultMax !== undefined) slider.max = String(Math.max(defaultMax, num));
+        slider.value = String(num);
+      }
+
+      function formatCurrency(value) {
+        return '$' + formatNumber(value, { 
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+          useGrouping: true
+        });
+      }
+
+      // ============================================
+      // RESET FUNCTION
+      // ============================================
+      function resetLoan() {
+        loanAmountSlider.value = 10000;
+        interestSlider.value = 7;
+        termSlider.value = 5;
+        loanAmountInput.value = 10000;
+        interestInput.value = 7;
+        termInput.value = 5;
+        calculateLoan();
+        if (window.showToast) {
+          window.showToast('🔄 Loan calculator reset to default values', 'info');
+        }
+      }
+
+      function calculateLoan() {
+        const principal = parseFloat(loanAmountSlider.value) || 0;
+        const annualRate = parseFloat(interestSlider.value) || 0;
+        const years = parseFloat(termSlider.value) || 1;
         
-        // Handle last payment rounding
-        const adjustedPrincipal = (i === displayCount && displayCount < months) ? 0 : principalPayment;
-        const adjustedBalance = (i === displayCount && displayCount < months) ? 0 : Math.max(balance - principalPayment, 0);
+        const monthlyRate = annualRate / 100 / 12;
+        const months = years * 12;
 
-        if (i === displayCount && displayCount < months) {
-          const row = document.createElement('tr');
-          row.className = 'text-gray-500 dark:text-gray-400';
-          row.innerHTML = `
-            <td colspan="5" class="text-center py-2 text-xs">... ${formatNumber(months - displayCount, { maximumFractionDigits: 0 })} more months ...</td>
-          `;
-          amortizationBody.appendChild(row);
-          break;
+        // Update displays
+        loanAmountDisplay.textContent = formatNumber(principal, { useGrouping: true, maximumFractionDigits: 0 });
+        interestDisplay.textContent = formatNumber(annualRate, { maximumFractionDigits: 1 });
+        termDisplay.textContent = formatNumber(years, { maximumFractionDigits: 0 });
+
+        // Calculate EMI
+        let emi, totalInterestAmount, totalPaymentAmount;
+        
+        if (principal === 0) {
+          emi = 0;
+          totalInterestAmount = 0;
+          totalPaymentAmount = 0;
+        } else if (monthlyRate === 0 || annualRate === 0) {
+          emi = principal / months;
+          totalInterestAmount = 0;
+          totalPaymentAmount = principal;
+        } else {
+          const factor = Math.pow(1 + monthlyRate, months);
+          emi = principal * monthlyRate * factor / (factor - 1);
+          totalPaymentAmount = emi * months;
+          totalInterestAmount = totalPaymentAmount - principal;
         }
 
-        balance -= principalPayment;
+        // Update results
+        monthlyPayment.textContent = formatCurrency(emi);
+        totalInterest.textContent = formatCurrency(totalInterestAmount);
+        totalPayment.textContent = formatCurrency(totalPaymentAmount);
+        
+        // Update formula
+        formulaPayment.textContent = formatCurrency(emi);
+        formulaInterest.textContent = formatCurrency(totalInterestAmount);
+        formulaTotal.textContent = formatCurrency(totalPaymentAmount);
 
-        const row = document.createElement('tr');
-        row.className = 'border-b border-gray-100 dark:border-gray-700';
-        row.innerHTML = `
-          <td class="py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatNumber(i, { maximumFractionDigits: 0 })}</td>
-          <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(emi)}</td>
-          <td class="text-right py-1.5 px-2 text-emerald-600 dark:text-emerald-400">${formatCurrency(Math.max(principalPayment, 0))}</td>
-          <td class="text-right py-1.5 px-2 text-amber-600 dark:text-amber-400">${formatCurrency(Math.max(interestPayment, 0))}</td>
-          <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(Math.max(balance, 0))}</td>
-        `;
-        amortizationBody.appendChild(row);
+        // Update summary
+        summaryAmount.textContent = formatCurrency(principal);
+        summaryRate.textContent = formatNumber(annualRate, { maximumFractionDigits: 1 }) + '%';
+        summaryTerm.textContent = formatNumber(years, { maximumFractionDigits: 0 }) + ' year' + (years > 1 ? 's' : '');
+        summaryMonths.textContent = formatNumber(months, { maximumFractionDigits: 0 });
+
+        // Show results if principal > 0
+        if (principal > 0) {
+          loanResultBox.classList.remove('hidden');
+          generateAmortization(principal, monthlyRate, months, emi);
+        } else {
+          loanResultBox.classList.add('hidden');
+          amortizationSection.classList.add('hidden');
+        }
       }
 
-      amortizationSection.classList.remove('hidden');
-    }
+      function generateAmortization(principal, monthlyRate, months, emi) {
+        amortizationBody.innerHTML = '';
+        let balance = principal;
+        let displayCount = Math.min(months, 60);
 
-    // ============================================
-    // EVENT LISTENERS
-    // ============================================
-    loanAmountSlider.addEventListener('input', () => {
-      loanAmountInput.value = loanAmountSlider.value;
-      calculateLoan();
-    });
-    interestSlider.addEventListener('input', () => {
-      interestInput.value = interestSlider.value;
-      calculateLoan();
-    });
-    termSlider.addEventListener('input', () => {
-      termInput.value = termSlider.value;
-      calculateLoan();
-    });
+        if (months === 0 || principal === 0) {
+          amortizationSection.classList.add('hidden');
+          return;
+        }
 
-    loanAmountInput.addEventListener('input', () => {
-      const validation = validatePositive(loanAmountInput.value, 'Loan Amount');
-      if (validation.valid) {
-        setSliderValue(loanAmountSlider, validation.value, 1000000);
+        for (let i = 1; i <= displayCount; i++) {
+          const interestPayment = balance * monthlyRate;
+          const principalPayment = emi - interestPayment;
+          
+          // Handle last payment rounding
+          const adjustedPrincipal = (i === displayCount && displayCount < months) ? 0 : principalPayment;
+          const adjustedBalance = (i === displayCount && displayCount < months) ? 0 : Math.max(balance - principalPayment, 0);
+
+          if (i === displayCount && displayCount < months) {
+            const row = document.createElement('tr');
+            row.className = 'text-gray-500 dark:text-gray-400';
+            row.innerHTML = `
+              <td colspan="5" class="text-center py-2 text-xs">... ${formatNumber(months - displayCount, { maximumFractionDigits: 0 })} more months ...</td>
+            `;
+            amortizationBody.appendChild(row);
+            break;
+          }
+
+          balance -= principalPayment;
+
+          const row = document.createElement('tr');
+          row.className = 'border-b border-gray-100 dark:border-gray-700';
+          row.innerHTML = `
+            <td class="py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatNumber(i, { maximumFractionDigits: 0 })}</td>
+            <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(emi)}</td>
+            <td class="text-right py-1.5 px-2 text-emerald-600 dark:text-emerald-400">${formatCurrency(Math.max(principalPayment, 0))}</td>
+            <td class="text-right py-1.5 px-2 text-amber-600 dark:text-amber-400">${formatCurrency(Math.max(interestPayment, 0))}</td>
+            <td class="text-right py-1.5 px-2 text-gray-700 dark:text-gray-300">${formatCurrency(Math.max(balance, 0))}</td>
+          `;
+          amortizationBody.appendChild(row);
+        }
+
+        amortizationSection.classList.remove('hidden');
+      }
+
+      // ============================================
+      // EVENT LISTENERS
+      // ============================================
+      loanAmountSlider.addEventListener('input', () => {
+        loanAmountInput.value = loanAmountSlider.value;
         calculateLoan();
-      }
-    });
-    interestInput.addEventListener('input', () => {
-      const validation = validatePositive(interestInput.value, 'Interest Rate');
-      if (validation.valid && validation.value <= 30) {
-        interestSlider.value = String(validation.value);
+      });
+      interestSlider.addEventListener('input', () => {
+        interestInput.value = interestSlider.value;
         calculateLoan();
-      }
-    });
-    termInput.addEventListener('input', () => {
-      const validation = validatePositive(termInput.value, 'Loan Term');
-      if (validation.valid && validation.value <= 30) {
-        termSlider.value = String(validation.value);
+      });
+      termSlider.addEventListener('input', () => {
+        termInput.value = termSlider.value;
         calculateLoan();
-      }
-    });
+      });
 
-    document.getElementById('loanCalculateBtn').addEventListener('click', () => {
-      const amountResult = validatePositive(loanAmountInput.value, 'Loan Amount');
-      if (!amountResult.valid) { 
-        showValidationError(amountResult.message); 
-        loanAmountInput.focus(); 
-        return; 
-      }
+      loanAmountInput.addEventListener('input', () => {
+        const validation = validatePositive(loanAmountInput.value, 'Loan Amount');
+        if (validation.valid) {
+          setSliderValue(loanAmountSlider, validation.value, 1000000);
+          calculateLoan();
+        }
+      });
+      interestInput.addEventListener('input', () => {
+        const validation = validatePositive(interestInput.value, 'Interest Rate');
+        if (validation.valid && validation.value <= 30) {
+          interestSlider.value = String(validation.value);
+          calculateLoan();
+        }
+      });
+      termInput.addEventListener('input', () => {
+        const validation = validatePositive(termInput.value, 'Loan Term');
+        if (validation.valid && validation.value <= 30) {
+          termSlider.value = String(validation.value);
+          calculateLoan();
+        }
+      });
+
+      document.getElementById('loanCalculateBtn').addEventListener('click', () => {
+        const amountResult = validatePositive(loanAmountInput.value, 'Loan Amount');
+        const rateResult = validatePositive(interestInput.value, 'Interest Rate');
+        const termResult = validatePositive(termInput.value, 'Loan Term');
+        
+        if (!amountResult.valid) {
+          showValidationError(amountResult.message);
+          loanAmountInput.focus();
+          return;
+        }
+        if (!rateResult.valid) {
+          showValidationError(rateResult.message);
+          interestInput.focus();
+          return;
+        }
+        if (!termResult.valid) {
+          showValidationError(termResult.message);
+          termInput.focus();
+          return;
+        }
+        
+        if (rateResult.value > 30) {
+          showValidationError('Interest rate should be between 0% and 30%.');
+          interestInput.focus();
+          return;
+        }
+        if (termResult.value > 30) {
+          showValidationError('Loan term should be between 1 and 30 years.');
+          termInput.focus();
+          return;
+        }
+        
+        setSliderValue(loanAmountSlider, amountResult.value, 1000000);
+        setSliderValue(interestSlider, rateResult.value, 30);
+        setSliderValue(termSlider, termResult.value, 30);
+        calculateLoan();
+        if (window.showToast) {
+          window.showToast('✅ Loan calculation updated!', 'success');
+        }
+      });
+
+      // ============================================
+      // RESET BUTTON
+      // ============================================
+      const resetBtn = document.createElement('button');
+      resetBtn.id = 'resetLoanBtn';
+      resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+      resetBtn.textContent = '🔄 Reset Calculator';
+      resetBtn.addEventListener('click', resetLoan);
       
-      const rateResult = validatePositive(interestInput.value, 'Interest Rate');
-      if (!rateResult.valid) { 
-        showValidationError(rateResult.message); 
-        interestInput.focus(); 
-        return; 
+      const resultBox = document.getElementById('loanResultBox');
+      if (resultBox) {
+        resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
       }
-      
-      const termResult = validatePositive(termInput.value, 'Loan Term');
-      if (!termResult.valid) { 
-        showValidationError(termResult.message); 
-        termInput.focus(); 
-        return; 
-      }
-      
-      if (rateResult.value > 30) {
-        showValidationError('Interest rate should be between 0% and 30%.');
-        interestInput.focus();
-        return;
-      }
-      if (termResult.value > 30) {
-        showValidationError('Loan term should be between 1 and 30 years.');
-        termInput.focus();
-        return;
-      }
-      
-      setSliderValue(loanAmountSlider, amountResult.value, 1000000);
-      setSliderValue(interestSlider, rateResult.value, 30);
-      setSliderValue(termSlider, termResult.value, 30);
+
+      // ============================================
+      // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+      // ============================================
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+          e.preventDefault();
+          resetLoan();
+        }
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
       calculateLoan();
-      if (window.showToast) {
-        window.showToast('✅ Loan calculation updated!', 'success');
-      }
     });
+  </script>
 
-    // ============================================
-    // RESET BUTTON
-    // ============================================
-    const resetBtn = document.createElement('button');
-    resetBtn.id = 'resetLoanBtn';
-    resetBtn.className = 'btn-secondary w-full mt-3 text-center';
-    resetBtn.textContent = '🔄 Reset Calculator';
-    resetBtn.addEventListener('click', resetLoan);
-    
-    const resultBox = document.getElementById('loanResultBox');
-    if (resultBox) {
-      resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
-    }
-
-    // ============================================
-    // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
-    // ============================================
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
-        e.preventDefault();
-        resetLoan();
-      }
-    });
-
-    // ============================================
-    // INITIALIZE
-    // ============================================
-    calculateLoan();
-  });
-</script>
 </Layout>

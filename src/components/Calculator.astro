@@ -406,6 +406,9 @@
 </div>
 
 <script>
+  import { validatePositiveNumber } from '../lib/calculator/validation';
+  import { formatNumber, formatResult, formatDecimal } from '../lib/calculator/formatting';
+  
   document.addEventListener('DOMContentLoaded', () => {
     const card = document.getElementById('calcCard');
     const display = document.getElementById('result');
@@ -442,8 +445,16 @@
       history = [];
     }
 
-    // ---------- Glow color states ----------
+    // ---------- Validation Helper ----------
+    function validatePositive(value, name) {
+      const result = validatePositiveNumber(value, name, 1e10);
+      if (!result.valid) {
+        return { valid: false, message: result.message };
+      }
+      return { valid: true, value: result.value };
+    }
 
+    // ---------- Glow color states ----------
     function setGlow(kind: string) {
       const glows: Record<string, string[]> = {
         idle: [
@@ -479,7 +490,6 @@
     }
 
     // ---------- Display helpers ----------
-
     function prettify(str: string) {
       return str
         .replaceAll('sinD(', 'sin(')
@@ -509,7 +519,6 @@
     }
 
     // ---------- History ----------
-
     function renderHistory() {
       historyList.innerHTML = history
         .slice(-8)
@@ -592,7 +601,6 @@
     });
 
     // ---------- Mode switch ----------
-
     const modePill = document.getElementById('modePill');
     const sciPanel = document.getElementById('sciPanel');
 
@@ -636,7 +644,6 @@
     });
 
     // ---------- History drawer ----------
-
     const historyDrawer =
       document.getElementById('historyDrawer');
 
@@ -661,7 +668,6 @@
       ?.addEventListener('click', closeHistory);
 
     // ---------- Copy result ----------
-
     document
       .getElementById('copyResult')
       ?.addEventListener('click', () => {
@@ -688,7 +694,6 @@
       });
 
     // ---------- Evaluation ----------
-
     function sinD(deg: number) {
       return Math.sin(
         (deg * Math.PI) / 180
@@ -786,7 +791,6 @@
     }
 
     // ---------- Button wiring ----------
-
     document
       .querySelectorAll('.calc-btn')
       .forEach((btn) => {

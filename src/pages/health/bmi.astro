@@ -438,6 +438,17 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     }
 
     // ============================================
+    // VALIDATION HELPERS - Using imported validation
+    // ============================================
+    function validatePositive(value, name, maxVal) {
+      const result = validatePositiveNumber(value, name, maxVal);
+      if (!result.valid) {
+        return { valid: false, message: result.message };
+      }
+      return { valid: true, value: result.value };
+    }
+
+    // ============================================
     // DOM REFERENCES
     // ============================================
     const weightSlider = document.getElementById('weightSlider');
@@ -709,14 +720,14 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     });
 
     weightInput.addEventListener('input', () => {
-      const validation = validatePositiveNumber(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
+      const validation = validatePositive(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
       if (validation.valid) {
         rawWeight = validation.value;
         updateBMI(false);
       }
     });
     heightInput.addEventListener('input', () => {
-      const validation = validatePositiveNumber(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
+      const validation = validatePositive(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
       if (validation.valid) {
         rawHeight = validation.value;
         updateBMI(false);
@@ -724,20 +735,22 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     });
 
     document.getElementById('bmiCalculateBtn').addEventListener('click', () => {
-      const weightValidation = validatePositiveNumber(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
-      const heightValidation = validatePositiveNumber(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
-      if (!weightValidation.valid) {
-        showValidationError(weightValidation.message);
+      const weightResult = validatePositive(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
+      const heightResult = validatePositive(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
+      
+      if (!weightResult.valid) {
+        showValidationError(weightResult.message);
         weightInput.focus();
         return;
       }
-      if (!heightValidation.valid) {
-        showValidationError(heightValidation.message);
+      if (!heightResult.valid) {
+        showValidationError(heightResult.message);
         heightInput.focus();
         return;
       }
-      rawWeight = weightValidation.value;
-      rawHeight = heightValidation.value;
+      
+      rawWeight = weightResult.value;
+      rawHeight = heightResult.value;
       updateBMI();
       setTimeout(scrollToResults, 100);
     });
