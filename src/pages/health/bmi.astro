@@ -363,398 +363,415 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // ============================================
-      // STATE
-      // ============================================
-      let currentUnit = 'metric';
-      let rawWeight = 70;
-      let rawHeight = 175;
+  import { validatePositiveNumber } from '../../lib/calculator/validation';
+  import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    // ============================================
+    // STATE
+    // ============================================
+    let currentUnit = 'metric';
+    let rawWeight = 70;
+    let rawHeight = 175;
 
-      // ============================================
-      // BMI DATA WITH EMOJIS & MOTIVATIONAL MESSAGES
-      // ============================================
-      const bmiData = {
-        underweight: {
-          emoji: '😔',
-          label: 'Underweight',
-          color: 'blue',
-          textColor: 'text-blue-600 dark:text-blue-400',
-          bgColor: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
-          gaugeColor: '#3b82f6',
-          description: 'Your BMI indicates you may be underweight. Consider consulting a healthcare professional.',
-          motivational: `🌟 Your body is a beautiful garden that needs the right nutrients to grow. Start your journey by adding one extra healthy snack each day. Remember, small steps lead to big changes! 💪
+    // ============================================
+    // BMI DATA WITH EMOJIS & MOTIVATIONAL MESSAGES
+    // ============================================
+    const bmiData = {
+      underweight: {
+        emoji: '😔',
+        label: 'Underweight',
+        color: 'blue',
+        textColor: 'text-blue-600 dark:text-blue-400',
+        bgColor: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20',
+        gaugeColor: '#3b82f6',
+        description: 'Your BMI indicates you may be underweight. Consider consulting a healthcare professional.',
+        motivational: `🌟 Your body is a beautiful garden that needs the right nutrients to grow. Start your journey by adding one extra healthy snack each day. Remember, small steps lead to big changes! 💪
 
-          ✨ Focus on nutrient-rich foods like nuts, avocados, and whole grains. Your future self will thank you for the care you're giving your body today.`,
-          tip: 'Consider consulting a nutritionist for a healthy weight gain plan.'
-        },
-        normal: {
-          emoji: '😊',
-          label: 'Normal Weight',
-          color: 'green',
-          textColor: 'text-green-600 dark:text-green-400',
-          bgColor: 'border-green-500 bg-green-50 dark:bg-green-900/20',
-          gaugeColor: '#22c55e',
-          description: 'Your BMI indicates a healthy weight for your height. Great job!',
-          motivational: `🌟 You're doing amazing! Your healthy weight is a reflection of the good choices you make every day. Keep nurturing your body with balanced meals and regular movement.
+        ✨ Focus on nutrient-rich foods like nuts, avocados, and whole grains. Your future self will thank you for the care you're giving your body today.`,
+        tip: 'Consider consulting a nutritionist for a healthy weight gain plan.'
+      },
+      normal: {
+        emoji: '😊',
+        label: 'Normal Weight',
+        color: 'green',
+        textColor: 'text-green-600 dark:text-green-400',
+        bgColor: 'border-green-500 bg-green-50 dark:bg-green-900/20',
+        gaugeColor: '#22c55e',
+        description: 'Your BMI indicates a healthy weight for your height. Great job!',
+        motivational: `🌟 You're doing amazing! Your healthy weight is a reflection of the good choices you make every day. Keep nurturing your body with balanced meals and regular movement.
 
-          🏃‍♂️ Remember, health is a journey, not a destination. Celebrate your wins, stay consistent, and continue being the best version of yourself. You've got this!`,
-          tip: 'Maintain your healthy lifestyle with balanced diet and regular exercise.'
-        },
-        overweight: {
-          emoji: '😐',
-          label: 'Overweight',
-          color: 'yellow',
-          textColor: 'text-yellow-600 dark:text-yellow-400',
-          bgColor: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
-          gaugeColor: '#eab308',
-          description: 'Your BMI indicates you may be overweight. Consider a balanced diet and exercise.',
-          motivational: `🌅 Every great journey begins with a single step. Your awareness today is the first step toward a healthier tomorrow. You have the power to create positive change!
+        🏃‍♂️ Remember, health is a journey, not a destination. Celebrate your wins, stay consistent, and continue being the best version of yourself. You've got this!`,
+        tip: 'Maintain your healthy lifestyle with balanced diet and regular exercise.'
+      },
+      overweight: {
+        emoji: '😐',
+        label: 'Overweight',
+        color: 'yellow',
+        textColor: 'text-yellow-600 dark:text-yellow-400',
+        bgColor: 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20',
+        gaugeColor: '#eab308',
+        description: 'Your BMI indicates you may be overweight. Consider a balanced diet and exercise.',
+        motivational: `🌅 Every great journey begins with a single step. Your awareness today is the first step toward a healthier tomorrow. You have the power to create positive change!
 
-          🍎 Start small—swap one sugary drink for water, add a 10-minute walk to your day. Celebrate every small victory. Your health journey is unique, and every step counts. You can do this! 💪`,
-          tip: 'Incorporate more physical activity and balanced meals into your routine.'
-        },
-        obese: {
-          emoji: '😢',
-          label: 'Obese',
-          color: 'red',
-          textColor: 'text-red-600 dark:text-red-400',
-          bgColor: 'border-red-500 bg-red-50 dark:bg-red-900/20',
-          gaugeColor: '#ef4444',
-          description: 'Your BMI indicates obesity. Please consult with a healthcare professional.',
-          motivational: `❤️ You are worthy of health and happiness, exactly as you are right now. Your weight doesn't define your worth. Every journey starts with self-compassion and one small step forward.
+        🍎 Start small—swap one sugary drink for water, add a 10-minute walk to your day. Celebrate every small victory. Your health journey is unique, and every step counts. You can do this! 💪`,
+        tip: 'Incorporate more physical activity and balanced meals into your routine.'
+      },
+      obese: {
+        emoji: '😢',
+        label: 'Obese',
+        color: 'red',
+        textColor: 'text-red-600 dark:text-red-400',
+        bgColor: 'border-red-500 bg-red-50 dark:bg-red-900/20',
+        gaugeColor: '#ef4444',
+        description: 'Your BMI indicates obesity. Please consult with a healthcare professional.',
+        motivational: `❤️ You are worthy of health and happiness, exactly as you are right now. Your weight doesn't define your worth. Every journey starts with self-compassion and one small step forward.
 
-          🌟 Today is a new beginning. Reach out to a healthcare professional who can support you. Remember, asking for help is a sign of strength, not weakness. Your future self will be grateful for the love you show yourself today. You are capable of amazing things! 💪`,
-          tip: 'Consult with a healthcare professional for a personalized health plan.'
-        }
-      };
-
-      // ============================================
-      // DOM REFERENCES
-      // ============================================
-      const weightSlider = document.getElementById('weightSlider');
-      const heightSlider = document.getElementById('heightSlider');
-      const weightInput = document.getElementById('weightInput');
-      const heightInput = document.getElementById('heightInput');
-      const weightDisplay = document.getElementById('weightDisplay');
-      const heightDisplay = document.getElementById('heightDisplay');
-      const weightUnit = document.getElementById('weightUnit');
-      const heightUnit = document.getElementById('heightUnit');
-      const weightMaxLabel = document.getElementById('weightMaxLabel');
-      const heightMaxLabel = document.getElementById('heightMaxLabel');
-      const bmiResultValue = document.getElementById('bmiResultValue');
-      const bmiCategory = document.getElementById('bmiCategory');
-      const bmiDescription = document.getElementById('bmiDescription');
-      const bmiFormula = document.getElementById('bmiFormula');
-      const bmiFormulaDetail = document.getElementById('bmiFormulaDetail');
-      const bmiWeight = document.getElementById('bmiWeight');
-      const bmiHeight = document.getElementById('bmiHeight');
-      const bmiResultFormula = document.getElementById('bmiResultFormula');
-      const bmiResultBox = document.getElementById('bmiResultBox');
-      const motivationalBox = document.getElementById('motivationalBox');
-      const motivationalMessage = document.getElementById('motivationalMessage');
-      const healthyRange = document.getElementById('healthyRange');
-      const gaugeValue = document.getElementById('gaugeValue');
-      const needleGroup = document.getElementById('needleGroup');
-      const step1 = document.getElementById('step1');
-      const step2 = document.getElementById('step2');
-      const step3 = document.getElementById('step3');
-      const step4 = document.getElementById('step4');
-      const emojiDisplay = document.getElementById('emojiDisplay');
-      const emojiRing = document.getElementById('emojiRing');
-      const heightFeetInches = document.getElementById('heightFeetInches');
-      const bmiPrime = document.getElementById('bmiPrime');
-      const shareResultBtn = document.getElementById('shareResultBtn');
-      const shareLabel = document.getElementById('shareLabel');
-      const shareIcon = document.getElementById('shareIcon');
-
-      let lastBMI = 22.9;
-      let lastAngle = -90 + (22.9 / 40) * 180;
-
-      // ============================================
-      // RING COLOR PER CATEGORY (bg + ring classes)
-      // ============================================
-      const ringClasses = {
-        underweight: 'bg-blue-100 dark:bg-blue-800/40 ring-4 ring-blue-300/60 dark:ring-blue-600/40',
-        normal: 'bg-emerald-100 dark:bg-emerald-800/40 ring-4 ring-emerald-300/60 dark:ring-emerald-600/40',
-        overweight: 'bg-yellow-100 dark:bg-yellow-800/40 ring-4 ring-yellow-300/60 dark:ring-yellow-600/40',
-        obese: 'bg-red-100 dark:bg-red-800/40 ring-4 ring-red-300/60 dark:ring-red-600/40'
-      };
-
-      // ============================================
-      // ANIMATED NUMBER COUNT-UP
-      // ============================================
-      function animateValue(el, start, end, duration = 500) {
-        const startTime = performance.now();
-        function step(now) {
-          const progress = Math.min((now - startTime) / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const value = start + (end - start) * eased;
-          el.textContent = value.toFixed(1);
-          if (progress < 1) requestAnimationFrame(step);
-          else el.textContent = end.toFixed(1);
-        }
-        requestAnimationFrame(step);
+        🌟 Today is a new beginning. Reach out to a healthcare professional who can support you. Remember, asking for help is a sign of strength, not weakness. Your future self will be grateful for the love you show yourself today. You are capable of amazing things! 💪`,
+        tip: 'Consult with a healthcare professional for a personalized health plan.'
       }
+    };
 
-      // ============================================
-      // ANIMATED NEEDLE ROTATION (JS-driven)
-      // ============================================
-      function animateNeedle(start, end, duration = 500) {
-        const startTime = performance.now();
-        function step(now) {
-          const progress = Math.min((now - startTime) / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const angle = start + (end - start) * eased;
-          needleGroup.setAttribute('transform', `rotate(${angle}, 150, 160)`);
-          if (progress < 1) requestAnimationFrame(step);
-          else needleGroup.setAttribute('transform', `rotate(${end}, 150, 160)`);
-        }
-        requestAnimationFrame(step);
+    function showValidationError(message) {
+      if (window.showToast) window.showToast(message, 'error');
+      else window.alert(message);
+    }
+
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
+    const weightSlider = document.getElementById('weightSlider');
+    const heightSlider = document.getElementById('heightSlider');
+    const weightInput = document.getElementById('weightInput');
+    const heightInput = document.getElementById('heightInput');
+    const weightDisplay = document.getElementById('weightDisplay');
+    const heightDisplay = document.getElementById('heightDisplay');
+    const weightUnit = document.getElementById('weightUnit');
+    const heightUnit = document.getElementById('heightUnit');
+    const weightMaxLabel = document.getElementById('weightMaxLabel');
+    const heightMaxLabel = document.getElementById('heightMaxLabel');
+    const bmiResultValue = document.getElementById('bmiResultValue');
+    const bmiCategory = document.getElementById('bmiCategory');
+    const bmiDescription = document.getElementById('bmiDescription');
+    const bmiFormula = document.getElementById('bmiFormula');
+    const bmiFormulaDetail = document.getElementById('bmiFormulaDetail');
+    const bmiWeight = document.getElementById('bmiWeight');
+    const bmiHeight = document.getElementById('bmiHeight');
+    const bmiResultFormula = document.getElementById('bmiResultFormula');
+    const bmiResultBox = document.getElementById('bmiResultBox');
+    const motivationalBox = document.getElementById('motivationalBox');
+    const motivationalMessage = document.getElementById('motivationalMessage');
+    const healthyRange = document.getElementById('healthyRange');
+    const gaugeValue = document.getElementById('gaugeValue');
+    const needleGroup = document.getElementById('needleGroup');
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const step4 = document.getElementById('step4');
+    const emojiDisplay = document.getElementById('emojiDisplay');
+    const emojiRing = document.getElementById('emojiRing');
+    const heightFeetInches = document.getElementById('heightFeetInches');
+    const bmiPrime = document.getElementById('bmiPrime');
+    const shareResultBtn = document.getElementById('shareResultBtn');
+    const shareLabel = document.getElementById('shareLabel');
+    const shareIcon = document.getElementById('shareIcon');
+
+    let lastBMI = 22.9;
+    let lastAngle = -90 + (22.9 / 40) * 180;
+
+    // ============================================
+    // RING COLOR PER CATEGORY (bg + ring classes)
+    // ============================================
+    const ringClasses = {
+      underweight: 'bg-blue-100 dark:bg-blue-800/40 ring-4 ring-blue-300/60 dark:ring-blue-600/40',
+      normal: 'bg-emerald-100 dark:bg-emerald-800/40 ring-4 ring-emerald-300/60 dark:ring-emerald-600/40',
+      overweight: 'bg-yellow-100 dark:bg-yellow-800/40 ring-4 ring-yellow-300/60 dark:ring-yellow-600/40',
+      obese: 'bg-red-100 dark:bg-red-800/40 ring-4 ring-red-300/60 dark:ring-red-600/40'
+    };
+
+    // ============================================
+    // ANIMATED NUMBER COUNT-UP
+    // ============================================
+    function animateValue(el, start, end, duration = 500) {
+      const startTime = performance.now();
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const value = start + (end - start) * eased;
+        el.textContent = formatNumber(value, { maximumFractionDigits: 1 });
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = formatNumber(end, { maximumFractionDigits: 1 });
       }
+      requestAnimationFrame(step);
+    }
 
-      // ============================================
-      // UNIT TOGGLE
-      // ============================================
-      document.getElementById('unitMetric').addEventListener('click', () => {
-        document.querySelectorAll('.bmi-unit-btn').forEach(b => {
-          b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-        });
-        document.getElementById('unitMetric').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-        currentUnit = 'metric';
-        updateBMI();
-      });
-
-      document.getElementById('unitImperial').addEventListener('click', () => {
-        document.querySelectorAll('.bmi-unit-btn').forEach(b => {
-          b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-        });
-        document.getElementById('unitImperial').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-        currentUnit = 'imperial';
-        updateBMI();
-      });
-
-      // ============================================
-      // UPDATE BMI
-      // ============================================
-      function updateBMI(syncInputs = true) {
-        let weight, height, weightLabel, heightLabel, weightMax, heightMax;
-        let weightVal, heightVal;
-
-        if (currentUnit === 'metric') {
-          weight = rawWeight;
-          height = rawHeight;
-          weightLabel = 'kg';
-          heightLabel = 'cm';
-          weightMax = '200 kg';
-          heightMax = '250 cm';
-          weightVal = weight;
-          heightVal = height / 100;
-          
-          bmiFormula.textContent = 'BMI = weight / (height)²';
-          bmiFormulaDetail.textContent = 'Weight in kg, Height in meters';
-          weightUnit.textContent = 'kg';
-          heightUnit.textContent = 'cm';
-          weightMaxLabel.textContent = '200 kg';
-          heightMaxLabel.textContent = '250 cm';
-          
-          weightSlider.min = 20;
-          weightSlider.max = 200;
-          heightSlider.min = 100;
-          heightSlider.max = 250;
-
-          weightInput.min = 20;
-          weightInput.max = 200;
-          weightInput.step = 0.5;
-          heightInput.min = 100;
-          heightInput.max = 250;
-          heightInput.step = 0.5;
-
-          heightFeetInches.textContent = '';
-
-        } else {
-          weight = rawWeight;
-          height = rawHeight;
-          weightLabel = 'lbs';
-          heightLabel = 'in';
-          weightMax = '440 lbs';
-          heightMax = '98 in';
-          weightVal = weight * 0.453592;
-          heightVal = height * 0.0254;
-          
-          bmiFormula.textContent = 'BMI = 703 × weight / (height)²';
-          bmiFormulaDetail.textContent = 'Weight in lbs, Height in inches';
-          weightUnit.textContent = 'lbs';
-          heightUnit.textContent = 'in';
-          weightMaxLabel.textContent = '440 lbs';
-          heightMaxLabel.textContent = '98 in';
-
-          const totalFeet = Math.floor(height / 12);
-          const remInches = Math.round(height % 12);
-          heightFeetInches.textContent = `(${totalFeet}'${remInches}")`;
-          
-          weightSlider.min = 44;
-          weightSlider.max = 440;
-          heightSlider.min = 39;
-          heightSlider.max = 98;
-
-          weightInput.min = 44;
-          weightInput.max = 440;
-          weightInput.step = 0.5;
-          heightInput.min = 39;
-          heightInput.max = 98;
-          heightInput.step = 0.5;
-        }
-
-        const safeWeightVal = weightVal > 0 ? weightVal : 0;
-        const safeHeightVal = heightVal > 0 ? heightVal : 0;
-        const bmi = safeHeightVal > 0 ? safeWeightVal / (safeHeightVal * safeHeightVal) : 0;
-        const formattedBMI = bmi.toFixed(1);
-
-        let categoryKey;
-        if (bmi < 18.5) categoryKey = 'underweight';
-        else if (bmi >= 18.5 && bmi < 25) categoryKey = 'normal';
-        else if (bmi >= 25 && bmi < 30) categoryKey = 'overweight';
-        else categoryKey = 'obese';
-
-        const data = bmiData[categoryKey];
-
-        emojiDisplay.textContent = data.emoji;
-        emojiRing.className = `relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 ${ringClasses[categoryKey]}`;
-
-        animateValue(bmiResultValue, lastBMI, bmi);
-        bmiResultValue.className = `text-5xl font-bold ${data.textColor}`;
-
-        bmiCategory.textContent = data.label;
-        bmiCategory.className = `text-xl font-bold ${data.textColor} transition-all duration-500`;
-
-        bmiDescription.textContent = data.description;
-        bmiResultBox.className = `mt-4 rounded-xl p-4 border transition-all duration-500 ${data.bgColor}`;
-        motivationalMessage.innerHTML = data.motivational;
-        bmiPrime.textContent = (bmi / 25).toFixed(2);
-
-        const angle = Math.min(Math.max(-90 + (bmi / 40) * 180, -90), 90);
-        animateNeedle(lastAngle, angle);
-        animateValue(gaugeValue, lastBMI, bmi);
-        lastAngle = angle;
-        lastBMI = bmi;
-
-        bmiWeight.textContent = `${weight} ${weightLabel}`;
-        if (currentUnit === 'metric') {
-          bmiHeight.textContent = `${height} cm (${heightVal.toFixed(2)} m)`;
-        } else {
-          bmiHeight.textContent = `${height} in (${(height * 2.54).toFixed(1)} cm)`;
-        }
-        bmiResultFormula.textContent = formattedBMI;
-
-        const minWeight = 18.5 * heightVal * heightVal;
-        const maxWeight = 24.9 * heightVal * heightVal;
-        if (currentUnit === 'metric') {
-          healthyRange.textContent = `${minWeight.toFixed(1)} – ${maxWeight.toFixed(1)} kg`;
-        } else {
-          healthyRange.textContent = `${(minWeight / 0.453592).toFixed(1)} – ${(maxWeight / 0.453592).toFixed(1)} lbs`;
-        }
-
-        if (currentUnit === 'metric') {
-          step1.textContent = `Convert height to meters: ${height} cm = ${heightVal.toFixed(2)} m`;
-        } else {
-          step1.textContent = `Convert height to meters: ${height} in = ${heightVal.toFixed(2)} m`;
-        }
-        step2.textContent = `Square height: ${heightVal.toFixed(2)}² = ${(heightVal * heightVal).toFixed(2)}`;
-        step3.textContent = `BMI = ${weightVal.toFixed(1)} ÷ ${(heightVal * heightVal).toFixed(2)} = ${formattedBMI}`;
-        step4.textContent = `Result: BMI = ${formattedBMI} (${data.label})`;
-
-        weightSlider.value = weight;
-        heightSlider.value = height;
-
-        if (syncInputs) {
-          weightInput.value = weight;
-          heightInput.value = height;
-        }
+    // ============================================
+    // ANIMATED NEEDLE ROTATION (JS-driven)
+    // ============================================
+    function animateNeedle(start, end, duration = 500) {
+      const startTime = performance.now();
+      function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const angle = start + (end - start) * eased;
+        needleGroup.setAttribute('transform', `rotate(${angle}, 150, 160)`);
+        if (progress < 1) requestAnimationFrame(step);
+        else needleGroup.setAttribute('transform', `rotate(${end}, 150, 160)`);
       }
+      requestAnimationFrame(step);
+    }
 
-      // ============================================
-      // AUTO-SCROLL TO RESULTS
-      // ============================================
-      function scrollToResults() {
-        const resultBox = document.getElementById('bmiResultBox');
-        if (resultBox) {
-          const yOffset = -80;
-          const y = resultBox.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }
-
-      // ============================================
-      // EVENT LISTENERS
-      // ============================================
-      weightSlider.addEventListener('input', () => {
-        rawWeight = parseFloat(weightSlider.value);
-        updateBMI();
+    // ============================================
+    // UNIT TOGGLE
+    // ============================================
+    document.getElementById('unitMetric').addEventListener('click', () => {
+      document.querySelectorAll('.bmi-unit-btn').forEach(b => {
+        b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
-      heightSlider.addEventListener('input', () => {
-        rawHeight = parseFloat(heightSlider.value);
-        updateBMI();
-      });
-
-      weightInput.addEventListener('input', () => {
-        const val = parseFloat(weightInput.value);
-        if (!isNaN(val) && val >= 0) {
-          rawWeight = val;
-          updateBMI(false);
-        }
-      });
-      heightInput.addEventListener('input', () => {
-        const val = parseFloat(heightInput.value);
-        if (!isNaN(val) && val >= 0) {
-          rawHeight = val;
-          updateBMI(false);
-        }
-      });
-
-      document.getElementById('bmiCalculateBtn').addEventListener('click', () => {
-        const w = parseFloat(weightInput.value);
-        const h = parseFloat(heightInput.value);
-        if (!w || w <= 0 || !h || h <= 0) {
-          showValidationError('Please enter valid positive numbers for weight and height.');
-          return;
-        }
-        rawWeight = w;
-        rawHeight = h;
-        updateBMI();
-        setTimeout(scrollToResults, 100);
-      });
-
-      // ============================================
-      // SHARE / COPY RESULT
-      // ============================================
-      shareResultBtn.addEventListener('click', async () => {
-        const bmiVal = bmiResultValue.textContent;
-        const category = bmiCategory.textContent;
-        const w = weightInput.value;
-        const h = heightInput.value;
-        const wUnit = weightUnit.textContent;
-        const hUnit = heightUnit.textContent;
-        const summary = `My BMI is ${bmiVal} (${category}) — ${w} ${wUnit}, ${h} ${hUnit}. Calculated with the BMI Calculator.`;
-
-        try {
-          await navigator.clipboard.writeText(summary);
-          shareIcon.textContent = '✅';
-          shareLabel.textContent = 'Copied!';
-        } catch (err) {
-          shareIcon.textContent = '⚠️';
-          shareLabel.textContent = 'Could not copy';
-        }
-        setTimeout(() => {
-          shareIcon.textContent = '📋';
-          shareLabel.textContent = 'Copy My Result';
-        }, 2000);
-      });
-
-      // ============================================
-      // INITIALIZE
-      // ============================================
+      document.getElementById('unitMetric').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentUnit = 'metric';
       updateBMI();
     });
-  </script>
+
+    document.getElementById('unitImperial').addEventListener('click', () => {
+      document.querySelectorAll('.bmi-unit-btn').forEach(b => {
+        b.className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('unitImperial').className = 'bmi-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentUnit = 'imperial';
+      updateBMI();
+    });
+
+    // ============================================
+    // UPDATE BMI
+    // ============================================
+    function updateBMI(syncInputs = true) {
+      let weight, height, weightLabel, heightLabel, weightMax, heightMax;
+      let weightVal, heightVal;
+
+      if (currentUnit === 'metric') {
+        weight = rawWeight;
+        height = rawHeight;
+        weightLabel = 'kg';
+        heightLabel = 'cm';
+        weightMax = '200 kg';
+        heightMax = '250 cm';
+        weightVal = weight;
+        heightVal = height / 100;
+        
+        bmiFormula.textContent = 'BMI = weight / (height)²';
+        bmiFormulaDetail.textContent = 'Weight in kg, Height in meters';
+        weightUnit.textContent = 'kg';
+        heightUnit.textContent = 'cm';
+        weightMaxLabel.textContent = '200 kg';
+        heightMaxLabel.textContent = '250 cm';
+        
+        weightSlider.min = 20;
+        weightSlider.max = 200;
+        heightSlider.min = 100;
+        heightSlider.max = 250;
+
+        weightInput.min = 20;
+        weightInput.max = 200;
+        weightInput.step = 0.5;
+        heightInput.min = 100;
+        heightInput.max = 250;
+        heightInput.step = 0.5;
+
+        heightFeetInches.textContent = '';
+
+      } else {
+        weight = rawWeight;
+        height = rawHeight;
+        weightLabel = 'lbs';
+        heightLabel = 'in';
+        weightMax = '440 lbs';
+        heightMax = '98 in';
+        weightVal = weight * 0.453592;
+        heightVal = height * 0.0254;
+        
+        bmiFormula.textContent = 'BMI = 703 × weight / (height)²';
+        bmiFormulaDetail.textContent = 'Weight in lbs, Height in inches';
+        weightUnit.textContent = 'lbs';
+        heightUnit.textContent = 'in';
+        weightMaxLabel.textContent = '440 lbs';
+        heightMaxLabel.textContent = '98 in';
+
+        const totalFeet = Math.floor(height / 12);
+        const remInches = Math.round(height % 12);
+        heightFeetInches.textContent = `(${totalFeet}'${remInches}")`;
+        
+        weightSlider.min = 44;
+        weightSlider.max = 440;
+        heightSlider.min = 39;
+        heightSlider.max = 98;
+
+        weightInput.min = 44;
+        weightInput.max = 440;
+        weightInput.step = 0.5;
+        heightInput.min = 39;
+        heightInput.max = 98;
+        heightInput.step = 0.5;
+      }
+
+      const safeWeightVal = weightVal > 0 ? weightVal : 0;
+      const safeHeightVal = heightVal > 0 ? heightVal : 0;
+      const bmi = safeHeightVal > 0 ? safeWeightVal / (safeHeightVal * safeHeightVal) : 0;
+      const formattedBMI = formatNumber(bmi, { maximumFractionDigits: 1 });
+
+      let categoryKey;
+      if (bmi < 18.5) categoryKey = 'underweight';
+      else if (bmi >= 18.5 && bmi < 25) categoryKey = 'normal';
+      else if (bmi >= 25 && bmi < 30) categoryKey = 'overweight';
+      else categoryKey = 'obese';
+
+      const data = bmiData[categoryKey];
+
+      emojiDisplay.textContent = data.emoji;
+      emojiRing.className = `relative inline-flex items-center justify-center w-24 h-24 rounded-full transition-all duration-500 ${ringClasses[categoryKey]}`;
+
+      animateValue(bmiResultValue, lastBMI, bmi);
+      bmiResultValue.className = `text-5xl font-bold ${data.textColor}`;
+
+      bmiCategory.textContent = data.label;
+      bmiCategory.className = `text-xl font-bold ${data.textColor} transition-all duration-500`;
+
+      bmiDescription.textContent = data.description;
+      bmiResultBox.className = `mt-4 rounded-xl p-4 border transition-all duration-500 ${data.bgColor}`;
+      motivationalMessage.innerHTML = data.motivational;
+      bmiPrime.textContent = formatNumber(bmi / 25, { maximumFractionDigits: 2 });
+
+      const angle = Math.min(Math.max(-90 + (bmi / 40) * 180, -90), 90);
+      animateNeedle(lastAngle, angle);
+      animateValue(gaugeValue, lastBMI, bmi);
+      lastAngle = angle;
+      lastBMI = bmi;
+
+      bmiWeight.textContent = `${formatNumber(weight, { maximumFractionDigits: 1 })} ${weightLabel}`;
+      if (currentUnit === 'metric') {
+        bmiHeight.textContent = `${formatNumber(height, { maximumFractionDigits: 1 })} cm (${formatNumber(heightVal, { maximumFractionDigits: 2 })} m)`;
+      } else {
+        bmiHeight.textContent = `${formatNumber(height, { maximumFractionDigits: 1 })} in (${formatNumber(height * 2.54, { maximumFractionDigits: 1 })} cm)`;
+      }
+      bmiResultFormula.textContent = formattedBMI;
+
+      const minWeight = 18.5 * heightVal * heightVal;
+      const maxWeight = 24.9 * heightVal * heightVal;
+      if (currentUnit === 'metric') {
+        healthyRange.textContent = `${formatNumber(minWeight, { maximumFractionDigits: 1 })} – ${formatNumber(maxWeight, { maximumFractionDigits: 1 })} kg`;
+      } else {
+        healthyRange.textContent = `${formatNumber(minWeight / 0.453592, { maximumFractionDigits: 1 })} – ${formatNumber(maxWeight / 0.453592, { maximumFractionDigits: 1 })} lbs`;
+      }
+
+      if (currentUnit === 'metric') {
+        step1.textContent = `Convert height to meters: ${formatNumber(height, { maximumFractionDigits: 1 })} cm = ${formatNumber(heightVal, { maximumFractionDigits: 2 })} m`;
+      } else {
+        step1.textContent = `Convert height to meters: ${formatNumber(height, { maximumFractionDigits: 1 })} in = ${formatNumber(heightVal, { maximumFractionDigits: 2 })} m`;
+      }
+      step2.textContent = `Square height: ${formatNumber(heightVal, { maximumFractionDigits: 2 })}² = ${formatNumber(heightVal * heightVal, { maximumFractionDigits: 2 })}`;
+      step3.textContent = `BMI = ${formatNumber(weightVal, { maximumFractionDigits: 1 })} ÷ ${formatNumber(heightVal * heightVal, { maximumFractionDigits: 2 })} = ${formattedBMI}`;
+      step4.textContent = `Result: BMI = ${formattedBMI} (${data.label})`;
+
+      weightSlider.value = weight;
+      heightSlider.value = height;
+
+      weightDisplay.textContent = formatNumber(weight, { maximumFractionDigits: 1 });
+      heightDisplay.textContent = formatNumber(height, { maximumFractionDigits: 1 });
+
+      if (syncInputs) {
+        weightInput.value = weight;
+        heightInput.value = height;
+      }
+    }
+
+    // ============================================
+    // AUTO-SCROLL TO RESULTS
+    // ============================================
+    function scrollToResults() {
+      const resultBox = document.getElementById('bmiResultBox');
+      if (resultBox) {
+        const yOffset = -80;
+        const y = resultBox.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
+
+    // ============================================
+    // EVENT LISTENERS
+    // ============================================
+    weightSlider.addEventListener('input', () => {
+      rawWeight = parseFloat(weightSlider.value);
+      updateBMI();
+    });
+    heightSlider.addEventListener('input', () => {
+      rawHeight = parseFloat(heightSlider.value);
+      updateBMI();
+    });
+
+    weightInput.addEventListener('input', () => {
+      const validation = validatePositiveNumber(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
+      if (validation.valid) {
+        rawWeight = validation.value;
+        updateBMI(false);
+      }
+    });
+    heightInput.addEventListener('input', () => {
+      const validation = validatePositiveNumber(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
+      if (validation.valid) {
+        rawHeight = validation.value;
+        updateBMI(false);
+      }
+    });
+
+    document.getElementById('bmiCalculateBtn').addEventListener('click', () => {
+      const weightValidation = validatePositiveNumber(weightInput.value, 'Weight', currentUnit === 'metric' ? 500 : 1100);
+      const heightValidation = validatePositiveNumber(heightInput.value, 'Height', currentUnit === 'metric' ? 300 : 120);
+      if (!weightValidation.valid) {
+        showValidationError(weightValidation.message);
+        weightInput.focus();
+        return;
+      }
+      if (!heightValidation.valid) {
+        showValidationError(heightValidation.message);
+        heightInput.focus();
+        return;
+      }
+      rawWeight = weightValidation.value;
+      rawHeight = heightValidation.value;
+      updateBMI();
+      setTimeout(scrollToResults, 100);
+    });
+
+    // ============================================
+    // SHARE / COPY RESULT
+    // ============================================
+    shareResultBtn.addEventListener('click', async () => {
+      const bmiVal = bmiResultValue.textContent;
+      const category = bmiCategory.textContent;
+      const w = weightInput.value;
+      const h = heightInput.value;
+      const wUnit = weightUnit.textContent;
+      const hUnit = heightUnit.textContent;
+      const summary = `My BMI is ${bmiVal} (${category}) — ${w} ${wUnit}, ${h} ${hUnit}. Calculated with the BMI Calculator.`;
+
+      try {
+        await navigator.clipboard.writeText(summary);
+        shareIcon.textContent = '✅';
+        shareLabel.textContent = 'Copied!';
+      } catch (err) {
+        shareIcon.textContent = '⚠️';
+        shareLabel.textContent = 'Could not copy';
+      }
+      setTimeout(() => {
+        shareIcon.textContent = '📋';
+        shareLabel.textContent = 'Copy My Result';
+      }, 2000);
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    updateBMI();
+  });
+</script>
 </Layout>

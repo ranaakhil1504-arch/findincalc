@@ -556,573 +556,574 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     </div>
   </main>
 
-  <script>
-   document.addEventListener('DOMContentLoaded', () => {
-  // ============================================
-  // STATE
-  // ============================================
-  let currentUnit = 'cm';
-  let currentMode = 'area'; // 'area', 'base', 'height'
-  let currentBase = 10;
-  let currentHeight = 6;
-  let currentSide = 8;
-
-  // ============================================
-  // DOM REFERENCES
-  // ============================================
-  // Area mode
-  const baseSliderPara = document.getElementById('baseSliderPara');
-  const heightSliderPara = document.getElementById('heightSliderPara');
-  const sideSliderPara = document.getElementById('sideSliderPara');
-  const baseInputPara = document.getElementById('baseInputPara');
-  const heightInputPara = document.getElementById('heightInputPara');
-  const sideInputPara = document.getElementById('sideInputPara');
-  const baseDisplayPara = document.getElementById('baseDisplayPara');
-  const heightDisplayPara = document.getElementById('heightDisplayPara');
-  const sideDisplayPara = document.getElementById('sideDisplayPara');
-  const baseUnitDisplayPara = document.getElementById('baseUnitDisplayPara');
-  const heightUnitDisplayPara = document.getElementById('heightUnitDisplayPara');
-  const sideUnitDisplayPara = document.getElementById('sideUnitDisplayPara');
-
-  // Base mode
-  const areaForBaseSlider = document.getElementById('areaForBaseSlider');
-  const heightForBaseSlider = document.getElementById('heightForBaseSlider');
-  const areaForBaseInput = document.getElementById('areaForBaseInput');
-  const heightForBaseInput = document.getElementById('heightForBaseInput');
-  const areaForBaseDisplay = document.getElementById('areaForBaseDisplay');
-  const areaForBaseUnit = document.getElementById('areaForBaseUnit');
-  const heightForBaseDisplay = document.getElementById('heightForBaseDisplay');
-  const heightForBaseUnit = document.getElementById('heightForBaseUnit');
-  const areaBaseMaxLabel = document.getElementById('areaBaseMaxLabel');
-
-  // Height mode
-  const areaForHeightSlider = document.getElementById('areaForHeightSlider');
-  const baseForHeightSlider = document.getElementById('baseForHeightSlider');
-  const areaForHeightInput = document.getElementById('areaForHeightInput');
-  const baseForHeightInput = document.getElementById('baseForHeightInput');
-  const areaForHeightDisplay = document.getElementById('areaForHeightDisplay');
-  const areaForHeightUnit = document.getElementById('areaForHeightUnit');
-  const baseForHeightDisplay = document.getElementById('baseForHeightDisplay');
-  const baseForHeightUnit = document.getElementById('baseForHeightUnit');
-  const areaHeightMaxLabel = document.getElementById('areaHeightMaxLabel');
-
-  // SVG
-  const paraVisual = document.getElementById('paraVisual');
-  const heightLinePara = document.getElementById('heightLinePara');
-  const baseLabelParaValue = document.getElementById('baseLabelParaValue');
-  const heightLabelParaValue = document.getElementById('heightLabelParaValue');
-  const sideLabelParaValue = document.getElementById('sideLabelParaValue');
-  const areaLabelParaValue = document.getElementById('areaLabelParaValue');
-  const paraResultValue = document.getElementById('paraResultValue');
-  const paraResultLabel = document.getElementById('paraResultLabel');
-  const paraResultSecondaryLabel = document.getElementById('paraResultSecondaryLabel');
-  const paraResultFormula = document.getElementById('paraResultFormula');
-  const paraFormulaDisplay = document.getElementById('paraFormulaDisplay');
-  const paraFormulaDesc = document.getElementById('paraFormulaDesc');
-  const paraFormulaLabel1 = document.getElementById('paraFormulaLabel1');
-  const paraFormulaLabel2 = document.getElementById('paraFormulaLabel2');
-  const paraFormulaVal1 = document.getElementById('paraFormulaVal1');
-  const paraFormulaVal2 = document.getElementById('paraFormulaVal2');
-  const paraFormulaResultLabel = document.getElementById('paraFormulaResultLabel');
-  const paraFormulaResult = document.getElementById('paraFormulaResult');
-  const paraStep1 = document.getElementById('paraStep1');
-  const paraStep2 = document.getElementById('paraStep2');
-  const paraStep3 = document.getElementById('paraStep3');
-  const paraStep4 = document.getElementById('paraStep4');
-
-  const paraAreaModeInputs = document.getElementById('paraAreaModeInputs');
-  const paraBaseModeInputs = document.getElementById('paraBaseModeInputs');
-  const paraHeightModeInputs = document.getElementById('paraHeightModeInputs');
-
-  const unitConversions = {
-    cm: { label: 'cm', factor: 1, display: 'cm' },
-    m: { label: 'm', factor: 100, display: 'm' },
-    in: { label: 'in', factor: 2.54, display: 'in' },
-    ft: { label: 'ft', factor: 30.48, display: 'ft' }
-  };
-
-  function showValidationError(message) {
-    if (window.showToast) window.showToast(message, 'error');
-    else window.alert(message);
-  }
-
-  // ============================================
-  // VALIDATION HELPERS
-  // ============================================
-  function validatePositive(value, name) {
-    if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: `Please enter a ${name}` };
-    }
-    const num = Number(value);
-    if (!Number.isFinite(num)) {
-      return { valid: false, message: 'Please enter a valid number' };
-    }
-    if (num <= 0) {
-      return { valid: false, message: `${name} must be greater than 0` };
-    }
-    if (num > 1e10) {
-      return { valid: false, message: `${name} is too large` };
-    }
-    return { valid: true, value: num };
-  }
-
-  function getUnit() { return unitConversions[currentUnit]; }
-
-  // Convert a displayed linear value to centimeters.
-  function linearToCm(value) {
-    return value * unitConversions[currentUnit].factor;
-  }
-
-  // Convert a displayed area value to square centimeters.
-  function areaToCm2(value) {
-    const factor = unitConversions[currentUnit].factor;
-    return value * factor * factor;
-  }
-
-  // Keep the slider synchronized without rounding or clamping manual input.
-  function setSliderValue(slider, value, defaultMax = 20) {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return;
-    slider.max = String(Math.max(defaultMax, num));
-    slider.value = String(num);
-  }
-
-  function convertDisplayedValues(oldUnit, newUnit) {
-    if (oldUnit === newUnit) return;
-    const oldFactor = unitConversions[oldUnit].factor;
-    const newFactor = unitConversions[newUnit].factor;
-    const linearRatio = oldFactor / newFactor;
-    const areaRatio = linearRatio * linearRatio;
-    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
-      const value = Number(input.value);
-      if (!Number.isFinite(value)) return;
-      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
-      input.value = String(value * ratio);
-      ['min','max'].forEach(attr => {
-        const n = Number(input.getAttribute(attr));
-        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
-      });
-    });
-  }
-
-  function formatArea(area) {
-    let displayArea = area;
-    let areaUnit = 'cm²';
-    if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
-    else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
-    else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
-    return { value: displayArea, unit: areaUnit };
-  }
-
-  // ============================================
-  // RESET FUNCTION
-  // ============================================
-  function resetParallelogram() {
-    currentBase = 10;
-    currentHeight = 6;
-    currentSide = 8;
-    baseSliderPara.value = 10;
-    heightSliderPara.value = 6;
-    sideSliderPara.value = 8;
-    baseInputPara.value = 10;
-    heightInputPara.value = 6;
-    sideInputPara.value = 8;
-    areaForBaseSlider.value = 60;
-    areaForBaseInput.value = 60;
-    heightForBaseSlider.value = 6;
-    heightForBaseInput.value = 6;
-    areaForHeightSlider.value = 60;
-    areaForHeightInput.value = 60;
-    baseForHeightSlider.value = 10;
-    baseForHeightInput.value = 10;
-    updateParallelogram();
-    if (window.showToast) {
-      window.showToast('🔄 Parallelogram calculator reset to default values', 'info');
-    }
-  }
-
-  // ============================================
-  // UPDATE SVG
-  // ============================================
-  function updateSVG(base, height, side, area) {
-    const maxSize = Math.max(base, height, side, 20);
-    const scaleBase = Math.min(base / maxSize, 1);
-    const scaleHeight = Math.min(height / maxSize, 1);
-    const scaleSide = Math.min(side / maxSize, 1);
-    const centerX = 250;
-    const topY = 100 + (1 - scaleHeight) * 150;
-    const bottomY = 100 + (1 + scaleHeight) * 150;
-    const baseWidth = 100 + scaleBase * 200;
-    const slant = 50 + scaleSide * 100;
-    const topLeftX = centerX - baseWidth / 2 + slant;
-    const topRightX = centerX + baseWidth / 2 + slant;
-    const bottomLeftX = centerX - baseWidth / 2;
-    const bottomRightX = centerX + baseWidth / 2;
-
-    paraVisual.setAttribute('points', 
-      `${topLeftX},${topY} ${topRightX},${topY} ${bottomRightX},${bottomY} ${bottomLeftX},${bottomY}`
-    );
-    heightLinePara.setAttribute('x1', bottomLeftX);
-    heightLinePara.setAttribute('y1', topY);
-    heightLinePara.setAttribute('x2', bottomLeftX);
-    heightLinePara.setAttribute('y2', bottomY);
-
-    const formatted = formatArea(area);
-    baseLabelParaValue.textContent = base.toFixed(2);
-    heightLabelParaValue.textContent = height.toFixed(2);
-    sideLabelParaValue.textContent = side.toFixed(2);
-    areaLabelParaValue.textContent = formatted.value.toFixed(2);
-  }
-
-  // ============================================
-  // UPDATE RESULT
-  // ============================================
-  function updateResult(value, label, secondary, formula) {
-    paraResultValue.textContent = value;
-    paraResultLabel.textContent = label;
-    paraResultSecondaryLabel.textContent = secondary;
-    paraResultFormula.textContent = formula;
-  }
-
-  function updateFormula(val1, val2, result, label1, label2, resultLabel, display, desc) {
-    paraFormulaVal1.textContent = val1;
-    paraFormulaVal2.textContent = val2;
-    paraFormulaResult.textContent = result;
-    paraFormulaLabel1.textContent = label1;
-    paraFormulaLabel2.textContent = label2;
-    paraFormulaResultLabel.textContent = resultLabel;
-    if (display) paraFormulaDisplay.textContent = display;
-    if (desc) paraFormulaDesc.textContent = desc;
-  }
-
-  function updateSteps(s1, s2, s3, s4) {
-    paraStep1.textContent = s1;
-    paraStep2.textContent = s2;
-    paraStep3.textContent = s3;
-    paraStep4.textContent = s4;
-  }
-
-  // ============================================
-  // MODE TOGGLE
-  // ============================================
-  function setMode(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.para-mode-btn').forEach(b => {
-      b.className = 'para-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    const btnMap = { area: 'modeAreaPara', base: 'modeBasePara', height: 'modeHeightPara' };
-    document.getElementById(btnMap[mode]).className = 'para-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-
-    paraAreaModeInputs.classList.toggle('hidden', mode !== 'area');
-    paraBaseModeInputs.classList.toggle('hidden', mode !== 'base');
-    paraHeightModeInputs.classList.toggle('hidden', mode !== 'height');
-
-    if (mode === 'area') {
-      baseInputPara.value = baseSliderPara.value;
-      heightInputPara.value = heightSliderPara.value;
-      sideInputPara.value = sideSliderPara.value;
-    } else if (mode === 'base') {
-      areaForBaseInput.value = areaForBaseSlider.value;
-      heightForBaseInput.value = heightForBaseSlider.value;
-    } else if (mode === 'height') {
-      areaForHeightInput.value = areaForHeightSlider.value;
-      baseForHeightInput.value = baseForHeightSlider.value;
-    }
-    updateParallelogram();
-  }
-
-  document.getElementById('modeAreaPara').addEventListener('click', () => setMode('area'));
-  document.getElementById('modeBasePara').addEventListener('click', () => setMode('base'));
-  document.getElementById('modeHeightPara').addEventListener('click', () => setMode('height'));
-
-  // ============================================
-  // UNIT TOGGLE
-  // ============================================
-  document.querySelectorAll('.para-unit-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.para-unit-btn').forEach(b => {
-        b.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-      });
-      btn.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      const oldUnit = currentUnit;
-      const newUnit = btn.dataset.unit;
-      convertDisplayedValues(oldUnit, newUnit);
-      currentUnit = newUnit;
-      const maxArea = 20 * 20;
-      const formatted = formatArea(maxArea);
-      areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
-      areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
-      updateParallelogram();
-    });
-  });
-
-  // ============================================
-  // UPDATE PARALLELOGRAM
-  // ============================================
-  function updateParallelogram() {
-    const unit = getUnit();
-    const displayUnit = unit.display;
-    let base, height, side, area;
-    let resultValue, resultLabel, resultSecondary, resultFormula;
-    let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
-    let val1, val2, result;
-    let step1, step2, step3, step4;
-
-    if (currentMode === 'area') {
-      base = parseFloat(baseSliderPara.value);
-      height = parseFloat(heightSliderPara.value);
-      side = parseFloat(sideSliderPara.value);
-      area = linearToCm(base) * linearToCm(height);
-
-      const formatted = formatArea(area);
-      resultValue = formatted.value.toFixed(2);
-      resultLabel = 'Area of Parallelogram';
-      resultSecondary = 'A = b × h';
-      resultFormula = 'A = b × h';
-      formulaDisplay = 'A = b × h';
-      formulaDesc = 'Area = Base × Height';
-      label1 = 'Base (b)';
-      label2 = 'Height (h)';
-      resultLabelText = 'Area';
-      val1 = `${base} ${displayUnit}`;
-      val2 = `${height} ${displayUnit}`;
-      result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      step1 = 'Formula: A = b × h';
-      step2 = `Plug in: A = ${base} × ${height}`;
-      step3 = `Calculate: A = ${area.toFixed(2)}`;
-      step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
-
-      baseDisplayPara.textContent = base;
-      heightDisplayPara.textContent = height;
-      sideDisplayPara.textContent = side;
-      baseUnitDisplayPara.textContent = displayUnit;
-      heightUnitDisplayPara.textContent = displayUnit;
-      sideUnitDisplayPara.textContent = displayUnit;
-
-    } else if (currentMode === 'base') {
-      const areaVal = parseFloat(areaForBaseSlider.value);
-      height = parseFloat(heightForBaseSlider.value);
-      const areaCm2 = areaToCm2(areaVal);
-      base = areaCm2 / linearToCm(height) / unitConversions[currentUnit].factor;
-      side = base;
-      area = areaCm2;
-
-      const formatted = formatArea(area);
-      resultValue = base.toFixed(2);
-      resultLabel = 'Base (b)';
-      resultSecondary = 'b = A / h';
-      resultFormula = 'b = A / h';
-      formulaDisplay = 'b = A / h';
-      formulaDesc = 'Base = Area ÷ Height';
-      label1 = 'Area';
-      label2 = 'Height (h)';
-      resultLabelText = 'Base (b)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      val2 = `${height} ${displayUnit}`;
-      result = `${base.toFixed(2)} ${displayUnit}`;
-      step1 = 'Formula: b = A / h';
-      step2 = `Plug in: b = ${formatted.value.toFixed(2)} ÷ ${height}`;
-      step3 = `Calculate: b = ${base.toFixed(2)}`;
-      step4 = `Answer: b = ${base.toFixed(2)} ${displayUnit}`;
-
-      areaForBaseDisplay.textContent = formatted.value.toFixed(2);
-      areaForBaseUnit.textContent = formatted.unit;
-      heightForBaseDisplay.textContent = height;
-      heightForBaseUnit.textContent = displayUnit;
-
-    } else if (currentMode === 'height') {
-      const areaVal = parseFloat(areaForHeightSlider.value);
-      base = parseFloat(baseForHeightSlider.value);
-      const areaCm2 = areaToCm2(areaVal);
-      height = areaCm2 / linearToCm(base) / unitConversions[currentUnit].factor;
-      side = height;
-      area = areaCm2;
-
-      const formatted = formatArea(area);
-      resultValue = height.toFixed(2);
-      resultLabel = 'Height (h)';
-      resultSecondary = 'h = A / b';
-      resultFormula = 'h = A / b';
-      formulaDisplay = 'h = A / b';
-      formulaDesc = 'Height = Area ÷ Base';
-      label1 = 'Area';
-      label2 = 'Base (b)';
-      resultLabelText = 'Height (h)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      val2 = `${base} ${displayUnit}`;
-      result = `${height.toFixed(2)} ${displayUnit}`;
-      step1 = 'Formula: h = A / b';
-      step2 = `Plug in: h = ${formatted.value.toFixed(2)} ÷ ${base}`;
-      step3 = `Calculate: h = ${height.toFixed(2)}`;
-      step4 = `Answer: h = ${height.toFixed(2)} ${displayUnit}`;
-
-      areaForHeightDisplay.textContent = formatted.value.toFixed(2);
-      areaForHeightUnit.textContent = formatted.unit;
-      baseForHeightDisplay.textContent = base;
-      baseForHeightUnit.textContent = displayUnit;
-    }
-
-    // Update SVG
-    updateSVG(base, height, side || base, area);
-
-    // Update result
-    updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
-
-    // Update formula
-    updateFormula(
-      val1,
-      val2,
-      result,
-      label1,
-      label2,
-      resultLabelText,
-      formulaDisplay,
-      formulaDesc
-    );
-
-    // Update steps
-    updateSteps(step1, step2, step3, step4);
-
-    // Update inputs
-    if (currentMode === 'area') {
-      baseInputPara.value = base;
-      heightInputPara.value = height;
-      sideInputPara.value = side || base;
-    } else if (currentMode === 'base') {
-      areaForBaseInput.value = areaForBaseSlider.value;
-      heightForBaseInput.value = heightForBaseSlider.value;
-    } else if (currentMode === 'height') {
-      areaForHeightInput.value = areaForHeightSlider.value;
-      baseForHeightInput.value = baseForHeightSlider.value;
-    }
-  }
-
-  // ============================================
-  // AREA MODE EVENTS
-  // ============================================
-  baseSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
-  heightSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
-  sideSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
-
-  baseInputPara.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-  heightInputPara.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-  sideInputPara.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-
-  document.getElementById('paraCalculateBtn').addEventListener('click', () => {
-    if (currentMode === 'area') {
-      const bVal = validatePositive(baseInputPara.value, 'Base');
-      const hVal = validatePositive(heightInputPara.value, 'Height');
-      const sVal = validatePositive(sideInputPara.value, 'Side');
-      if (!bVal.valid) { showValidationError(bVal.message); baseInputPara.focus(); return; }
-      if (!hVal.valid) { showValidationError(hVal.message); heightInputPara.focus(); return; }
-      if (!sVal.valid) { showValidationError(sVal.message); sideInputPara.focus(); return; }
-      setSliderValue(baseSliderPara, bVal.value);
-      setSliderValue(heightSliderPara, hVal.value);
-      setSliderValue(sideSliderPara, sVal.value);
-      updateParallelogram();
-      if (window.showToast) {
-        window.showToast('✅ Calculation updated!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // BASE MODE EVENTS
-  // ============================================
-  areaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateParallelogram(); });
-  heightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateParallelogram(); });
-
-  areaForBaseInput.addEventListener('input', () => {
-    // Do not touch the slider while the user is typing.
-  });
-  heightForBaseInput.addEventListener('input', () => {
-    // Do not touch the slider while the user is typing.
-  });
-
-  document.getElementById('findBaseParaBtn').addEventListener('click', () => {
-    if (currentMode === 'base') {
-      const aVal = validatePositive(areaForBaseInput.value, 'Area');
-      const hVal = validatePositive(heightForBaseInput.value, 'Height');
-      if (!aVal.valid) { showValidationError(aVal.message); areaForBaseInput.focus(); return; }
-      if (!hVal.valid) { showValidationError(hVal.message); heightForBaseInput.focus(); return; }
-      setSliderValue(areaForBaseSlider, aVal.value, 400);
-      setSliderValue(heightForBaseSlider, hVal.value);
-      updateParallelogram();
-      if (window.showToast) {
-        window.showToast('✅ Base found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // HEIGHT MODE EVENTS
-  // ============================================
-  areaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateParallelogram(); });
-  baseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateParallelogram(); });
-
-  areaForHeightInput.addEventListener('input', () => {
-    // Do not touch the slider while the user is typing.
-  });
-  baseForHeightInput.addEventListener('input', () => {
-    // Do not touch the slider while the user is typing.
-  });
-
-  document.getElementById('findHeightParaBtn').addEventListener('click', () => {
-    if (currentMode === 'height') {
-      const aVal = validatePositive(areaForHeightInput.value, 'Area');
-      const bVal = validatePositive(baseForHeightInput.value, 'Base');
-      if (!aVal.valid) { showValidationError(aVal.message); areaForHeightInput.focus(); return; }
-      if (!bVal.valid) { showValidationError(bVal.message); baseForHeightInput.focus(); return; }
-      setSliderValue(areaForHeightSlider, aVal.value, 400);
-      setSliderValue(baseForHeightSlider, bVal.value);
-      updateParallelogram();
-      if (window.showToast) {
-        window.showToast('✅ Height found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // RESET BUTTON
-  // ============================================
-  const resetBtn = document.createElement('button');
-  resetBtn.id = 'resetParaBtn';
-  resetBtn.className = 'btn-secondary w-full mt-3 text-center';
-  resetBtn.textContent = '🔄 Reset Calculator';
-  resetBtn.addEventListener('click', resetParallelogram);
+ <script>
+  import { validatePositiveNumber } from '../../lib/calculator/validation';
+  import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
   
-  const resultBox = document.getElementById('paraResultBox');
-  if (resultBox) {
-    resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    // ============================================
+    // STATE
+    // ============================================
+    let currentUnit = 'cm';
+    let currentMode = 'area'; // 'area', 'base', 'height'
+    let currentBase = 10;
+    let currentHeight = 6;
+    let currentSide = 8;
 
-  // ============================================
-  // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
-  // ============================================
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
-      e.preventDefault();
-      resetParallelogram();
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
+    // Area mode
+    const baseSliderPara = document.getElementById('baseSliderPara');
+    const heightSliderPara = document.getElementById('heightSliderPara');
+    const sideSliderPara = document.getElementById('sideSliderPara');
+    const baseInputPara = document.getElementById('baseInputPara');
+    const heightInputPara = document.getElementById('heightInputPara');
+    const sideInputPara = document.getElementById('sideInputPara');
+    const baseDisplayPara = document.getElementById('baseDisplayPara');
+    const heightDisplayPara = document.getElementById('heightDisplayPara');
+    const sideDisplayPara = document.getElementById('sideDisplayPara');
+    const baseUnitDisplayPara = document.getElementById('baseUnitDisplayPara');
+    const heightUnitDisplayPara = document.getElementById('heightUnitDisplayPara');
+    const sideUnitDisplayPara = document.getElementById('sideUnitDisplayPara');
+
+    // Base mode
+    const areaForBaseSlider = document.getElementById('areaForBaseSlider');
+    const heightForBaseSlider = document.getElementById('heightForBaseSlider');
+    const areaForBaseInput = document.getElementById('areaForBaseInput');
+    const heightForBaseInput = document.getElementById('heightForBaseInput');
+    const areaForBaseDisplay = document.getElementById('areaForBaseDisplay');
+    const areaForBaseUnit = document.getElementById('areaForBaseUnit');
+    const heightForBaseDisplay = document.getElementById('heightForBaseDisplay');
+    const heightForBaseUnit = document.getElementById('heightForBaseUnit');
+    const areaBaseMaxLabel = document.getElementById('areaBaseMaxLabel');
+
+    // Height mode
+    const areaForHeightSlider = document.getElementById('areaForHeightSlider');
+    const baseForHeightSlider = document.getElementById('baseForHeightSlider');
+    const areaForHeightInput = document.getElementById('areaForHeightInput');
+    const baseForHeightInput = document.getElementById('baseForHeightInput');
+    const areaForHeightDisplay = document.getElementById('areaForHeightDisplay');
+    const areaForHeightUnit = document.getElementById('areaForHeightUnit');
+    const baseForHeightDisplay = document.getElementById('baseForHeightDisplay');
+    const baseForHeightUnit = document.getElementById('baseForHeightUnit');
+    const areaHeightMaxLabel = document.getElementById('areaHeightMaxLabel');
+
+    // SVG
+    const paraVisual = document.getElementById('paraVisual');
+    const heightLinePara = document.getElementById('heightLinePara');
+    const baseLabelParaValue = document.getElementById('baseLabelParaValue');
+    const heightLabelParaValue = document.getElementById('heightLabelParaValue');
+    const sideLabelParaValue = document.getElementById('sideLabelParaValue');
+    const areaLabelParaValue = document.getElementById('areaLabelParaValue');
+    const paraResultValue = document.getElementById('paraResultValue');
+    const paraResultLabel = document.getElementById('paraResultLabel');
+    const paraResultSecondaryLabel = document.getElementById('paraResultSecondaryLabel');
+    const paraResultFormula = document.getElementById('paraResultFormula');
+    const paraFormulaDisplay = document.getElementById('paraFormulaDisplay');
+    const paraFormulaDesc = document.getElementById('paraFormulaDesc');
+    const paraFormulaLabel1 = document.getElementById('paraFormulaLabel1');
+    const paraFormulaLabel2 = document.getElementById('paraFormulaLabel2');
+    const paraFormulaVal1 = document.getElementById('paraFormulaVal1');
+    const paraFormulaVal2 = document.getElementById('paraFormulaVal2');
+    const paraFormulaResultLabel = document.getElementById('paraFormulaResultLabel');
+    const paraFormulaResult = document.getElementById('paraFormulaResult');
+    const paraStep1 = document.getElementById('paraStep1');
+    const paraStep2 = document.getElementById('paraStep2');
+    const paraStep3 = document.getElementById('paraStep3');
+    const paraStep4 = document.getElementById('paraStep4');
+
+    const paraAreaModeInputs = document.getElementById('paraAreaModeInputs');
+    const paraBaseModeInputs = document.getElementById('paraBaseModeInputs');
+    const paraHeightModeInputs = document.getElementById('paraHeightModeInputs');
+
+    const unitConversions = {
+      cm: { label: 'cm', factor: 1, display: 'cm' },
+      m: { label: 'm', factor: 100, display: 'm' },
+      in: { label: 'in', factor: 2.54, display: 'in' },
+      ft: { label: 'ft', factor: 30.48, display: 'ft' }
+    };
+
+    function showValidationError(message) {
+      if (window.showToast) window.showToast(message, 'error');
+      else window.alert(message);
     }
-  });
 
-  // ============================================
-  // INITIALIZE
-  // ============================================
-  const maxArea = 20 * 20;
-  const formatted = formatArea(maxArea);
-  areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
-  areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
-  updateParallelogram();
-});
-  </script>
+    // ============================================
+    // VALIDATION HELPERS - Using imported validation
+    // ============================================
+    function validatePositive(value, name) {
+      const result = validatePositiveNumber(value, name, 1e10);
+      if (!result.valid) {
+        return { valid: false, message: result.message };
+      }
+      return { valid: true, value: result.value };
+    }
+
+    function getUnit() { return unitConversions[currentUnit]; }
+
+    // Convert a displayed linear value to centimeters.
+    function linearToCm(value) {
+      return value * unitConversions[currentUnit].factor;
+    }
+
+    // Convert a displayed area value to square centimeters.
+    function areaToCm2(value) {
+      const factor = unitConversions[currentUnit].factor;
+      return value * factor * factor;
+    }
+
+    // Keep the slider synchronized without rounding or clamping manual input.
+    function setSliderValue(slider, value, defaultMax = 20) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return;
+      slider.max = String(Math.max(defaultMax, num));
+      slider.value = String(num);
+    }
+
+    function convertDisplayedValues(oldUnit, newUnit) {
+      if (oldUnit === newUnit) return;
+      const oldFactor = unitConversions[oldUnit].factor;
+      const newFactor = unitConversions[newUnit].factor;
+      const linearRatio = oldFactor / newFactor;
+      const areaRatio = linearRatio * linearRatio;
+      document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+        const value = Number(input.value);
+        if (!Number.isFinite(value)) return;
+        const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+        input.value = String(value * ratio);
+        ['min','max'].forEach(attr => {
+          const n = Number(input.getAttribute(attr));
+          if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+        });
+      });
+    }
+
+    function formatArea(area) {
+      let displayArea = area;
+      let areaUnit = 'cm²';
+      if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+      else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+      else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+      return { value: displayArea, unit: areaUnit };
+    }
+
+    // ============================================
+    // RESET FUNCTION
+    // ============================================
+    function resetParallelogram() {
+      currentBase = 10;
+      currentHeight = 6;
+      currentSide = 8;
+      baseSliderPara.value = 10;
+      heightSliderPara.value = 6;
+      sideSliderPara.value = 8;
+      baseInputPara.value = 10;
+      heightInputPara.value = 6;
+      sideInputPara.value = 8;
+      areaForBaseSlider.value = 60;
+      areaForBaseInput.value = 60;
+      heightForBaseSlider.value = 6;
+      heightForBaseInput.value = 6;
+      areaForHeightSlider.value = 60;
+      areaForHeightInput.value = 60;
+      baseForHeightSlider.value = 10;
+      baseForHeightInput.value = 10;
+      updateParallelogram();
+      if (window.showToast) {
+        window.showToast('🔄 Parallelogram calculator reset to default values', 'info');
+      }
+    }
+
+    // ============================================
+    // UPDATE SVG
+    // ============================================
+    function updateSVG(base, height, side, area) {
+      const maxSize = Math.max(base, height, side, 20);
+      const scaleBase = Math.min(base / maxSize, 1);
+      const scaleHeight = Math.min(height / maxSize, 1);
+      const scaleSide = Math.min(side / maxSize, 1);
+      const centerX = 250;
+      const topY = 100 + (1 - scaleHeight) * 150;
+      const bottomY = 100 + (1 + scaleHeight) * 150;
+      const baseWidth = 100 + scaleBase * 200;
+      const slant = 50 + scaleSide * 100;
+      const topLeftX = centerX - baseWidth / 2 + slant;
+      const topRightX = centerX + baseWidth / 2 + slant;
+      const bottomLeftX = centerX - baseWidth / 2;
+      const bottomRightX = centerX + baseWidth / 2;
+
+      paraVisual.setAttribute('points', 
+        `${topLeftX},${topY} ${topRightX},${topY} ${bottomRightX},${bottomY} ${bottomLeftX},${bottomY}`
+      );
+      heightLinePara.setAttribute('x1', bottomLeftX);
+      heightLinePara.setAttribute('y1', topY);
+      heightLinePara.setAttribute('x2', bottomLeftX);
+      heightLinePara.setAttribute('y2', bottomY);
+
+      const formatted = formatArea(area);
+      baseLabelParaValue.textContent = formatNumber(base, { maximumFractionDigits: 2 });
+      heightLabelParaValue.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+      sideLabelParaValue.textContent = formatNumber(side, { maximumFractionDigits: 2 });
+      areaLabelParaValue.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+    }
+
+    // ============================================
+    // UPDATE RESULT
+    // ============================================
+    function updateResult(value, label, secondary, formula) {
+      paraResultValue.textContent = value;
+      paraResultLabel.textContent = label;
+      paraResultSecondaryLabel.textContent = secondary;
+      paraResultFormula.textContent = formula;
+    }
+
+    function updateFormula(val1, val2, result, label1, label2, resultLabel, display, desc) {
+      paraFormulaVal1.textContent = val1;
+      paraFormulaVal2.textContent = val2;
+      paraFormulaResult.textContent = result;
+      paraFormulaLabel1.textContent = label1;
+      paraFormulaLabel2.textContent = label2;
+      paraFormulaResultLabel.textContent = resultLabel;
+      if (display) paraFormulaDisplay.textContent = display;
+      if (desc) paraFormulaDesc.textContent = desc;
+    }
+
+    function updateSteps(s1, s2, s3, s4) {
+      paraStep1.textContent = s1;
+      paraStep2.textContent = s2;
+      paraStep3.textContent = s3;
+      paraStep4.textContent = s4;
+    }
+
+    // ============================================
+    // MODE TOGGLE
+    // ============================================
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.para-mode-btn').forEach(b => {
+        b.className = 'para-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      const btnMap = { area: 'modeAreaPara', base: 'modeBasePara', height: 'modeHeightPara' };
+      document.getElementById(btnMap[mode]).className = 'para-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+      paraAreaModeInputs.classList.toggle('hidden', mode !== 'area');
+      paraBaseModeInputs.classList.toggle('hidden', mode !== 'base');
+      paraHeightModeInputs.classList.toggle('hidden', mode !== 'height');
+
+      if (mode === 'area') {
+        baseInputPara.value = baseSliderPara.value;
+        heightInputPara.value = heightSliderPara.value;
+        sideInputPara.value = sideSliderPara.value;
+      } else if (mode === 'base') {
+        areaForBaseInput.value = areaForBaseSlider.value;
+        heightForBaseInput.value = heightForBaseSlider.value;
+      } else if (mode === 'height') {
+        areaForHeightInput.value = areaForHeightSlider.value;
+        baseForHeightInput.value = baseForHeightSlider.value;
+      }
+      updateParallelogram();
+    }
+
+    document.getElementById('modeAreaPara').addEventListener('click', () => setMode('area'));
+    document.getElementById('modeBasePara').addEventListener('click', () => setMode('base'));
+    document.getElementById('modeHeightPara').addEventListener('click', () => setMode('height'));
+
+    // ============================================
+    // UNIT TOGGLE
+    // ============================================
+    document.querySelectorAll('.para-unit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.para-unit-btn').forEach(b => {
+          b.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        btn.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        const oldUnit = currentUnit;
+        const newUnit = btn.dataset.unit;
+        convertDisplayedValues(oldUnit, newUnit);
+        currentUnit = newUnit;
+        const maxArea = 20 * 20;
+        const formatted = formatArea(maxArea);
+        areaBaseMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+        areaHeightMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+        updateParallelogram();
+      });
+    });
+
+    // ============================================
+    // UPDATE PARALLELOGRAM
+    // ============================================
+    function updateParallelogram() {
+      const unit = getUnit();
+      const displayUnit = unit.display;
+      let base, height, side, area;
+      let resultValue, resultLabel, resultSecondary, resultFormula;
+      let formulaDisplay, formulaDesc, label1, label2, resultLabelText;
+      let val1, val2, result;
+      let step1, step2, step3, step4;
+
+      if (currentMode === 'area') {
+        base = parseFloat(baseSliderPara.value);
+        height = parseFloat(heightSliderPara.value);
+        side = parseFloat(sideSliderPara.value);
+        area = linearToCm(base) * linearToCm(height);
+
+        const formatted = formatArea(area);
+        resultValue = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        resultLabel = 'Area of Parallelogram';
+        resultSecondary = 'A = b × h';
+        resultFormula = 'A = b × h';
+        formulaDisplay = 'A = b × h';
+        formulaDesc = 'Area = Base × Height';
+        label1 = 'Base (b)';
+        label2 = 'Height (h)';
+        resultLabelText = 'Area';
+        val1 = `${formatNumber(base, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        val2 = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        step1 = 'Formula: A = b × h';
+        step2 = `Plug in: A = ${formatNumber(base, { maximumFractionDigits: 2 })} × ${formatNumber(height, { maximumFractionDigits: 2 })}`;
+        step3 = `Calculate: A = ${formatNumber(area, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: A = ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+
+        baseDisplayPara.textContent = formatNumber(base, { maximumFractionDigits: 2 });
+        heightDisplayPara.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+        sideDisplayPara.textContent = formatNumber(side, { maximumFractionDigits: 2 });
+        baseUnitDisplayPara.textContent = displayUnit;
+        heightUnitDisplayPara.textContent = displayUnit;
+        sideUnitDisplayPara.textContent = displayUnit;
+
+      } else if (currentMode === 'base') {
+        const areaVal = parseFloat(areaForBaseSlider.value);
+        height = parseFloat(heightForBaseSlider.value);
+        const areaCm2 = areaToCm2(areaVal);
+        base = areaCm2 / linearToCm(height) / unitConversions[currentUnit].factor;
+        side = base;
+        area = areaCm2;
+
+        const formatted = formatArea(area);
+        resultValue = formatNumber(base, { maximumFractionDigits: 2 });
+        resultLabel = 'Base (b)';
+        resultSecondary = 'b = A / h';
+        resultFormula = 'b = A / h';
+        formulaDisplay = 'b = A / h';
+        formulaDesc = 'Base = Area ÷ Height';
+        label1 = 'Area';
+        label2 = 'Height (h)';
+        resultLabelText = 'Base (b)';
+        val1 = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        val2 = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(base, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        step1 = 'Formula: b = A / h';
+        step2 = `Plug in: b = ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ÷ ${formatNumber(height, { maximumFractionDigits: 2 })}`;
+        step3 = `Calculate: b = ${formatNumber(base, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: b = ${formatNumber(base, { maximumFractionDigits: 2 })} ${displayUnit}`;
+
+        areaForBaseDisplay.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        areaForBaseUnit.textContent = formatted.unit;
+        heightForBaseDisplay.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+        heightForBaseUnit.textContent = displayUnit;
+
+      } else if (currentMode === 'height') {
+        const areaVal = parseFloat(areaForHeightSlider.value);
+        base = parseFloat(baseForHeightSlider.value);
+        const areaCm2 = areaToCm2(areaVal);
+        height = areaCm2 / linearToCm(base) / unitConversions[currentUnit].factor;
+        side = height;
+        area = areaCm2;
+
+        const formatted = formatArea(area);
+        resultValue = formatNumber(height, { maximumFractionDigits: 2 });
+        resultLabel = 'Height (h)';
+        resultSecondary = 'h = A / b';
+        resultFormula = 'h = A / b';
+        formulaDisplay = 'h = A / b';
+        formulaDesc = 'Height = Area ÷ Base';
+        label1 = 'Area';
+        label2 = 'Base (b)';
+        resultLabelText = 'Height (h)';
+        val1 = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        val2 = `${formatNumber(base, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        step1 = 'Formula: h = A / b';
+        step2 = `Plug in: h = ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ÷ ${formatNumber(base, { maximumFractionDigits: 2 })}`;
+        step3 = `Calculate: h = ${formatNumber(height, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: h = ${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+
+        areaForHeightDisplay.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        areaForHeightUnit.textContent = formatted.unit;
+        baseForHeightDisplay.textContent = formatNumber(base, { maximumFractionDigits: 2 });
+        baseForHeightUnit.textContent = displayUnit;
+      }
+
+      // Update SVG
+      updateSVG(base, height, side || base, area);
+
+      // Update result
+      updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
+
+      // Update formula
+      updateFormula(
+        val1,
+        val2,
+        result,
+        label1,
+        label2,
+        resultLabelText,
+        formulaDisplay,
+        formulaDesc
+      );
+
+      // Update steps
+      updateSteps(step1, step2, step3, step4);
+
+      // Update inputs
+      if (currentMode === 'area') {
+        baseInputPara.value = base;
+        heightInputPara.value = height;
+        sideInputPara.value = side || base;
+      } else if (currentMode === 'base') {
+        areaForBaseInput.value = areaForBaseSlider.value;
+        heightForBaseInput.value = heightForBaseSlider.value;
+      } else if (currentMode === 'height') {
+        areaForHeightInput.value = areaForHeightSlider.value;
+        baseForHeightInput.value = baseForHeightSlider.value;
+      }
+    }
+
+    // ============================================
+    // AREA MODE EVENTS
+    // ============================================
+    baseSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
+    heightSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
+    sideSliderPara.addEventListener('input', () => { if (currentMode === 'area') updateParallelogram(); });
+
+    baseInputPara.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+    heightInputPara.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+    sideInputPara.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+
+    document.getElementById('paraCalculateBtn').addEventListener('click', () => {
+      if (currentMode === 'area') {
+        const bResult = validatePositive(baseInputPara.value, 'Base');
+        if (!bResult.valid) { showValidationError(bResult.message); baseInputPara.focus(); return; }
+        
+        const hResult = validatePositive(heightInputPara.value, 'Height');
+        if (!hResult.valid) { showValidationError(hResult.message); heightInputPara.focus(); return; }
+        
+        const sResult = validatePositive(sideInputPara.value, 'Side');
+        if (!sResult.valid) { showValidationError(sResult.message); sideInputPara.focus(); return; }
+        
+        setSliderValue(baseSliderPara, bResult.value);
+        setSliderValue(heightSliderPara, hResult.value);
+        setSliderValue(sideSliderPara, sResult.value);
+        updateParallelogram();
+        if (window.showToast) {
+          window.showToast('✅ Calculation updated!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // BASE MODE EVENTS
+    // ============================================
+    areaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateParallelogram(); });
+    heightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateParallelogram(); });
+
+    areaForBaseInput.addEventListener('input', () => {
+      // Do not touch the slider while the user is typing.
+    });
+    heightForBaseInput.addEventListener('input', () => {
+      // Do not touch the slider while the user is typing.
+    });
+
+    document.getElementById('findBaseParaBtn').addEventListener('click', () => {
+      if (currentMode === 'base') {
+        const aResult = validatePositive(areaForBaseInput.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaForBaseInput.focus(); return; }
+        
+        const hResult = validatePositive(heightForBaseInput.value, 'Height');
+        if (!hResult.valid) { showValidationError(hResult.message); heightForBaseInput.focus(); return; }
+        
+        setSliderValue(areaForBaseSlider, aResult.value, 400);
+        setSliderValue(heightForBaseSlider, hResult.value);
+        updateParallelogram();
+        if (window.showToast) {
+          window.showToast('✅ Base found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // HEIGHT MODE EVENTS
+    // ============================================
+    areaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateParallelogram(); });
+    baseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateParallelogram(); });
+
+    areaForHeightInput.addEventListener('input', () => {
+      // Do not touch the slider while the user is typing.
+    });
+    baseForHeightInput.addEventListener('input', () => {
+      // Do not touch the slider while the user is typing.
+    });
+
+    document.getElementById('findHeightParaBtn').addEventListener('click', () => {
+      if (currentMode === 'height') {
+        const aResult = validatePositive(areaForHeightInput.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaForHeightInput.focus(); return; }
+        
+        const bResult = validatePositive(baseForHeightInput.value, 'Base');
+        if (!bResult.valid) { showValidationError(bResult.message); baseForHeightInput.focus(); return; }
+        
+        setSliderValue(areaForHeightSlider, aResult.value, 400);
+        setSliderValue(baseForHeightSlider, bResult.value);
+        updateParallelogram();
+        if (window.showToast) {
+          window.showToast('✅ Height found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // RESET BUTTON
+    // ============================================
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'resetParaBtn';
+    resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+    resetBtn.textContent = '🔄 Reset Calculator';
+    resetBtn.addEventListener('click', resetParallelogram);
+    
+    const resultBox = document.getElementById('paraResultBox');
+    if (resultBox) {
+      resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        resetParallelogram();
+      }
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    const maxArea = 20 * 20;
+    const formatted = formatArea(maxArea);
+    areaBaseMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+    areaHeightMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+    updateParallelogram();
+  });
+</script>
 </Layout>

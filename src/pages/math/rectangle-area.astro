@@ -500,503 +500,503 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   </main>
 
   <script>
-   document.addEventListener('DOMContentLoaded', () => {
-  // ============================================
-  // STATE
-  // ============================================
-  let currentUnit = 'cm';
-  let currentMode = 'area'; // 'area', 'length', 'width'
-  let currentLength = 10;
-  let currentWidth = 6;
+  import { validatePositiveNumber } from '../../lib/calculator/validation';
+  import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    // ============================================
+    // STATE
+    // ============================================
+    let currentUnit = 'cm';
+    let currentMode = 'area'; // 'area', 'length', 'width'
+    let currentLength = 10;
+    let currentWidth = 6;
 
-  // ============================================
-  // DOM REFERENCES
-  // ============================================
-  const lengthSlider = document.getElementById('lengthSlider');
-  const widthSlider = document.getElementById('widthSlider');
-  const lengthInput = document.getElementById('lengthInput');
-  const widthInput = document.getElementById('widthInput');
-  const lengthDisplay = document.getElementById('lengthDisplay');
-  const widthDisplay = document.getElementById('widthDisplay');
-  const lengthUnitDisplay = document.getElementById('lengthUnitDisplay');
-  const widthUnitDisplay = document.getElementById('widthUnitDisplay');
-  const lengthLabelValue = document.getElementById('lengthLabelValue');
-  const widthLabelValue = document.getElementById('widthLabelValue');
-  const areaLabelRectValue = document.getElementById('areaLabelRectValue');
-  const rectResultValue = document.getElementById('rectResultValue');
-  const rectResultDimensions = document.getElementById('rectResultDimensions');
-  const rectResultLabel = document.getElementById('rectResultLabel');
-  const rectResultSecondaryLabel = document.getElementById('rectResultSecondaryLabel');
-  const rectFormulaDisplay = document.getElementById('rectFormulaDisplay');
-  const rectFormulaDesc = document.getElementById('rectFormulaDesc');
-  const rectFormulaLabel1 = document.getElementById('rectFormulaLabel1');
-  const rectFormulaLabel2 = document.getElementById('rectFormulaLabel2');
-  const rectFormulaVal1 = document.getElementById('rectFormulaVal1');
-  const rectFormulaVal2 = document.getElementById('rectFormulaVal2');
-  const rectFormulaResultLabel = document.getElementById('rectFormulaResultLabel');
-  const rectFormulaResult = document.getElementById('rectFormulaResult');
-  const rectStep1 = document.getElementById('rectStep1');
-  const rectStep2 = document.getElementById('rectStep2');
-  const rectStep3 = document.getElementById('rectStep3');
-  const rectStep4 = document.getElementById('rectStep4');
-  const rectVisual = document.getElementById('rectVisual');
-  const rectAreaModeInputs = document.getElementById('rectAreaModeInputs');
-  const rectLengthModeInputs = document.getElementById('rectLengthModeInputs');
-  const rectWidthModeInputs = document.getElementById('rectWidthModeInputs');
-  const areaInputLength = document.getElementById('areaInputLength');
-  const areaInputLengthDisplay = document.getElementById('areaInputLengthDisplay');
-  const areaInputLengthUnit = document.getElementById('areaInputLengthUnit');
-  const areaSliderLength = document.getElementById('areaSliderLength');
-  const areaLengthMaxLabel = document.getElementById('areaLengthMaxLabel');
-  const widthForLengthInput = document.getElementById('widthForLengthInput');
-  const widthForLengthDisplay = document.getElementById('widthForLengthDisplay');
-  const widthForLengthUnit = document.getElementById('widthForLengthUnit');
-  const widthForLengthSlider = document.getElementById('widthForLengthSlider');
-  const areaInputWidth = document.getElementById('areaInputWidth');
-  const areaInputWidthDisplay = document.getElementById('areaInputWidthDisplay');
-  const areaInputWidthUnit = document.getElementById('areaInputWidthUnit');
-  const areaSliderWidth = document.getElementById('areaSliderWidth');
-  const areaWidthMaxLabel = document.getElementById('areaWidthMaxLabel');
-  const lengthForWidthInput = document.getElementById('lengthForWidthInput');
-  const lengthForWidthDisplay = document.getElementById('lengthForWidthDisplay');
-  const lengthForWidthUnit = document.getElementById('lengthForWidthUnit');
-  const lengthForWidthSlider = document.getElementById('lengthForWidthSlider');
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
+    const lengthSlider = document.getElementById('lengthSlider');
+    const widthSlider = document.getElementById('widthSlider');
+    const lengthInput = document.getElementById('lengthInput');
+    const widthInput = document.getElementById('widthInput');
+    const lengthDisplay = document.getElementById('lengthDisplay');
+    const widthDisplay = document.getElementById('widthDisplay');
+    const lengthUnitDisplay = document.getElementById('lengthUnitDisplay');
+    const widthUnitDisplay = document.getElementById('widthUnitDisplay');
+    const lengthLabelValue = document.getElementById('lengthLabelValue');
+    const widthLabelValue = document.getElementById('widthLabelValue');
+    const areaLabelRectValue = document.getElementById('areaLabelRectValue');
+    const rectResultValue = document.getElementById('rectResultValue');
+    const rectResultDimensions = document.getElementById('rectResultDimensions');
+    const rectResultLabel = document.getElementById('rectResultLabel');
+    const rectResultSecondaryLabel = document.getElementById('rectResultSecondaryLabel');
+    const rectFormulaDisplay = document.getElementById('rectFormulaDisplay');
+    const rectFormulaDesc = document.getElementById('rectFormulaDesc');
+    const rectFormulaLabel1 = document.getElementById('rectFormulaLabel1');
+    const rectFormulaLabel2 = document.getElementById('rectFormulaLabel2');
+    const rectFormulaVal1 = document.getElementById('rectFormulaVal1');
+    const rectFormulaVal2 = document.getElementById('rectFormulaVal2');
+    const rectFormulaResultLabel = document.getElementById('rectFormulaResultLabel');
+    const rectFormulaResult = document.getElementById('rectFormulaResult');
+    const rectStep1 = document.getElementById('rectStep1');
+    const rectStep2 = document.getElementById('rectStep2');
+    const rectStep3 = document.getElementById('rectStep3');
+    const rectStep4 = document.getElementById('rectStep4');
+    const rectVisual = document.getElementById('rectVisual');
+    const rectAreaModeInputs = document.getElementById('rectAreaModeInputs');
+    const rectLengthModeInputs = document.getElementById('rectLengthModeInputs');
+    const rectWidthModeInputs = document.getElementById('rectWidthModeInputs');
+    const areaInputLength = document.getElementById('areaInputLength');
+    const areaInputLengthDisplay = document.getElementById('areaInputLengthDisplay');
+    const areaInputLengthUnit = document.getElementById('areaInputLengthUnit');
+    const areaSliderLength = document.getElementById('areaSliderLength');
+    const areaLengthMaxLabel = document.getElementById('areaLengthMaxLabel');
+    const widthForLengthInput = document.getElementById('widthForLengthInput');
+    const widthForLengthDisplay = document.getElementById('widthForLengthDisplay');
+    const widthForLengthUnit = document.getElementById('widthForLengthUnit');
+    const widthForLengthSlider = document.getElementById('widthForLengthSlider');
+    const areaInputWidth = document.getElementById('areaInputWidth');
+    const areaInputWidthDisplay = document.getElementById('areaInputWidthDisplay');
+    const areaInputWidthUnit = document.getElementById('areaInputWidthUnit');
+    const areaSliderWidth = document.getElementById('areaSliderWidth');
+    const areaWidthMaxLabel = document.getElementById('areaWidthMaxLabel');
+    const lengthForWidthInput = document.getElementById('lengthForWidthInput');
+    const lengthForWidthDisplay = document.getElementById('lengthForWidthDisplay');
+    const lengthForWidthUnit = document.getElementById('lengthForWidthUnit');
+    const lengthForWidthSlider = document.getElementById('lengthForWidthSlider');
 
-  const unitConversions = {
-    cm: { label: 'cm', factor: 1, display: 'cm' },
-    m: { label: 'm', factor: 100, display: 'm' },
-    in: { label: 'in', factor: 2.54, display: 'in' },
-    ft: { label: 'ft', factor: 30.48, display: 'ft' }
-  };
+    const unitConversions = {
+      cm: { label: 'cm', factor: 1, display: 'cm' },
+      m: { label: 'm', factor: 100, display: 'm' },
+      in: { label: 'in', factor: 2.54, display: 'in' },
+      ft: { label: 'ft', factor: 30.48, display: 'ft' }
+    };
 
-  function showValidationError(message) {
-    if (window.showToast) window.showToast(message, 'error');
-    else window.alert(message);
-  }
-
-  // ============================================
-  // VALIDATION HELPERS
-  // ============================================
-  function validatePositive(value, name) {
-    if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: `Please enter a ${name}` };
+    function showValidationError(message) {
+      if (window.showToast) window.showToast(message, 'error');
+      else window.alert(message);
     }
-    const num = Number(value);
-    if (!Number.isFinite(num)) {
-      return { valid: false, message: 'Please enter a valid number' };
+
+    // ============================================
+    // VALIDATION HELPERS - Using imported validation
+    // ============================================
+    function validatePositive(value, name) {
+      const result = validatePositiveNumber(value, name, 1e10);
+      if (!result.valid) {
+        return { valid: false, message: result.message };
+      }
+      return { valid: true, value: result.value };
     }
-    if (num <= 0) {
-      return { valid: false, message: `${name} must be greater than 0` };
+
+    function getUnit() { return unitConversions[currentUnit]; }
+
+    // Convert a displayed linear value to centimeters.
+    function linearToCm(value) {
+      return value * unitConversions[currentUnit].factor;
     }
-    if (num > 1e10) {
-      return { valid: false, message: `${name} is too large` };
+
+    // Convert a displayed area value to square centimeters.
+    function areaToCm2(value) {
+      const factor = unitConversions[currentUnit].factor;
+      return value * factor * factor;
     }
-    return { valid: true, value: num };
-  }
 
-  function getUnit() { return unitConversions[currentUnit]; }
-
-  // Convert a displayed linear value to centimeters.
-  function linearToCm(value) {
-    return value * unitConversions[currentUnit].factor;
-  }
-
-  // Convert a displayed area value to square centimeters.
-  function areaToCm2(value) {
-    const factor = unitConversions[currentUnit].factor;
-    return value * factor * factor;
-  }
-
-  // Keep the slider synchronized without rounding or clamping manual input.
-  function setSliderValue(slider, value, defaultMax = 20) {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return;
-    slider.max = String(Math.max(defaultMax, num));
-    slider.value = String(num);
-  }
-
-  // ============================================
-  // RESET FUNCTION
-  // ============================================
-  function resetRectangle() {
-    currentLength = 10;
-    currentWidth = 6;
-    lengthSlider.value = 10;
-    widthSlider.value = 6;
-    lengthInput.value = 10;
-    widthInput.value = 6;
-    areaSliderLength.value = 60;
-    areaInputLength.value = 60;
-    widthForLengthSlider.value = 6;
-    widthForLengthInput.value = 6;
-    areaSliderWidth.value = 60;
-    areaInputWidth.value = 60;
-    lengthForWidthSlider.value = 10;
-    lengthForWidthInput.value = 10;
-    if (currentMode === 'area') updateRectangle();
-    else if (currentMode === 'length') updateFindLength();
-    else if (currentMode === 'width') updateFindWidth();
-    if (window.showToast) {
-      window.showToast('🔄 Rectangle calculator reset to default values', 'info');
+    // Keep the slider synchronized without rounding or clamping manual input.
+    function setSliderValue(slider, value, defaultMax = 20) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return;
+      slider.max = String(Math.max(defaultMax, num));
+      slider.value = String(num);
     }
-  }
 
-  // ============================================
-  // UPDATE SVG
-  // ============================================
-  function updateSVG(length, width, area) {
-    const maxSize = Math.max(length, width, 20);
-    const scaleX = Math.min(length / maxSize, 1);
-    const scaleY = Math.min(width / maxSize, 1);
-    const rectWidth = 150 + (scaleX * 200);
-    const rectHeight = 100 + (scaleY * 200);
-    const x = (500 - rectWidth) / 2;
-    const y = (500 - rectHeight) / 2;
-
-    rectVisual.setAttribute('width', rectWidth);
-    rectVisual.setAttribute('height', rectHeight);
-    rectVisual.setAttribute('x', x);
-    rectVisual.setAttribute('y', y);
-
-    const formatted = formatArea(area);
-    lengthLabelValue.textContent = length.toFixed(2);
-    widthLabelValue.textContent = width.toFixed(2);
-    areaLabelRectValue.textContent = formatted.value.toFixed(2);
-  }
-
-  function convertDisplayedValues(oldUnit, newUnit) {
-    if (oldUnit === newUnit) return;
-    const oldFactor = unitConversions[oldUnit].factor;
-    const newFactor = unitConversions[newUnit].factor;
-    const linearRatio = oldFactor / newFactor;
-    const areaRatio = linearRatio * linearRatio;
-    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
-      const value = Number(input.value);
-      if (!Number.isFinite(value)) return;
-      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
-      input.value = String(value * ratio);
-      ['min','max'].forEach(attr => {
-        const n = Number(input.getAttribute(attr));
-        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
-      });
-    });
-  }
-
-  function formatArea(area) {
-    let displayArea = area;
-    let areaUnit = 'cm²';
-    if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
-    else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
-    else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
-    return { value: displayArea, unit: areaUnit };
-  }
-
-  // ============================================
-  // UPDATE RECTANGLE (Find Area)
-  // ============================================
-  function updateRectangle() {
-    const length = parseFloat(lengthSlider.value);
-    const width = parseFloat(widthSlider.value);
-    const unit = getUnit();
-    const displayUnit = unit.display;
-
-    const area = linearToCm(length) * linearToCm(width);
-    const formatted = formatArea(area);
-    const formattedArea = formatted.value.toFixed(2);
-
-    updateSVG(length, width, area);
-
-    lengthDisplay.textContent = length;
-    widthDisplay.textContent = width;
-    lengthUnitDisplay.textContent = displayUnit;
-    widthUnitDisplay.textContent = displayUnit;
-    
-    rectResultValue.textContent = formattedArea;
-    rectResultDimensions.textContent = `${length} × ${width} ${displayUnit}`;
-    rectResultLabel.textContent = 'Area of Rectangle';
-    rectResultSecondaryLabel.textContent = 'Dimensions';
-    
-    rectFormulaDisplay.textContent = 'A = l × w';
-    rectFormulaDesc.textContent = 'Area = Length × Width';
-    rectFormulaLabel1.textContent = 'Length';
-    rectFormulaLabel2.textContent = 'Width';
-    rectFormulaVal1.textContent = `${length} ${displayUnit}`;
-    rectFormulaVal2.textContent = `${width} ${displayUnit}`;
-    rectFormulaResultLabel.textContent = 'Area';
-    rectFormulaResult.textContent = `${formattedArea} ${formatted.unit}`;
-    
-    rectStep1.textContent = 'Formula: A = l × w';
-    rectStep2.textContent = `Plug in: A = ${length} × ${width}`;
-    rectStep3.textContent = `Calculate: A = ${area.toFixed(2)}`;
-    rectStep4.textContent = `Answer: A = ${formattedArea} ${formatted.unit}`;
-
-    lengthInput.value = length;
-    widthInput.value = width;
-  }
-
-  // ============================================
-  // FIND LENGTH
-  // ============================================
-  function updateFindLength() {
-    const area = parseFloat(areaSliderLength.value);
-    const width = parseFloat(widthForLengthSlider.value);
-    const unit = getUnit();
-    const displayUnit = unit.display;
-
-    const areaCm2 = areaToCm2(area);
-
-    const length = areaCm2 / linearToCm(width) / unitConversions[currentUnit].factor;
-    const formatted = formatArea(area);
-    const formattedLength = length.toFixed(2);
-    const formattedArea = formatted.value.toFixed(2);
-
-    updateSVG(length, width, area);
-
-    rectResultValue.textContent = formattedLength;
-    rectResultDimensions.textContent = `${formattedLength} × ${width} ${displayUnit}`;
-    rectResultLabel.textContent = 'Length';
-    rectResultSecondaryLabel.textContent = 'Dimensions';
-    
-    rectFormulaDisplay.textContent = 'l = A / w';
-    rectFormulaDesc.textContent = 'Length = Area ÷ Width';
-    rectFormulaLabel1.textContent = 'Area';
-    rectFormulaLabel2.textContent = 'Width';
-    rectFormulaVal1.textContent = `${formattedArea} ${formatted.unit}`;
-    rectFormulaVal2.textContent = `${width} ${displayUnit}`;
-    rectFormulaResultLabel.textContent = 'Length';
-    rectFormulaResult.textContent = `${formattedLength} ${displayUnit}`;
-    
-    rectStep1.textContent = 'Formula: l = A / w';
-    rectStep2.textContent = `Plug in: l = ${formattedArea} ÷ ${width}`;
-    rectStep3.textContent = `Calculate: l = ${formattedLength}`;
-    rectStep4.textContent = `Answer: Length = ${formattedLength} ${displayUnit}`;
-
-    areaInputLength.value = area;
-    widthForLengthInput.value = width;
-    areaInputLengthDisplay.textContent = formattedArea;
-    areaInputLengthUnit.textContent = formatted.unit;
-    widthForLengthDisplay.textContent = width;
-    widthForLengthUnit.textContent = displayUnit;
-  }
-
-  // ============================================
-  // FIND WIDTH
-  // ============================================
-  function updateFindWidth() {
-    const area = parseFloat(areaSliderWidth.value);
-    const length = parseFloat(lengthForWidthSlider.value);
-    const unit = getUnit();
-    const displayUnit = unit.display;
-
-    const areaCm2 = areaToCm2(area);
-
-    const width = areaCm2 / linearToCm(length) / unitConversions[currentUnit].factor;
-    const formatted = formatArea(area);
-    const formattedWidth = width.toFixed(2);
-    const formattedArea = formatted.value.toFixed(2);
-
-    updateSVG(length, width, area);
-
-    rectResultValue.textContent = formattedWidth;
-    rectResultDimensions.textContent = `${length} × ${formattedWidth} ${displayUnit}`;
-    rectResultLabel.textContent = 'Width';
-    rectResultSecondaryLabel.textContent = 'Dimensions';
-    
-    rectFormulaDisplay.textContent = 'w = A / l';
-    rectFormulaDesc.textContent = 'Width = Area ÷ Length';
-    rectFormulaLabel1.textContent = 'Area';
-    rectFormulaLabel2.textContent = 'Length';
-    rectFormulaVal1.textContent = `${formattedArea} ${formatted.unit}`;
-    rectFormulaVal2.textContent = `${length} ${displayUnit}`;
-    rectFormulaResultLabel.textContent = 'Width';
-    rectFormulaResult.textContent = `${formattedWidth} ${displayUnit}`;
-    
-    rectStep1.textContent = 'Formula: w = A / l';
-    rectStep2.textContent = `Plug in: w = ${formattedArea} ÷ ${length}`;
-    rectStep3.textContent = `Calculate: w = ${formattedWidth}`;
-    rectStep4.textContent = `Answer: Width = ${formattedWidth} ${displayUnit}`;
-
-    areaInputWidth.value = area;
-    lengthForWidthInput.value = length;
-    areaInputWidthDisplay.textContent = formattedArea;
-    areaInputWidthUnit.textContent = formatted.unit;
-    lengthForWidthDisplay.textContent = length;
-    lengthForWidthUnit.textContent = displayUnit;
-  }
-
-  // ============================================
-  // UNIT TOGGLE
-  // ============================================
-  document.querySelectorAll('.rect-unit-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.rect-unit-btn').forEach(b => {
-        b.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-      });
-      btn.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      const oldUnit = currentUnit;
-      const newUnit = btn.dataset.unit;
-      convertDisplayedValues(oldUnit, newUnit);
-      currentUnit = newUnit;
-      
+    // ============================================
+    // RESET FUNCTION
+    // ============================================
+    function resetRectangle() {
+      currentLength = 10;
+      currentWidth = 6;
+      lengthSlider.value = 10;
+      widthSlider.value = 6;
+      lengthInput.value = 10;
+      widthInput.value = 6;
+      areaSliderLength.value = 60;
+      areaInputLength.value = 60;
+      widthForLengthSlider.value = 6;
+      widthForLengthInput.value = 6;
+      areaSliderWidth.value = 60;
+      areaInputWidth.value = 60;
+      lengthForWidthSlider.value = 10;
+      lengthForWidthInput.value = 10;
       if (currentMode === 'area') updateRectangle();
       else if (currentMode === 'length') updateFindLength();
       else if (currentMode === 'width') updateFindWidth();
-    });
-  });
+      if (window.showToast) {
+        window.showToast('🔄 Rectangle calculator reset to default values', 'info');
+      }
+    }
 
-  // ============================================
-  // MODE TOGGLE
-  // ============================================
-  document.getElementById('modeAreaRect').addEventListener('click', () => {
-    document.querySelectorAll('.rect-mode-btn').forEach(b => {
-      b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+    // ============================================
+    // UPDATE SVG
+    // ============================================
+    function updateSVG(length, width, area) {
+      const maxSize = Math.max(length, width, 20);
+      const scaleX = Math.min(length / maxSize, 1);
+      const scaleY = Math.min(width / maxSize, 1);
+      const rectWidth = 150 + (scaleX * 200);
+      const rectHeight = 100 + (scaleY * 200);
+      const x = (500 - rectWidth) / 2;
+      const y = (500 - rectHeight) / 2;
+
+      rectVisual.setAttribute('width', rectWidth);
+      rectVisual.setAttribute('height', rectHeight);
+      rectVisual.setAttribute('x', x);
+      rectVisual.setAttribute('y', y);
+
+      const formatted = formatArea(area);
+      lengthLabelValue.textContent = formatNumber(length, { maximumFractionDigits: 2 });
+      widthLabelValue.textContent = formatNumber(width, { maximumFractionDigits: 2 });
+      areaLabelRectValue.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+    }
+
+    function convertDisplayedValues(oldUnit, newUnit) {
+      if (oldUnit === newUnit) return;
+      const oldFactor = unitConversions[oldUnit].factor;
+      const newFactor = unitConversions[newUnit].factor;
+      const linearRatio = oldFactor / newFactor;
+      const areaRatio = linearRatio * linearRatio;
+      document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+        const value = Number(input.value);
+        if (!Number.isFinite(value)) return;
+        const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+        input.value = String(value * ratio);
+        ['min','max'].forEach(attr => {
+          const n = Number(input.getAttribute(attr));
+          if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+        });
+      });
+    }
+
+    function formatArea(area) {
+      let displayArea = area;
+      let areaUnit = 'cm²';
+      if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+      else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+      else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+      return { value: displayArea, unit: areaUnit };
+    }
+
+    // ============================================
+    // UPDATE RECTANGLE (Find Area)
+    // ============================================
+    function updateRectangle() {
+      const length = parseFloat(lengthSlider.value);
+      const width = parseFloat(widthSlider.value);
+      const unit = getUnit();
+      const displayUnit = unit.display;
+
+      const area = linearToCm(length) * linearToCm(width);
+      const formatted = formatArea(area);
+      const formattedArea = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+
+      updateSVG(length, width, area);
+
+      lengthDisplay.textContent = formatNumber(length, { maximumFractionDigits: 2 });
+      widthDisplay.textContent = formatNumber(width, { maximumFractionDigits: 2 });
+      lengthUnitDisplay.textContent = displayUnit;
+      widthUnitDisplay.textContent = displayUnit;
+      
+      rectResultValue.textContent = formattedArea;
+      rectResultDimensions.textContent = `${formatNumber(length, { maximumFractionDigits: 2 })} × ${formatNumber(width, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectResultLabel.textContent = 'Area of Rectangle';
+      rectResultSecondaryLabel.textContent = 'Dimensions';
+      
+      rectFormulaDisplay.textContent = 'A = l × w';
+      rectFormulaDesc.textContent = 'Area = Length × Width';
+      rectFormulaLabel1.textContent = 'Length';
+      rectFormulaLabel2.textContent = 'Width';
+      rectFormulaVal1.textContent = `${formatNumber(length, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectFormulaVal2.textContent = `${formatNumber(width, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectFormulaResultLabel.textContent = 'Area';
+      rectFormulaResult.textContent = `${formattedArea} ${formatted.unit}`;
+      
+      rectStep1.textContent = 'Formula: A = l × w';
+      rectStep2.textContent = `Plug in: A = ${formatNumber(length, { maximumFractionDigits: 2 })} × ${formatNumber(width, { maximumFractionDigits: 2 })}`;
+      rectStep3.textContent = `Calculate: A = ${formatNumber(area, { maximumFractionDigits: 2 })}`;
+      rectStep4.textContent = `Answer: A = ${formattedArea} ${formatted.unit}`;
+
+      lengthInput.value = length;
+      widthInput.value = width;
+    }
+
+    // ============================================
+    // FIND LENGTH
+    // ============================================
+    function updateFindLength() {
+      const area = parseFloat(areaSliderLength.value);
+      const width = parseFloat(widthForLengthSlider.value);
+      const unit = getUnit();
+      const displayUnit = unit.display;
+
+      const areaCm2 = areaToCm2(area);
+
+      const length = areaCm2 / linearToCm(width) / unitConversions[currentUnit].factor;
+      const formatted = formatArea(area);
+      const formattedLength = formatNumber(length, { maximumFractionDigits: 2 });
+      const formattedArea = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+
+      updateSVG(length, width, area);
+
+      rectResultValue.textContent = formattedLength;
+      rectResultDimensions.textContent = `${formattedLength} × ${formatNumber(width, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectResultLabel.textContent = 'Length';
+      rectResultSecondaryLabel.textContent = 'Dimensions';
+      
+      rectFormulaDisplay.textContent = 'l = A / w';
+      rectFormulaDesc.textContent = 'Length = Area ÷ Width';
+      rectFormulaLabel1.textContent = 'Area';
+      rectFormulaLabel2.textContent = 'Width';
+      rectFormulaVal1.textContent = `${formattedArea} ${formatted.unit}`;
+      rectFormulaVal2.textContent = `${formatNumber(width, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectFormulaResultLabel.textContent = 'Length';
+      rectFormulaResult.textContent = `${formattedLength} ${displayUnit}`;
+      
+      rectStep1.textContent = 'Formula: l = A / w';
+      rectStep2.textContent = `Plug in: l = ${formattedArea} ÷ ${formatNumber(width, { maximumFractionDigits: 2 })}`;
+      rectStep3.textContent = `Calculate: l = ${formattedLength}`;
+      rectStep4.textContent = `Answer: Length = ${formattedLength} ${displayUnit}`;
+
+      areaInputLength.value = area;
+      widthForLengthInput.value = width;
+      areaInputLengthDisplay.textContent = formattedArea;
+      areaInputLengthUnit.textContent = formatted.unit;
+      widthForLengthDisplay.textContent = formatNumber(width, { maximumFractionDigits: 2 });
+      widthForLengthUnit.textContent = displayUnit;
+    }
+
+    // ============================================
+    // FIND WIDTH
+    // ============================================
+    function updateFindWidth() {
+      const area = parseFloat(areaSliderWidth.value);
+      const length = parseFloat(lengthForWidthSlider.value);
+      const unit = getUnit();
+      const displayUnit = unit.display;
+
+      const areaCm2 = areaToCm2(area);
+
+      const width = areaCm2 / linearToCm(length) / unitConversions[currentUnit].factor;
+      const formatted = formatArea(area);
+      const formattedWidth = formatNumber(width, { maximumFractionDigits: 2 });
+      const formattedArea = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+
+      updateSVG(length, width, area);
+
+      rectResultValue.textContent = formattedWidth;
+      rectResultDimensions.textContent = `${formatNumber(length, { maximumFractionDigits: 2 })} × ${formattedWidth} ${displayUnit}`;
+      rectResultLabel.textContent = 'Width';
+      rectResultSecondaryLabel.textContent = 'Dimensions';
+      
+      rectFormulaDisplay.textContent = 'w = A / l';
+      rectFormulaDesc.textContent = 'Width = Area ÷ Length';
+      rectFormulaLabel1.textContent = 'Area';
+      rectFormulaLabel2.textContent = 'Length';
+      rectFormulaVal1.textContent = `${formattedArea} ${formatted.unit}`;
+      rectFormulaVal2.textContent = `${formatNumber(length, { maximumFractionDigits: 2 })} ${displayUnit}`;
+      rectFormulaResultLabel.textContent = 'Width';
+      rectFormulaResult.textContent = `${formattedWidth} ${displayUnit}`;
+      
+      rectStep1.textContent = 'Formula: w = A / l';
+      rectStep2.textContent = `Plug in: w = ${formattedArea} ÷ ${formatNumber(length, { maximumFractionDigits: 2 })}`;
+      rectStep3.textContent = `Calculate: w = ${formattedWidth}`;
+      rectStep4.textContent = `Answer: Width = ${formattedWidth} ${displayUnit}`;
+
+      areaInputWidth.value = area;
+      lengthForWidthInput.value = length;
+      areaInputWidthDisplay.textContent = formattedArea;
+      areaInputWidthUnit.textContent = formatted.unit;
+      lengthForWidthDisplay.textContent = formatNumber(length, { maximumFractionDigits: 2 });
+      lengthForWidthUnit.textContent = displayUnit;
+    }
+
+    // ============================================
+    // UNIT TOGGLE
+    // ============================================
+    document.querySelectorAll('.rect-unit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.rect-unit-btn').forEach(b => {
+          b.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        btn.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        const oldUnit = currentUnit;
+        const newUnit = btn.dataset.unit;
+        convertDisplayedValues(oldUnit, newUnit);
+        currentUnit = newUnit;
+        
+        if (currentMode === 'area') updateRectangle();
+        else if (currentMode === 'length') updateFindLength();
+        else if (currentMode === 'width') updateFindWidth();
+      });
     });
-    document.getElementById('modeAreaRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-    currentMode = 'area';
-    rectAreaModeInputs.classList.remove('hidden');
-    rectLengthModeInputs.classList.add('hidden');
-    rectWidthModeInputs.classList.add('hidden');
+
+    // ============================================
+    // MODE TOGGLE
+    // ============================================
+    document.getElementById('modeAreaRect').addEventListener('click', () => {
+      document.querySelectorAll('.rect-mode-btn').forEach(b => {
+        b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('modeAreaRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentMode = 'area';
+      rectAreaModeInputs.classList.remove('hidden');
+      rectLengthModeInputs.classList.add('hidden');
+      rectWidthModeInputs.classList.add('hidden');
+      updateRectangle();
+    });
+
+    document.getElementById('modeLengthRect').addEventListener('click', () => {
+      document.querySelectorAll('.rect-mode-btn').forEach(b => {
+        b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('modeLengthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentMode = 'length';
+      rectAreaModeInputs.classList.add('hidden');
+      rectLengthModeInputs.classList.remove('hidden');
+      rectWidthModeInputs.classList.add('hidden');
+      updateFindLength();
+    });
+
+    document.getElementById('modeWidthRect').addEventListener('click', () => {
+      document.querySelectorAll('.rect-mode-btn').forEach(b => {
+        b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('modeWidthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      currentMode = 'width';
+      rectAreaModeInputs.classList.add('hidden');
+      rectLengthModeInputs.classList.add('hidden');
+      rectWidthModeInputs.classList.remove('hidden');
+      updateFindWidth();
+    });
+
+    // ============================================
+    // AREA MODE EVENTS
+    // ============================================
+    lengthSlider.addEventListener('input', updateRectangle);
+    widthSlider.addEventListener('input', updateRectangle);
+
+    lengthInput.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+    widthInput.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+
+    document.getElementById('rectCalculateBtn').addEventListener('click', () => {
+      if (currentMode === 'area') {
+        const lResult = validatePositive(lengthInput.value, 'Length');
+        if (!lResult.valid) { showValidationError(lResult.message); lengthInput.focus(); return; }
+        
+        const wResult = validatePositive(widthInput.value, 'Width');
+        if (!wResult.valid) { showValidationError(wResult.message); widthInput.focus(); return; }
+        
+        setSliderValue(lengthSlider, lResult.value);
+        setSliderValue(widthSlider, wResult.value);
+        updateRectangle();
+        if (window.showToast) {
+          window.showToast('✅ Calculation updated!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // FIND LENGTH EVENTS
+    // ============================================
+    areaSliderLength.addEventListener('input', updateFindLength);
+    widthForLengthSlider.addEventListener('input', updateFindLength);
+
+    areaInputLength.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    widthForLengthInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+
+    document.getElementById('findLengthBtn').addEventListener('click', () => {
+      if (currentMode === 'length') {
+        const aResult = validatePositive(areaInputLength.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaInputLength.focus(); return; }
+        
+        const wResult = validatePositive(widthForLengthInput.value, 'Width');
+        if (!wResult.valid) { showValidationError(wResult.message); widthForLengthInput.focus(); return; }
+        
+        setSliderValue(areaSliderLength, aResult.value, 400);
+        setSliderValue(widthForLengthSlider, wResult.value);
+        updateFindLength();
+        if (window.showToast) {
+          window.showToast('✅ Length found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // FIND WIDTH EVENTS
+    // ============================================
+    areaSliderWidth.addEventListener('input', updateFindWidth);
+    lengthForWidthSlider.addEventListener('input', updateFindWidth);
+
+    areaInputWidth.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    lengthForWidthInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+
+    document.getElementById('findWidthBtn').addEventListener('click', () => {
+      if (currentMode === 'width') {
+        const aResult = validatePositive(areaInputWidth.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaInputWidth.focus(); return; }
+        
+        const lResult = validatePositive(lengthForWidthInput.value, 'Length');
+        if (!lResult.valid) { showValidationError(lResult.message); lengthForWidthInput.focus(); return; }
+        
+        setSliderValue(areaSliderWidth, aResult.value, 400);
+        setSliderValue(lengthForWidthSlider, lResult.value);
+        updateFindWidth();
+        if (window.showToast) {
+          window.showToast('✅ Width found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // RESET BUTTON
+    // ============================================
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'resetRectBtn';
+    resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+    resetBtn.textContent = '🔄 Reset Calculator';
+    resetBtn.addEventListener('click', resetRectangle);
+    
+    const resultBox = document.getElementById('rectResultBox');
+    if (resultBox) {
+      resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        resetRectangle();
+      }
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
     updateRectangle();
   });
-
-  document.getElementById('modeLengthRect').addEventListener('click', () => {
-    document.querySelectorAll('.rect-mode-btn').forEach(b => {
-      b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    document.getElementById('modeLengthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-    currentMode = 'length';
-    rectAreaModeInputs.classList.add('hidden');
-    rectLengthModeInputs.classList.remove('hidden');
-    rectWidthModeInputs.classList.add('hidden');
-    updateFindLength();
-  });
-
-  document.getElementById('modeWidthRect').addEventListener('click', () => {
-    document.querySelectorAll('.rect-mode-btn').forEach(b => {
-      b.className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    document.getElementById('modeWidthRect').className = 'rect-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-    currentMode = 'width';
-    rectAreaModeInputs.classList.add('hidden');
-    rectLengthModeInputs.classList.add('hidden');
-    rectWidthModeInputs.classList.remove('hidden');
-    updateFindWidth();
-  });
-
-  // ============================================
-  // AREA MODE EVENTS
-  // ============================================
-  lengthSlider.addEventListener('input', updateRectangle);
-  widthSlider.addEventListener('input', updateRectangle);
-
-  lengthInput.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-  widthInput.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-
-  document.getElementById('rectCalculateBtn').addEventListener('click', () => {
-    if (currentMode === 'area') {
-      const lVal = validatePositive(lengthInput.value, 'Length');
-      const wVal = validatePositive(widthInput.value, 'Width');
-      if (!lVal.valid) { showValidationError(lVal.message); lengthInput.focus(); return; }
-      if (!wVal.valid) { showValidationError(wVal.message); widthInput.focus(); return; }
-      setSliderValue(lengthSlider, lVal.value);
-      setSliderValue(widthSlider, wVal.value);
-      updateRectangle();
-      if (window.showToast) {
-        window.showToast('✅ Calculation updated!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // FIND LENGTH EVENTS
-  // ============================================
-  areaSliderLength.addEventListener('input', updateFindLength);
-  widthForLengthSlider.addEventListener('input', updateFindLength);
-
-  areaInputLength.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  widthForLengthInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-
-  document.getElementById('findLengthBtn').addEventListener('click', () => {
-    if (currentMode === 'length') {
-      const aVal = validatePositive(areaInputLength.value, 'Area');
-      const wVal = validatePositive(widthForLengthInput.value, 'Width');
-      if (!aVal.valid) { showValidationError(aVal.message); areaInputLength.focus(); return; }
-      if (!wVal.valid) { showValidationError(wVal.message); widthForLengthInput.focus(); return; }
-      setSliderValue(areaSliderLength, aVal.value, 400);
-      setSliderValue(widthForLengthSlider, wVal.value);
-      updateFindLength();
-      if (window.showToast) {
-        window.showToast('✅ Length found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // FIND WIDTH EVENTS
-  // ============================================
-  areaSliderWidth.addEventListener('input', updateFindWidth);
-  lengthForWidthSlider.addEventListener('input', updateFindWidth);
-
-  areaInputWidth.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  lengthForWidthInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-
-  document.getElementById('findWidthBtn').addEventListener('click', () => {
-    if (currentMode === 'width') {
-      const aVal = validatePositive(areaInputWidth.value, 'Area');
-      const lVal = validatePositive(lengthForWidthInput.value, 'Length');
-      if (!aVal.valid) { showValidationError(aVal.message); areaInputWidth.focus(); return; }
-      if (!lVal.valid) { showValidationError(lVal.message); lengthForWidthInput.focus(); return; }
-      setSliderValue(areaSliderWidth, aVal.value, 400);
-      setSliderValue(lengthForWidthSlider, lVal.value);
-      updateFindWidth();
-      if (window.showToast) {
-        window.showToast('✅ Width found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // RESET BUTTON
-  // ============================================
-  const resetBtn = document.createElement('button');
-  resetBtn.id = 'resetRectBtn';
-  resetBtn.className = 'btn-secondary w-full mt-3 text-center';
-  resetBtn.textContent = '🔄 Reset Calculator';
-  resetBtn.addEventListener('click', resetRectangle);
-  
-  const resultBox = document.getElementById('rectResultBox');
-  if (resultBox) {
-    resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
-  }
-
-  // ============================================
-  // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
-  // ============================================
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
-      e.preventDefault();
-      resetRectangle();
-    }
-  });
-
-  // ============================================
-  // INITIALIZE
-  // ============================================
-  updateRectangle();
-});
-  </script>
+</script>
 </Layout>

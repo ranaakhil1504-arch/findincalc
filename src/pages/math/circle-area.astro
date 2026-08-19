@@ -453,40 +453,31 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   const radiusModeInputs = document.getElementById('radiusModeInputs');
 
   // ============================================
-  // VALIDATION HELPERS
+  // RESTORED VALIDATION HELPERS
   // ============================================
-  function validateRadius(value) {
+  function validatePositiveNumber(value, name, maxVal) {
     if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: 'Please enter a radius' };
+      return { valid: false, message: `Please enter a ${name}` };
     }
     const num = Number(value);
     if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num <= 0) {
-      return { valid: false, message: 'Radius must be greater than 0' };
+      return { valid: false, message: `${name} must be greater than 0` };
     }
-    if (num > 1e10) {
-      return { valid: false, message: 'Radius is too large' };
+    if (num > maxVal) {
+      return { valid: false, message: `${name} is too large` };
     }
     return { valid: true, value: num };
   }
 
+  function validateRadius(value) {
+    return validatePositiveNumber(value, 'radius', 1e10);
+  }
+
   function validateArea(value) {
-    if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: 'Please enter an area' };
-    }
-    const num = Number(value);
-    if (!Number.isFinite(num)) {
-      return { valid: false, message: 'Please enter a valid number' };
-    }
-    if (num <= 0) {
-      return { valid: false, message: 'Area must be greater than 0' };
-    }
-    if (num > 1e20) {
-      return { valid: false, message: 'Area is too large' };
-    }
-    return { valid: true, value: num };
+    return validatePositiveNumber(value, 'area', 1e20);
   }
 
   // ============================================
@@ -549,7 +540,7 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     const areaCm2 = pi.value * radius * radius;
     const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
     
-    // Limit decimal places to 4
+    // FIXED: Replaced imported formatResult with native JS toFixed(4)
     const formattedArea = displayArea.toFixed(4);
     const formattedRadius = displayRadius.toFixed(4);
 
@@ -584,8 +575,12 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
 
     step1.textContent = `Formula: A = ${pi.label} × r²`;
     step2.textContent = `Plug in: A = ${pi.label} × ${formattedRadius}²`;
+    
+    // FIXED: Replaced imported formatResult with native JS toFixed(4)
     const radiusSquared = (radius * radius).toFixed(4);
-    step3.textContent = `Calculate: A = ${pi.value.toFixed(6)} × ${radiusSquared}`;
+    const piFormatted = pi.value.toFixed(6);
+    
+    step3.textContent = `Calculate: A = ${piFormatted} × ${radiusSquared}`;
     step4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
 
     piComparison.textContent = piComparisons[currentPiMode];
@@ -708,9 +703,12 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   // ============================================
   // AREA MODE EVENTS
   // ============================================
-  // THE FIX: Calculate continuously but don't overwrite the input box while typing
   radiusInput.addEventListener('input', () => {
-    const validation = validateRadius(radiusInput.value);
+    const validation = validatePositiveNumber(
+      radiusInput.value,
+      'radius',
+      1e10
+    );
     if (!validation.valid) {
       radiusError.textContent = validation.message;
       radiusError.classList.remove('hidden');
@@ -722,7 +720,11 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   });
 
   document.getElementById('calculateBtn').addEventListener('click', () => {
-    const validation = validateRadius(radiusInput.value);
+    const validation = validatePositiveNumber(
+      radiusInput.value,
+      'radius',
+      1e10
+    );
     if (!validation.valid) {
       radiusError.textContent = validation.message;
       radiusError.classList.remove('hidden');
@@ -746,7 +748,6 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   // ============================================
   // RADIUS MODE EVENTS
   // ============================================
-  // THE FIX: Calculate continuously but don't overwrite the input box while typing
   areaInput.addEventListener('input', () => {
     const validation = validateArea(areaInput.value);
     if (!validation.valid) {

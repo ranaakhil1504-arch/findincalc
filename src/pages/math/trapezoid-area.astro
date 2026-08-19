@@ -633,643 +633,647 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-  // ============================================
-  // STATE
-  // ============================================
-  let currentUnit = 'cm';
-  let currentMode = 'area'; // 'area', 'height', 'base'
-  let knownBase = 'top'; // 'top' or 'bottom'
-
-  // ============================================
-  // DOM REFERENCES
-  // ============================================
-  // Area mode
-  const topBaseSlider = document.getElementById('topBaseSlider');
-  const bottomBaseSlider = document.getElementById('bottomBaseSlider');
-  const heightSliderTrap = document.getElementById('heightSliderTrap');
-  const topBaseInput = document.getElementById('topBaseInput');
-  const bottomBaseInput = document.getElementById('bottomBaseInput');
-  const heightInputTrap = document.getElementById('heightInputTrap');
-  const topBaseDisplay = document.getElementById('topBaseDisplay');
-  const bottomBaseDisplay = document.getElementById('bottomBaseDisplay');
-  const heightDisplayTrap = document.getElementById('heightDisplayTrap');
-  const topBaseUnitDisplay = document.getElementById('topBaseUnitDisplay');
-  const bottomBaseUnitDisplay = document.getElementById('bottomBaseUnitDisplay');
-  const heightUnitDisplayTrap = document.getElementById('heightUnitDisplayTrap');
-
-  // Height mode
-  const areaForHeightSlider = document.getElementById('areaForHeightSlider');
-  const topBaseForHeightSlider = document.getElementById('topBaseForHeightSlider');
-  const bottomBaseForHeightSlider = document.getElementById('bottomBaseForHeightSlider');
-  const areaForHeightInput = document.getElementById('areaForHeightInput');
-  const topBaseForHeightInput = document.getElementById('topBaseForHeightInput');
-  const bottomBaseForHeightInput = document.getElementById('bottomBaseForHeightInput');
-  const areaForHeightDisplay = document.getElementById('areaForHeightDisplay');
-  const areaForHeightUnit = document.getElementById('areaForHeightUnit');
-  const topBaseForHeightDisplay = document.getElementById('topBaseForHeightDisplay');
-  const topBaseForHeightUnit = document.getElementById('topBaseForHeightUnit');
-  const bottomBaseForHeightDisplay = document.getElementById('bottomBaseForHeightDisplay');
-  const bottomBaseForHeightUnit = document.getElementById('bottomBaseForHeightUnit');
-  const areaHeightMaxLabel = document.getElementById('areaHeightMaxLabel');
-
-  // Base mode
-  const areaForBaseSlider = document.getElementById('areaForBaseSlider');
-  const heightForBaseSlider = document.getElementById('heightForBaseSlider');
-  const knownBaseForBaseSlider = document.getElementById('knownBaseForBaseSlider');
-  const areaForBaseInput = document.getElementById('areaForBaseInput');
-  const heightForBaseInput = document.getElementById('heightForBaseInput');
-  const knownBaseForBaseInput = document.getElementById('knownBaseForBaseInput');
-  const areaForBaseDisplay = document.getElementById('areaForBaseDisplay');
-  const areaForBaseUnit = document.getElementById('areaForBaseUnit');
-  const heightForBaseDisplay = document.getElementById('heightForBaseDisplay');
-  const heightForBaseUnit = document.getElementById('heightForBaseUnit');
-  const knownBaseForBaseDisplay = document.getElementById('knownBaseForBaseDisplay');
-  const knownBaseForBaseUnit = document.getElementById('knownBaseForBaseUnit');
-  const areaBaseMaxLabel = document.getElementById('areaBaseMaxLabel');
-
-  // SVG
-  const trapVisual = document.getElementById('trapVisual');
-  const heightLineTrap = document.getElementById('heightLineTrap');
-  const topBaseLabelValue = document.getElementById('topBaseLabelValue');
-  const bottomBaseLabelValue = document.getElementById('bottomBaseLabelValue');
-  const heightLabelTrapValue = document.getElementById('heightLabelTrapValue');
-  const areaLabelTrapValue = document.getElementById('areaLabelTrapValue');
-  const trapResultValue = document.getElementById('trapResultValue');
-  const trapResultLabel = document.getElementById('trapResultLabel');
-  const trapResultSecondaryLabel = document.getElementById('trapResultSecondaryLabel');
-  const trapResultFormula = document.getElementById('trapResultFormula');
-  const trapFormulaDisplay = document.getElementById('trapFormulaDisplay');
-  const trapFormulaDesc = document.getElementById('trapFormulaDesc');
-  const trapFormulaLabel1 = document.getElementById('trapFormulaLabel1');
-  const trapFormulaLabel2 = document.getElementById('trapFormulaLabel2');
-  const trapFormulaLabel3 = document.getElementById('trapFormulaLabel3');
-  const trapFormulaVal1 = document.getElementById('trapFormulaVal1');
-  const trapFormulaVal2 = document.getElementById('trapFormulaVal2');
-  const trapFormulaVal3 = document.getElementById('trapFormulaVal3');
-  const trapFormulaResultLabel = document.getElementById('trapFormulaResultLabel');
-  const trapFormulaResult = document.getElementById('trapFormulaResult');
-  const trapStep1 = document.getElementById('trapStep1');
-  const trapStep2 = document.getElementById('trapStep2');
-  const trapStep3 = document.getElementById('trapStep3');
-  const trapStep4 = document.getElementById('trapStep4');
-
-  const trapAreaModeInputs = document.getElementById('trapAreaModeInputs');
-  const trapHeightModeInputs = document.getElementById('trapHeightModeInputs');
-  const trapBaseModeInputs = document.getElementById('trapBaseModeInputs');
-
-  const unitConversions = {
-    cm: { label: 'cm', factor: 1, display: 'cm' },
-    m: { label: 'm', factor: 100, display: 'm' },
-    in: { label: 'in', factor: 2.54, display: 'in' },
-    ft: { label: 'ft', factor: 30.48, display: 'ft' }
-  };
-
-  function showValidationError(message) {
-    if (window.showToast) window.showToast(message, 'error');
-    else window.alert(message);
-  }
-
-  // ============================================
-  // VALIDATION HELPERS
-  // ============================================
-  function validatePositive(value, name) {
-    if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: `Please enter a ${name}` };
-    }
-    const num = Number(value);
-    if (!Number.isFinite(num)) {
-      return { valid: false, message: 'Please enter a valid number' };
-    }
-    if (num <= 0) {
-      return { valid: false, message: `${name} must be greater than 0` };
-    }
-    if (num > 1e10) {
-      return { valid: false, message: `${name} is too large` };
-    }
-    return { valid: true, value: num };
-  }
-
-  function getUnit() { return unitConversions[currentUnit]; }
-
-  // Convert a displayed linear value to centimeters.
-  function linearToCm(value) {
-    return value * unitConversions[currentUnit].factor;
-  }
-
-  // Convert a displayed area value to square centimeters.
-  function areaToCm2(value) {
-    const factor = unitConversions[currentUnit].factor;
-    return value * factor * factor;
-  }
-
-  // Keep the slider synchronized without rounding or clamping manual input.
-  function setSliderValue(slider, value, defaultMax = 20) {
-    const num = Number(value);
-    if (!Number.isFinite(num)) return;
-    slider.max = String(Math.max(defaultMax, num));
-    slider.value = String(num);
-  }
-
-  function convertDisplayedValues(oldUnit, newUnit) {
-    if (oldUnit === newUnit) return;
-    const oldFactor = unitConversions[oldUnit].factor;
-    const newFactor = unitConversions[newUnit].factor;
-    const linearRatio = oldFactor / newFactor;
-    const areaRatio = linearRatio * linearRatio;
-    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
-      const value = Number(input.value);
-      if (!Number.isFinite(value)) return;
-      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
-      input.value = String(value * ratio);
-      ['min','max'].forEach(attr => {
-        const n = Number(input.getAttribute(attr));
-        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
-      });
-    });
-  }
-
-  function formatArea(area) {
-    let displayArea = area;
-    let areaUnit = 'cm²';
-    if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
-    else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
-    else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
-    return { value: displayArea, unit: areaUnit };
-  }
-
-  // ============================================
-  // RESET FUNCTION
-  // ============================================
-  function resetTrapezoid() {
-    topBaseSlider.value = 8;
-    bottomBaseSlider.value = 12;
-    heightSliderTrap.value = 6;
-    topBaseInput.value = 8;
-    bottomBaseInput.value = 12;
-    heightInputTrap.value = 6;
-    areaForHeightSlider.value = 60;
-    areaForHeightInput.value = 60;
-    topBaseForHeightSlider.value = 8;
-    topBaseForHeightInput.value = 8;
-    bottomBaseForHeightSlider.value = 12;
-    bottomBaseForHeightInput.value = 12;
-    areaForBaseSlider.value = 60;
-    areaForBaseInput.value = 60;
-    heightForBaseSlider.value = 6;
-    heightForBaseInput.value = 6;
-    knownBaseForBaseSlider.value = 8;
-    knownBaseForBaseInput.value = 8;
-    updateTrapezoid();
-    if (window.showToast) {
-      window.showToast('🔄 Trapezoid calculator reset to default values', 'info');
-    }
-  }
-
-  // ============================================
-  // UPDATE SVG
-  // ============================================
-  function updateSVG(top, bottom, height, area) {
-    const maxSize = Math.max(top, bottom, height, 20);
-    const scaleTop = Math.min(top / maxSize, 1);
-    const scaleBottom = Math.min(bottom / maxSize, 1);
-    const scaleHeight = Math.min(height / maxSize, 1);
-    const centerX = 250;
-    const topY = 100 + (1 - scaleHeight) * 150;
-    const bottomY = 100 + (1 + scaleHeight) * 150;
-    const topWidth = 100 + scaleTop * 150;
-    const bottomWidth = 100 + scaleBottom * 150;
-    const topLeftX = centerX - topWidth / 2;
-    const topRightX = centerX + topWidth / 2;
-    const bottomLeftX = centerX - bottomWidth / 2;
-    const bottomRightX = centerX + bottomWidth / 2;
-
-    trapVisual.setAttribute('points', 
-      `${topLeftX},${topY} ${topRightX},${topY} ${bottomRightX},${bottomY} ${bottomLeftX},${bottomY}`
-    );
-    heightLineTrap.setAttribute('x1', bottomLeftX);
-    heightLineTrap.setAttribute('y1', topY);
-    heightLineTrap.setAttribute('x2', bottomLeftX);
-    heightLineTrap.setAttribute('y2', bottomY);
-
-    const formatted = formatArea(area);
-    topBaseLabelValue.textContent = top.toFixed(2);
-    bottomBaseLabelValue.textContent = bottom.toFixed(2);
-    heightLabelTrapValue.textContent = height.toFixed(2);
-    areaLabelTrapValue.textContent = formatted.value.toFixed(2);
-  }
-
-  // ============================================
-  // UPDATE RESULT
-  // ============================================
-  function updateResult(value, label, secondary, formula) {
-    trapResultValue.textContent = value;
-    trapResultLabel.textContent = label;
-    trapResultSecondaryLabel.textContent = secondary;
-    trapResultFormula.textContent = formula;
-  }
-
-  function updateFormula(val1, val2, val3, result, label1, label2, label3, resultLabel, display, desc) {
-    trapFormulaVal1.textContent = val1;
-    trapFormulaVal2.textContent = val2;
-    trapFormulaVal3.textContent = val3;
-    trapFormulaResult.textContent = result;
-    trapFormulaLabel1.textContent = label1;
-    trapFormulaLabel2.textContent = label2;
-    trapFormulaLabel3.textContent = label3;
-    trapFormulaResultLabel.textContent = resultLabel;
-    if (display) trapFormulaDisplay.textContent = display;
-    if (desc) trapFormulaDesc.textContent = desc;
-  }
-
-  function updateSteps(s1, s2, s3, s4) {
-    trapStep1.textContent = s1;
-    trapStep2.textContent = s2;
-    trapStep3.textContent = s3;
-    trapStep4.textContent = s4;
-  }
-
-  // ============================================
-  // MODE TOGGLE
-  // ============================================
-  function setMode(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.trap-mode-btn').forEach(b => {
-      b.className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    const btnMap = { area: 'modeAreaTrap', height: 'modeHeightTrap', base: 'modeBaseTrap' };
-    document.getElementById(btnMap[mode]).className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-
-    trapAreaModeInputs.classList.toggle('hidden', mode !== 'area');
-    trapHeightModeInputs.classList.toggle('hidden', mode !== 'height');
-    trapBaseModeInputs.classList.toggle('hidden', mode !== 'base');
-
-    if (mode === 'area') {
-      topBaseInput.value = topBaseSlider.value;
-      bottomBaseInput.value = bottomBaseSlider.value;
-      heightInputTrap.value = heightSliderTrap.value;
-    } else if (mode === 'height') {
-      areaForHeightInput.value = areaForHeightSlider.value;
-      topBaseForHeightInput.value = topBaseForHeightSlider.value;
-      bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
-    } else if (mode === 'base') {
-      areaForBaseInput.value = areaForBaseSlider.value;
-      heightForBaseInput.value = heightForBaseSlider.value;
-      knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
-    }
-    updateTrapezoid();
-  }
-
-  document.getElementById('modeAreaTrap').addEventListener('click', () => setMode('area'));
-  document.getElementById('modeHeightTrap').addEventListener('click', () => setMode('height'));
-  document.getElementById('modeBaseTrap').addEventListener('click', () => setMode('base'));
-
-  // ============================================
-  // KNOWN BASE TOGGLE
-  // ============================================
-  document.getElementById('knownBaseTop').addEventListener('click', () => {
-    document.querySelectorAll('.known-base-btn').forEach(b => {
-      b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    document.getElementById('knownBaseTop').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-    knownBase = 'top';
-    document.getElementById('knownBaseForBaseDisplay').textContent = 'Top (a)';
-    updateTrapezoid();
-  });
-
-  document.getElementById('knownBaseBottom').addEventListener('click', () => {
-    document.querySelectorAll('.known-base-btn').forEach(b => {
-      b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-    });
-    document.getElementById('knownBaseBottom').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-    knownBase = 'bottom';
-    document.getElementById('knownBaseForBaseDisplay').textContent = 'Bottom (b)';
-    updateTrapezoid();
-  });
-
-  // ============================================
-  // UNIT TOGGLE
-  // ============================================
-  document.querySelectorAll('.trap-unit-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.trap-unit-btn').forEach(b => {
-        b.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
-      });
-      btn.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      const oldUnit = currentUnit;
-      const newUnit = btn.dataset.unit;
-      convertDisplayedValues(oldUnit, newUnit);
-      currentUnit = newUnit;
-      const maxArea = 0.5 * (20 + 20) * 20;
-      const formatted = formatArea(maxArea);
-      areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
-      areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
-      updateTrapezoid();
-    });
-  });
-
-  // ============================================
-  // UPDATE TRAPEZOID
-  // ============================================
-  function updateTrapezoid() {
-    const unit = getUnit();
-    const displayUnit = unit.display;
-    let top, bottom, height, area;
-    let resultValue, resultLabel, resultSecondary, resultFormula;
-    let formulaDisplay, formulaDesc, label1, label2, label3, resultLabelText;
-    let val1, val2, val3, result;
-    let step1, step2, step3, step4;
-
-    if (currentMode === 'area') {
-      top = parseFloat(topBaseSlider.value);
-      bottom = parseFloat(bottomBaseSlider.value);
-      height = parseFloat(heightSliderTrap.value);
-      area = 0.5 * (linearToCm(top) + linearToCm(bottom)) * linearToCm(height);
-
-      const formatted = formatArea(area);
-      resultValue = formatted.value.toFixed(2);
-      resultLabel = 'Area of Trapezoid';
-      resultSecondary = 'A = ½ × (a + b) × h';
-      resultFormula = 'A = ½ × (a + b) × h';
-      formulaDisplay = 'A = ½ × (a + b) × h';
-      formulaDesc = 'Area = ½ × (Top Base + Bottom Base) × Height';
-      label1 = 'Top Base (a)';
-      label2 = 'Bottom Base (b)';
-      label3 = 'Height (h)';
-      resultLabelText = 'Area';
-      val1 = `${top} ${displayUnit}`;
-      val2 = `${bottom} ${displayUnit}`;
-      val3 = `${height} ${displayUnit}`;
-      result = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      step1 = 'Formula: A = ½ × (a + b) × h';
-      step2 = `Add bases: a + b = ${top} + ${bottom} = ${(top + bottom).toFixed(2)}`;
-      step3 = `Multiply: A = ½ × ${(top + bottom).toFixed(2)} × ${height} = ${area.toFixed(2)}`;
-      step4 = `Answer: A = ${formatted.value.toFixed(2)} ${formatted.unit}`;
-
-      topBaseDisplay.textContent = top;
-      bottomBaseDisplay.textContent = bottom;
-      heightDisplayTrap.textContent = height;
-      topBaseUnitDisplay.textContent = displayUnit;
-      bottomBaseUnitDisplay.textContent = displayUnit;
-      heightUnitDisplayTrap.textContent = displayUnit;
-
-    } else if (currentMode === 'height') {
-      const areaVal = parseFloat(areaForHeightSlider.value);
-      top = parseFloat(topBaseForHeightSlider.value);
-      bottom = parseFloat(bottomBaseForHeightSlider.value);
-      const areaCm2 = areaToCm2(areaVal);
-      height = (2 * areaCm2) / (linearToCm(top) + linearToCm(bottom)) / unitConversions[currentUnit].factor;
-      area = areaCm2;
-
-      const formatted = formatArea(area);
-      resultValue = height.toFixed(2);
-      resultLabel = 'Height (h)';
-      resultSecondary = 'h = 2A / (a + b)';
-      resultFormula = 'h = 2A / (a + b)';
-      formulaDisplay = 'h = 2A / (a + b)';
-      formulaDesc = 'Height = 2 × Area ÷ (Top Base + Bottom Base)';
-      label1 = 'Area';
-      label2 = 'Top Base (a)';
-      label3 = 'Bottom Base (b)';
-      resultLabelText = 'Height (h)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      val2 = `${top} ${displayUnit}`;
-      val3 = `${bottom} ${displayUnit}`;
-      result = `${height.toFixed(2)} ${displayUnit}`;
-      step1 = 'Formula: h = 2A / (a + b)';
-      step2 = `Plug in: h = 2 × ${formatted.value.toFixed(2)} ÷ (${top} + ${bottom})`;
-      step3 = `Calculate: h = ${height.toFixed(2)}`;
-      step4 = `Answer: h = ${height.toFixed(2)} ${displayUnit}`;
-
-      areaForHeightDisplay.textContent = formatted.value.toFixed(2);
-      areaForHeightUnit.textContent = formatted.unit;
-      topBaseForHeightDisplay.textContent = top;
-      topBaseForHeightUnit.textContent = displayUnit;
-      bottomBaseForHeightDisplay.textContent = bottom;
-      bottomBaseForHeightUnit.textContent = displayUnit;
-
-    } else if (currentMode === 'base') {
-      const areaVal = parseFloat(areaForBaseSlider.value);
-      height = parseFloat(heightForBaseSlider.value);
-      const known = parseFloat(knownBaseForBaseSlider.value);
-      const areaCm2 = areaToCm2(areaVal);
-      
-      if (knownBase === 'top') {
-        top = known;
-        bottom = ((2 * areaCm2) / linearToCm(height) - linearToCm(top)) / unitConversions[currentUnit].factor;
-      } else {
-        bottom = known;
-        top = ((2 * areaCm2) / linearToCm(height) - linearToCm(bottom)) / unitConversions[currentUnit].factor;
-      }
-      area = areaCm2;
-
-      const formatted = formatArea(area);
-      resultValue = knownBase === 'top' ? bottom.toFixed(2) : top.toFixed(2);
-      resultLabel = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
-      resultSecondary = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
-      resultFormula = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
-      formulaDisplay = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
-      formulaDesc = `Find ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'}`;
-      label1 = 'Area';
-      label2 = 'Height (h)';
-      label3 = knownBase === 'top' ? 'Top Base (a)' : 'Bottom Base (b)';
-      resultLabelText = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
-      val1 = `${formatted.value.toFixed(2)} ${formatted.unit}`;
-      val2 = `${height} ${displayUnit}`;
-      val3 = `${known} ${displayUnit}`;
-      result = `${(knownBase === 'top' ? bottom : top).toFixed(2)} ${displayUnit}`;
-      step1 = `Formula: ${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
-      step2 = `Plug in: ${knownBase === 'top' ? 'b' : 'a'} = 2 × ${formatted.value.toFixed(2)} / ${height} - ${known}`;
-      step3 = `Calculate: ${knownBase === 'top' ? 'b' : 'a'} = ${(knownBase === 'top' ? bottom : top).toFixed(2)}`;
-      step4 = `Answer: ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'} = ${(knownBase === 'top' ? bottom : top).toFixed(2)} ${displayUnit}`;
-
-      areaForBaseDisplay.textContent = formatted.value.toFixed(2);
-      areaForBaseUnit.textContent = formatted.unit;
-      heightForBaseDisplay.textContent = height;
-      heightForBaseUnit.textContent = displayUnit;
-      knownBaseForBaseDisplay.textContent = known;
-      knownBaseForBaseUnit.textContent = displayUnit;
-    }
-
-    // Update SVG
-    updateSVG(top, bottom, height, area);
-
-    // Update result
-    updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
-
-    // Update formula
-    updateFormula(
-      val1,
-      val2,
-      val3,
-      result,
-      label1,
-      label2,
-      label3,
-      resultLabelText,
-      formulaDisplay,
-      formulaDesc
-    );
-
-    // Update steps
-    updateSteps(step1, step2, step3, step4);
-
-    // Update inputs
-    if (currentMode === 'area') {
-      topBaseInput.value = top;
-      bottomBaseInput.value = bottom;
-      heightInputTrap.value = height;
-    } else if (currentMode === 'height') {
-      areaForHeightInput.value = areaForHeightSlider.value;
-      topBaseForHeightInput.value = topBaseForHeightSlider.value;
-      bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
-    } else if (currentMode === 'base') {
-      areaForBaseInput.value = areaForBaseSlider.value;
-      heightForBaseInput.value = heightForBaseSlider.value;
-      knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
-    }
-  }
-
-  // ============================================
-  // AREA MODE EVENTS
-  // ============================================
-  topBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
-  bottomBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
-  heightSliderTrap.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
-
-  topBaseInput.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-  bottomBaseInput.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-  heightInputTrap.addEventListener('input', () => {
-    // Manual input is intentionally not synchronized to the slider while typing.
-    // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
-  });
-
-  document.getElementById('trapCalculateBtn').addEventListener('click', () => {
-    if (currentMode === 'area') {
-      const aVal = validatePositive(topBaseInput.value, 'Top Base');
-      const bVal = validatePositive(bottomBaseInput.value, 'Bottom Base');
-      const hVal = validatePositive(heightInputTrap.value, 'Height');
-      if (!aVal.valid) { showValidationError(aVal.message); topBaseInput.focus(); return; }
-      if (!bVal.valid) { showValidationError(bVal.message); bottomBaseInput.focus(); return; }
-      if (!hVal.valid) { showValidationError(hVal.message); heightInputTrap.focus(); return; }
-      setSliderValue(topBaseSlider, aVal.value);
-      setSliderValue(bottomBaseSlider, bVal.value);
-      setSliderValue(heightSliderTrap, hVal.value);
-      updateTrapezoid();
-      if (window.showToast) {
-        window.showToast('✅ Calculation updated!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // HEIGHT MODE EVENTS
-  // ============================================
-  areaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
-  topBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
-  bottomBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
-
-  areaForHeightInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  topBaseForHeightInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  bottomBaseForHeightInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-
-  document.getElementById('findHeightBtn').addEventListener('click', () => {
-    if (currentMode === 'height') {
-      const aVal = validatePositive(areaForHeightInput.value, 'Area');
-      const bVal = validatePositive(topBaseForHeightInput.value, 'Top Base');
-      const cVal = validatePositive(bottomBaseForHeightInput.value, 'Bottom Base');
-      if (!aVal.valid) { showValidationError(aVal.message); areaForHeightInput.focus(); return; }
-      if (!bVal.valid) { showValidationError(bVal.message); topBaseForHeightInput.focus(); return; }
-      if (!cVal.valid) { showValidationError(cVal.message); bottomBaseForHeightInput.focus(); return; }
-      setSliderValue(areaForHeightSlider, aVal.value, 400);
-      setSliderValue(topBaseForHeightSlider, bVal.value);
-      setSliderValue(bottomBaseForHeightSlider, cVal.value);
-      updateTrapezoid();
-      if (window.showToast) {
-        window.showToast('✅ Height found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // BASE MODE EVENTS
-  // ============================================
-  areaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
-  heightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
-  knownBaseForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
-
-  areaForBaseInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  heightForBaseInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-  knownBaseForBaseInput.addEventListener('input', () => {
-    // Wait for the action button so manual decimals are not overwritten.
-  });
-
-  document.getElementById('findBaseBtn').addEventListener('click', () => {
-    if (currentMode === 'base') {
-      const aVal = validatePositive(areaForBaseInput.value, 'Area');
-      const bVal = validatePositive(heightForBaseInput.value, 'Height');
-      const cVal = validatePositive(knownBaseForBaseInput.value, 'Known Base');
-      if (!aVal.valid) { showValidationError(aVal.message); areaForBaseInput.focus(); return; }
-      if (!bVal.valid) { showValidationError(bVal.message); heightForBaseInput.focus(); return; }
-      if (!cVal.valid) { showValidationError(cVal.message); knownBaseForBaseInput.focus(); return; }
-      setSliderValue(areaForBaseSlider, aVal.value, 400);
-      setSliderValue(heightForBaseSlider, bVal.value);
-      setSliderValue(knownBaseForBaseSlider, cVal.value);
-      updateTrapezoid();
-      if (window.showToast) {
-        window.showToast('✅ Base found!', 'success');
-      }
-    }
-  });
-
-  // ============================================
-  // RESET BUTTON
-  // ============================================
-  const resetBtn = document.createElement('button');
-  resetBtn.id = 'resetTrapBtn';
-  resetBtn.className = 'btn-secondary w-full mt-3 text-center';
-  resetBtn.textContent = '🔄 Reset Calculator';
-  resetBtn.addEventListener('click', resetTrapezoid);
+  import { validatePositiveNumber } from '../../lib/calculator/validation';
+  import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
   
-  const resultBox = document.getElementById('trapResultBox');
-  if (resultBox) {
-    resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
-  }
+  document.addEventListener('DOMContentLoaded', () => {
+    // ============================================
+    // STATE
+    // ============================================
+    let currentUnit = 'cm';
+    let currentMode = 'area'; // 'area', 'height', 'base'
+    let knownBase = 'top'; // 'top' or 'bottom'
 
-  // ============================================
-  // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
-  // ============================================
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
-      e.preventDefault();
-      resetTrapezoid();
+    // ============================================
+    // DOM REFERENCES
+    // ============================================
+    // Area mode
+    const topBaseSlider = document.getElementById('topBaseSlider');
+    const bottomBaseSlider = document.getElementById('bottomBaseSlider');
+    const heightSliderTrap = document.getElementById('heightSliderTrap');
+    const topBaseInput = document.getElementById('topBaseInput');
+    const bottomBaseInput = document.getElementById('bottomBaseInput');
+    const heightInputTrap = document.getElementById('heightInputTrap');
+    const topBaseDisplay = document.getElementById('topBaseDisplay');
+    const bottomBaseDisplay = document.getElementById('bottomBaseDisplay');
+    const heightDisplayTrap = document.getElementById('heightDisplayTrap');
+    const topBaseUnitDisplay = document.getElementById('topBaseUnitDisplay');
+    const bottomBaseUnitDisplay = document.getElementById('bottomBaseUnitDisplay');
+    const heightUnitDisplayTrap = document.getElementById('heightUnitDisplayTrap');
+
+    // Height mode
+    const areaForHeightSlider = document.getElementById('areaForHeightSlider');
+    const topBaseForHeightSlider = document.getElementById('topBaseForHeightSlider');
+    const bottomBaseForHeightSlider = document.getElementById('bottomBaseForHeightSlider');
+    const areaForHeightInput = document.getElementById('areaForHeightInput');
+    const topBaseForHeightInput = document.getElementById('topBaseForHeightInput');
+    const bottomBaseForHeightInput = document.getElementById('bottomBaseForHeightInput');
+    const areaForHeightDisplay = document.getElementById('areaForHeightDisplay');
+    const areaForHeightUnit = document.getElementById('areaForHeightUnit');
+    const topBaseForHeightDisplay = document.getElementById('topBaseForHeightDisplay');
+    const topBaseForHeightUnit = document.getElementById('topBaseForHeightUnit');
+    const bottomBaseForHeightDisplay = document.getElementById('bottomBaseForHeightDisplay');
+    const bottomBaseForHeightUnit = document.getElementById('bottomBaseForHeightUnit');
+    const areaHeightMaxLabel = document.getElementById('areaHeightMaxLabel');
+
+    // Base mode
+    const areaForBaseSlider = document.getElementById('areaForBaseSlider');
+    const heightForBaseSlider = document.getElementById('heightForBaseSlider');
+    const knownBaseForBaseSlider = document.getElementById('knownBaseForBaseSlider');
+    const areaForBaseInput = document.getElementById('areaForBaseInput');
+    const heightForBaseInput = document.getElementById('heightForBaseInput');
+    const knownBaseForBaseInput = document.getElementById('knownBaseForBaseInput');
+    const areaForBaseDisplay = document.getElementById('areaForBaseDisplay');
+    const areaForBaseUnit = document.getElementById('areaForBaseUnit');
+    const heightForBaseDisplay = document.getElementById('heightForBaseDisplay');
+    const heightForBaseUnit = document.getElementById('heightForBaseUnit');
+    const knownBaseForBaseDisplay = document.getElementById('knownBaseForBaseDisplay');
+    const knownBaseForBaseUnit = document.getElementById('knownBaseForBaseUnit');
+    const areaBaseMaxLabel = document.getElementById('areaBaseMaxLabel');
+
+    // SVG
+    const trapVisual = document.getElementById('trapVisual');
+    const heightLineTrap = document.getElementById('heightLineTrap');
+    const topBaseLabelValue = document.getElementById('topBaseLabelValue');
+    const bottomBaseLabelValue = document.getElementById('bottomBaseLabelValue');
+    const heightLabelTrapValue = document.getElementById('heightLabelTrapValue');
+    const areaLabelTrapValue = document.getElementById('areaLabelTrapValue');
+    const trapResultValue = document.getElementById('trapResultValue');
+    const trapResultLabel = document.getElementById('trapResultLabel');
+    const trapResultSecondaryLabel = document.getElementById('trapResultSecondaryLabel');
+    const trapResultFormula = document.getElementById('trapResultFormula');
+    const trapFormulaDisplay = document.getElementById('trapFormulaDisplay');
+    const trapFormulaDesc = document.getElementById('trapFormulaDesc');
+    const trapFormulaLabel1 = document.getElementById('trapFormulaLabel1');
+    const trapFormulaLabel2 = document.getElementById('trapFormulaLabel2');
+    const trapFormulaLabel3 = document.getElementById('trapFormulaLabel3');
+    const trapFormulaVal1 = document.getElementById('trapFormulaVal1');
+    const trapFormulaVal2 = document.getElementById('trapFormulaVal2');
+    const trapFormulaVal3 = document.getElementById('trapFormulaVal3');
+    const trapFormulaResultLabel = document.getElementById('trapFormulaResultLabel');
+    const trapFormulaResult = document.getElementById('trapFormulaResult');
+    const trapStep1 = document.getElementById('trapStep1');
+    const trapStep2 = document.getElementById('trapStep2');
+    const trapStep3 = document.getElementById('trapStep3');
+    const trapStep4 = document.getElementById('trapStep4');
+
+    const trapAreaModeInputs = document.getElementById('trapAreaModeInputs');
+    const trapHeightModeInputs = document.getElementById('trapHeightModeInputs');
+    const trapBaseModeInputs = document.getElementById('trapBaseModeInputs');
+
+    const unitConversions = {
+      cm: { label: 'cm', factor: 1, display: 'cm' },
+      m: { label: 'm', factor: 100, display: 'm' },
+      in: { label: 'in', factor: 2.54, display: 'in' },
+      ft: { label: 'ft', factor: 30.48, display: 'ft' }
+    };
+
+    function showValidationError(message) {
+      if (window.showToast) window.showToast(message, 'error');
+      else window.alert(message);
     }
-  });
 
-  // ============================================
-  // INITIALIZE
-  // ============================================
-  const maxArea = 0.5 * (20 + 20) * 20;
-  const formatted = formatArea(maxArea);
-  areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
-  areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
-  updateTrapezoid();
-});
-  </script>
+    // ============================================
+    // VALIDATION HELPERS - Using imported validation
+    // ============================================
+    function validatePositive(value, name) {
+      const result = validatePositiveNumber(value, name, 1e10);
+      if (!result.valid) {
+        return { valid: false, message: result.message };
+      }
+      return { valid: true, value: result.value };
+    }
+
+    function getUnit() { return unitConversions[currentUnit]; }
+
+    // Convert a displayed linear value to centimeters.
+    function linearToCm(value) {
+      return value * unitConversions[currentUnit].factor;
+    }
+
+    // Convert a displayed area value to square centimeters.
+    function areaToCm2(value) {
+      const factor = unitConversions[currentUnit].factor;
+      return value * factor * factor;
+    }
+
+    // Keep the slider synchronized without rounding or clamping manual input.
+    function setSliderValue(slider, value, defaultMax = 20) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return;
+      slider.max = String(Math.max(defaultMax, num));
+      slider.value = String(num);
+    }
+
+    function convertDisplayedValues(oldUnit, newUnit) {
+      if (oldUnit === newUnit) return;
+      const oldFactor = unitConversions[oldUnit].factor;
+      const newFactor = unitConversions[newUnit].factor;
+      const linearRatio = oldFactor / newFactor;
+      const areaRatio = linearRatio * linearRatio;
+      document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+        const value = Number(input.value);
+        if (!Number.isFinite(value)) return;
+        const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+        input.value = String(value * ratio);
+        ['min','max'].forEach(attr => {
+          const n = Number(input.getAttribute(attr));
+          if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+        });
+      });
+    }
+
+    function formatArea(area) {
+      let displayArea = area;
+      let areaUnit = 'cm²';
+      if (currentUnit === 'm') { displayArea = area / 10000; areaUnit = 'm²'; }
+      else if (currentUnit === 'in') { displayArea = area / 6.4516; areaUnit = 'in²'; }
+      else if (currentUnit === 'ft') { displayArea = area / 929.0304; areaUnit = 'ft²'; }
+      return { value: displayArea, unit: areaUnit };
+    }
+
+    // ============================================
+    // RESET FUNCTION
+    // ============================================
+    function resetTrapezoid() {
+      topBaseSlider.value = 8;
+      bottomBaseSlider.value = 12;
+      heightSliderTrap.value = 6;
+      topBaseInput.value = 8;
+      bottomBaseInput.value = 12;
+      heightInputTrap.value = 6;
+      areaForHeightSlider.value = 60;
+      areaForHeightInput.value = 60;
+      topBaseForHeightSlider.value = 8;
+      topBaseForHeightInput.value = 8;
+      bottomBaseForHeightSlider.value = 12;
+      bottomBaseForHeightInput.value = 12;
+      areaForBaseSlider.value = 60;
+      areaForBaseInput.value = 60;
+      heightForBaseSlider.value = 6;
+      heightForBaseInput.value = 6;
+      knownBaseForBaseSlider.value = 8;
+      knownBaseForBaseInput.value = 8;
+      updateTrapezoid();
+      if (window.showToast) {
+        window.showToast('🔄 Trapezoid calculator reset to default values', 'info');
+      }
+    }
+
+    // ============================================
+    // UPDATE SVG
+    // ============================================
+    function updateSVG(top, bottom, height, area) {
+      const maxSize = Math.max(top, bottom, height, 20);
+      const scaleTop = Math.min(top / maxSize, 1);
+      const scaleBottom = Math.min(bottom / maxSize, 1);
+      const scaleHeight = Math.min(height / maxSize, 1);
+      const centerX = 250;
+      const topY = 100 + (1 - scaleHeight) * 150;
+      const bottomY = 100 + (1 + scaleHeight) * 150;
+      const topWidth = 100 + scaleTop * 150;
+      const bottomWidth = 100 + scaleBottom * 150;
+      const topLeftX = centerX - topWidth / 2;
+      const topRightX = centerX + topWidth / 2;
+      const bottomLeftX = centerX - bottomWidth / 2;
+      const bottomRightX = centerX + bottomWidth / 2;
+
+      trapVisual.setAttribute('points', 
+        `${topLeftX},${topY} ${topRightX},${topY} ${bottomRightX},${bottomY} ${bottomLeftX},${bottomY}`
+      );
+      heightLineTrap.setAttribute('x1', bottomLeftX);
+      heightLineTrap.setAttribute('y1', topY);
+      heightLineTrap.setAttribute('x2', bottomLeftX);
+      heightLineTrap.setAttribute('y2', bottomY);
+
+      const formatted = formatArea(area);
+      topBaseLabelValue.textContent = formatNumber(top, { maximumFractionDigits: 2 });
+      bottomBaseLabelValue.textContent = formatNumber(bottom, { maximumFractionDigits: 2 });
+      heightLabelTrapValue.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+      areaLabelTrapValue.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+    }
+
+    // ============================================
+    // UPDATE RESULT
+    // ============================================
+    function updateResult(value, label, secondary, formula) {
+      trapResultValue.textContent = value;
+      trapResultLabel.textContent = label;
+      trapResultSecondaryLabel.textContent = secondary;
+      trapResultFormula.textContent = formula;
+    }
+
+    function updateFormula(val1, val2, val3, result, label1, label2, label3, resultLabel, display, desc) {
+      trapFormulaVal1.textContent = val1;
+      trapFormulaVal2.textContent = val2;
+      trapFormulaVal3.textContent = val3;
+      trapFormulaResult.textContent = result;
+      trapFormulaLabel1.textContent = label1;
+      trapFormulaLabel2.textContent = label2;
+      trapFormulaLabel3.textContent = label3;
+      trapFormulaResultLabel.textContent = resultLabel;
+      if (display) trapFormulaDisplay.textContent = display;
+      if (desc) trapFormulaDesc.textContent = desc;
+    }
+
+    function updateSteps(s1, s2, s3, s4) {
+      trapStep1.textContent = s1;
+      trapStep2.textContent = s2;
+      trapStep3.textContent = s3;
+      trapStep4.textContent = s4;
+    }
+
+    // ============================================
+    // MODE TOGGLE
+    // ============================================
+    function setMode(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.trap-mode-btn').forEach(b => {
+        b.className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      const btnMap = { area: 'modeAreaTrap', height: 'modeHeightTrap', base: 'modeBaseTrap' };
+      document.getElementById(btnMap[mode]).className = 'trap-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+
+      trapAreaModeInputs.classList.toggle('hidden', mode !== 'area');
+      trapHeightModeInputs.classList.toggle('hidden', mode !== 'height');
+      trapBaseModeInputs.classList.toggle('hidden', mode !== 'base');
+
+      if (mode === 'area') {
+        topBaseInput.value = topBaseSlider.value;
+        bottomBaseInput.value = bottomBaseSlider.value;
+        heightInputTrap.value = heightSliderTrap.value;
+      } else if (mode === 'height') {
+        areaForHeightInput.value = areaForHeightSlider.value;
+        topBaseForHeightInput.value = topBaseForHeightSlider.value;
+        bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
+      } else if (mode === 'base') {
+        areaForBaseInput.value = areaForBaseSlider.value;
+        heightForBaseInput.value = heightForBaseSlider.value;
+        knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
+      }
+      updateTrapezoid();
+    }
+
+    document.getElementById('modeAreaTrap').addEventListener('click', () => setMode('area'));
+    document.getElementById('modeHeightTrap').addEventListener('click', () => setMode('height'));
+    document.getElementById('modeBaseTrap').addEventListener('click', () => setMode('base'));
+
+    // ============================================
+    // KNOWN BASE TOGGLE
+    // ============================================
+    document.getElementById('knownBaseTop').addEventListener('click', () => {
+      document.querySelectorAll('.known-base-btn').forEach(b => {
+        b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('knownBaseTop').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      knownBase = 'top';
+      document.getElementById('knownBaseForBaseDisplay').textContent = 'Top (a)';
+      updateTrapezoid();
+    });
+
+    document.getElementById('knownBaseBottom').addEventListener('click', () => {
+      document.querySelectorAll('.known-base-btn').forEach(b => {
+        b.className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+      });
+      document.getElementById('knownBaseBottom').className = 'known-base-btn px-4 py-1 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+      knownBase = 'bottom';
+      document.getElementById('knownBaseForBaseDisplay').textContent = 'Bottom (b)';
+      updateTrapezoid();
+    });
+
+    // ============================================
+    // UNIT TOGGLE
+    // ============================================
+    document.querySelectorAll('.trap-unit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.trap-unit-btn').forEach(b => {
+          b.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        btn.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        const oldUnit = currentUnit;
+        const newUnit = btn.dataset.unit;
+        convertDisplayedValues(oldUnit, newUnit);
+        currentUnit = newUnit;
+        const maxArea = 0.5 * (20 + 20) * 20;
+        const formatted = formatArea(maxArea);
+        areaHeightMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+        areaBaseMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+        updateTrapezoid();
+      });
+    });
+
+    // ============================================
+    // UPDATE TRAPEZOID
+    // ============================================
+    function updateTrapezoid() {
+      const unit = getUnit();
+      const displayUnit = unit.display;
+      let top, bottom, height, area;
+      let resultValue, resultLabel, resultSecondary, resultFormula;
+      let formulaDisplay, formulaDesc, label1, label2, label3, resultLabelText;
+      let val1, val2, val3, result;
+      let step1, step2, step3, step4;
+
+      if (currentMode === 'area') {
+        top = parseFloat(topBaseSlider.value);
+        bottom = parseFloat(bottomBaseSlider.value);
+        height = parseFloat(heightSliderTrap.value);
+        area = 0.5 * (linearToCm(top) + linearToCm(bottom)) * linearToCm(height);
+
+        const formatted = formatArea(area);
+        resultValue = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        resultLabel = 'Area of Trapezoid';
+        resultSecondary = 'A = ½ × (a + b) × h';
+        resultFormula = 'A = ½ × (a + b) × h';
+        formulaDisplay = 'A = ½ × (a + b) × h';
+        formulaDesc = 'Area = ½ × (Top Base + Bottom Base) × Height';
+        label1 = 'Top Base (a)';
+        label2 = 'Bottom Base (b)';
+        label3 = 'Height (h)';
+        resultLabelText = 'Area';
+        val1 = `${formatNumber(top, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        val2 = `${formatNumber(bottom, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        val3 = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        step1 = 'Formula: A = ½ × (a + b) × h';
+        step2 = `Add bases: a + b = ${formatNumber(top, { maximumFractionDigits: 2 })} + ${formatNumber(bottom, { maximumFractionDigits: 2 })} = ${formatNumber(top + bottom, { maximumFractionDigits: 2 })}`;
+        step3 = `Multiply: A = ½ × ${formatNumber(top + bottom, { maximumFractionDigits: 2 })} × ${formatNumber(height, { maximumFractionDigits: 2 })} = ${formatNumber(area, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: A = ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+
+        topBaseDisplay.textContent = formatNumber(top, { maximumFractionDigits: 2 });
+        bottomBaseDisplay.textContent = formatNumber(bottom, { maximumFractionDigits: 2 });
+        heightDisplayTrap.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+        topBaseUnitDisplay.textContent = displayUnit;
+        bottomBaseUnitDisplay.textContent = displayUnit;
+        heightUnitDisplayTrap.textContent = displayUnit;
+
+      } else if (currentMode === 'height') {
+        const areaVal = parseFloat(areaForHeightSlider.value);
+        top = parseFloat(topBaseForHeightSlider.value);
+        bottom = parseFloat(bottomBaseForHeightSlider.value);
+        const areaCm2 = areaToCm2(areaVal);
+        height = (2 * areaCm2) / (linearToCm(top) + linearToCm(bottom)) / unitConversions[currentUnit].factor;
+        area = areaCm2;
+
+        const formatted = formatArea(area);
+        resultValue = formatNumber(height, { maximumFractionDigits: 2 });
+        resultLabel = 'Height (h)';
+        resultSecondary = 'h = 2A / (a + b)';
+        resultFormula = 'h = 2A / (a + b)';
+        formulaDisplay = 'h = 2A / (a + b)';
+        formulaDesc = 'Height = 2 × Area ÷ (Top Base + Bottom Base)';
+        label1 = 'Area';
+        label2 = 'Top Base (a)';
+        label3 = 'Bottom Base (b)';
+        resultLabelText = 'Height (h)';
+        val1 = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        val2 = `${formatNumber(top, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        val3 = `${formatNumber(bottom, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        step1 = 'Formula: h = 2A / (a + b)';
+        step2 = `Plug in: h = 2 × ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ÷ (${formatNumber(top, { maximumFractionDigits: 2 })} + ${formatNumber(bottom, { maximumFractionDigits: 2 })})`;
+        step3 = `Calculate: h = ${formatNumber(height, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: h = ${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+
+        areaForHeightDisplay.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        areaForHeightUnit.textContent = formatted.unit;
+        topBaseForHeightDisplay.textContent = formatNumber(top, { maximumFractionDigits: 2 });
+        topBaseForHeightUnit.textContent = displayUnit;
+        bottomBaseForHeightDisplay.textContent = formatNumber(bottom, { maximumFractionDigits: 2 });
+        bottomBaseForHeightUnit.textContent = displayUnit;
+
+      } else if (currentMode === 'base') {
+        const areaVal = parseFloat(areaForBaseSlider.value);
+        height = parseFloat(heightForBaseSlider.value);
+        const known = parseFloat(knownBaseForBaseSlider.value);
+        const areaCm2 = areaToCm2(areaVal);
+        
+        if (knownBase === 'top') {
+          top = known;
+          bottom = ((2 * areaCm2) / linearToCm(height) - linearToCm(top)) / unitConversions[currentUnit].factor;
+        } else {
+          bottom = known;
+          top = ((2 * areaCm2) / linearToCm(height) - linearToCm(bottom)) / unitConversions[currentUnit].factor;
+        }
+        area = areaCm2;
+
+        const formatted = formatArea(area);
+        const resultBase = knownBase === 'top' ? bottom : top;
+        resultValue = formatNumber(resultBase, { maximumFractionDigits: 2 });
+        resultLabel = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
+        resultSecondary = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+        resultFormula = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+        formulaDisplay = `${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+        formulaDesc = `Find ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'}`;
+        label1 = 'Area';
+        label2 = 'Height (h)';
+        label3 = knownBase === 'top' ? 'Top Base (a)' : 'Bottom Base (b)';
+        resultLabelText = knownBase === 'top' ? 'Bottom Base (b)' : 'Top Base (a)';
+        val1 = `${formatNumber(formatted.value, { maximumFractionDigits: 2 })} ${formatted.unit}`;
+        val2 = `${formatNumber(height, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        val3 = `${formatNumber(known, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        result = `${formatNumber(resultBase, { maximumFractionDigits: 2 })} ${displayUnit}`;
+        step1 = `Formula: ${knownBase === 'top' ? 'b' : 'a'} = 2A/h - ${knownBase === 'top' ? 'a' : 'b'}`;
+        step2 = `Plug in: ${knownBase === 'top' ? 'b' : 'a'} = 2 × ${formatNumber(formatted.value, { maximumFractionDigits: 2 })} / ${formatNumber(height, { maximumFractionDigits: 2 })} - ${formatNumber(known, { maximumFractionDigits: 2 })}`;
+        step3 = `Calculate: ${knownBase === 'top' ? 'b' : 'a'} = ${formatNumber(resultBase, { maximumFractionDigits: 2 })}`;
+        step4 = `Answer: ${knownBase === 'top' ? 'Bottom Base' : 'Top Base'} = ${formatNumber(resultBase, { maximumFractionDigits: 2 })} ${displayUnit}`;
+
+        areaForBaseDisplay.textContent = formatNumber(formatted.value, { maximumFractionDigits: 2 });
+        areaForBaseUnit.textContent = formatted.unit;
+        heightForBaseDisplay.textContent = formatNumber(height, { maximumFractionDigits: 2 });
+        heightForBaseUnit.textContent = displayUnit;
+        knownBaseForBaseDisplay.textContent = formatNumber(known, { maximumFractionDigits: 2 });
+        knownBaseForBaseUnit.textContent = displayUnit;
+      }
+
+      // Update SVG
+      updateSVG(top, bottom, height, area);
+
+      // Update result
+      updateResult(resultValue, resultLabel, resultSecondary, resultFormula);
+
+      // Update formula
+      updateFormula(
+        val1,
+        val2,
+        val3,
+        result,
+        label1,
+        label2,
+        label3,
+        resultLabelText,
+        formulaDisplay,
+        formulaDesc
+      );
+
+      // Update steps
+      updateSteps(step1, step2, step3, step4);
+
+      // Update inputs
+      if (currentMode === 'area') {
+        topBaseInput.value = top;
+        bottomBaseInput.value = bottom;
+        heightInputTrap.value = height;
+      } else if (currentMode === 'height') {
+        areaForHeightInput.value = areaForHeightSlider.value;
+        topBaseForHeightInput.value = topBaseForHeightSlider.value;
+        bottomBaseForHeightInput.value = bottomBaseForHeightSlider.value;
+      } else if (currentMode === 'base') {
+        areaForBaseInput.value = areaForBaseSlider.value;
+        heightForBaseInput.value = heightForBaseSlider.value;
+        knownBaseForBaseInput.value = knownBaseForBaseSlider.value;
+      }
+    }
+
+    // ============================================
+    // AREA MODE EVENTS
+    // ============================================
+    topBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+    bottomBaseSlider.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+    heightSliderTrap.addEventListener('input', () => { if (currentMode === 'area') updateTrapezoid(); });
+
+    topBaseInput.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+    bottomBaseInput.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+    heightInputTrap.addEventListener('input', () => {
+      // Manual input is intentionally not synchronized to the slider while typing.
+      // This preserves decimals such as 2.35 and lets the Calculate button commit the value.
+    });
+
+    document.getElementById('trapCalculateBtn').addEventListener('click', () => {
+      if (currentMode === 'area') {
+        const aResult = validatePositive(topBaseInput.value, 'Top Base');
+        if (!aResult.valid) { showValidationError(aResult.message); topBaseInput.focus(); return; }
+        
+        const bResult = validatePositive(bottomBaseInput.value, 'Bottom Base');
+        if (!bResult.valid) { showValidationError(bResult.message); bottomBaseInput.focus(); return; }
+        
+        const hResult = validatePositive(heightInputTrap.value, 'Height');
+        if (!hResult.valid) { showValidationError(hResult.message); heightInputTrap.focus(); return; }
+        
+        setSliderValue(topBaseSlider, aResult.value);
+        setSliderValue(bottomBaseSlider, bResult.value);
+        setSliderValue(heightSliderTrap, hResult.value);
+        updateTrapezoid();
+        if (window.showToast) {
+          window.showToast('✅ Calculation updated!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // HEIGHT MODE EVENTS
+    // ============================================
+    areaForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+    topBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+    bottomBaseForHeightSlider.addEventListener('input', () => { if (currentMode === 'height') updateTrapezoid(); });
+
+    areaForHeightInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    topBaseForHeightInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    bottomBaseForHeightInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+
+    document.getElementById('findHeightBtn').addEventListener('click', () => {
+      if (currentMode === 'height') {
+        const aResult = validatePositive(areaForHeightInput.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaForHeightInput.focus(); return; }
+        
+        const tResult = validatePositive(topBaseForHeightInput.value, 'Top Base');
+        if (!tResult.valid) { showValidationError(tResult.message); topBaseForHeightInput.focus(); return; }
+        
+        const bResult = validatePositive(bottomBaseForHeightInput.value, 'Bottom Base');
+        if (!bResult.valid) { showValidationError(bResult.message); bottomBaseForHeightInput.focus(); return; }
+        
+        setSliderValue(areaForHeightSlider, aResult.value, 400);
+        setSliderValue(topBaseForHeightSlider, tResult.value);
+        setSliderValue(bottomBaseForHeightSlider, bResult.value);
+        updateTrapezoid();
+        if (window.showToast) {
+          window.showToast('✅ Height found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // BASE MODE EVENTS
+    // ============================================
+    areaForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+    heightForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+    knownBaseForBaseSlider.addEventListener('input', () => { if (currentMode === 'base') updateTrapezoid(); });
+
+    areaForBaseInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    heightForBaseInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+    knownBaseForBaseInput.addEventListener('input', () => {
+      // Wait for the action button so manual decimals are not overwritten.
+    });
+
+    document.getElementById('findBaseBtn').addEventListener('click', () => {
+      if (currentMode === 'base') {
+        const aResult = validatePositive(areaForBaseInput.value, 'Area');
+        if (!aResult.valid) { showValidationError(aResult.message); areaForBaseInput.focus(); return; }
+        
+        const hResult = validatePositive(heightForBaseInput.value, 'Height');
+        if (!hResult.valid) { showValidationError(hResult.message); heightForBaseInput.focus(); return; }
+        
+        const kResult = validatePositive(knownBaseForBaseInput.value, 'Known Base');
+        if (!kResult.valid) { showValidationError(kResult.message); knownBaseForBaseInput.focus(); return; }
+        
+        setSliderValue(areaForBaseSlider, aResult.value, 400);
+        setSliderValue(heightForBaseSlider, hResult.value);
+        setSliderValue(knownBaseForBaseSlider, kResult.value);
+        updateTrapezoid();
+        if (window.showToast) {
+          window.showToast('✅ Base found!', 'success');
+        }
+      }
+    });
+
+    // ============================================
+    // RESET BUTTON
+    // ============================================
+    const resetBtn = document.createElement('button');
+    resetBtn.id = 'resetTrapBtn';
+    resetBtn.className = 'btn-secondary w-full mt-3 text-center';
+    resetBtn.textContent = '🔄 Reset Calculator';
+    resetBtn.addEventListener('click', resetTrapezoid);
+    
+    const resultBox = document.getElementById('trapResultBox');
+    if (resultBox) {
+      resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
+    }
+
+    // ============================================
+    // KEYBOARD SHORTCUT: Ctrl+Shift+R to reset
+    // ============================================
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        resetTrapezoid();
+      }
+    });
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+    const maxArea = 0.5 * (20 + 20) * 20;
+    const formatted = formatArea(maxArea);
+    areaHeightMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+    areaBaseMaxLabel.textContent = formatNumber(formatted.value, { maximumFractionDigits: 0 });
+    updateTrapezoid();
+  });
+</script>
 </Layout>

@@ -560,6 +560,8 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   </main>
 
   <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatResult, formatNumber, formatDecimal } from '../../lib/calculator/formatting';
    document.addEventListener('DOMContentLoaded', () => {
   // ============================================
   // STATE
@@ -656,20 +658,27 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   // VALIDATION HELPERS
   // ============================================
   function validatePositive(value, name) {
-    if (value === '' || value === null || value === undefined) {
-      return { valid: false, message: `Please enter a ${name}` };
-    }
-    const num = Number(value);
-    if (!Number.isFinite(num)) {
-      return { valid: false, message: 'Please enter a valid number' };
-    }
-    if (num <= 0) {
-      return { valid: false, message: `${name} cannot be negative` };
-    }
-    if (num > 1e10) {
-      return { valid: false, message: `${name} is too large` };
-    }
-    return { valid: true, value: num };
+    return validatePositiveNumber(value, name, 1e10);
+  }
+
+  // ============================================
+  // FORMATTING HELPERS
+  // ============================================
+  // Axis lengths: small numbers, no thousands separators, trimmed to 4dp.
+  function fmtAxis(value) {
+    return formatDecimal(value, 4);
+  }
+  // Results/areas: allow thousands separators, 2dp for display.
+  function fmtResult2(value) {
+    return formatResult(value, { maximumFractionDigits: 2 });
+  }
+  // Intermediate "Calculate:" step: more precision, no grouping needed.
+  function fmtStep(value) {
+    return formatResult(value, { maximumFractionDigits: 4, useGrouping: false });
+  }
+  // Slider max labels: whole numbers, no grouping.
+  function fmtWhole(value) {
+    return formatNumber(value, { maximumFractionDigits: 0, useGrouping: false });
   }
 
   function getPi() { return piValues[currentPiMode]; }
@@ -725,9 +734,9 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
     semiMinorLine.setAttribute('y1', cy);
     semiMinorLine.setAttribute('y2', cy - ry);
 
-    semiMajorLabelValue.textContent = Number(a).toFixed(2);
-    semiMinorLabelValue.textContent = Number(b).toFixed(2);
-    areaLabelEllipseValue.textContent = Number(areaDisplay).toFixed(2);
+    semiMajorLabelValue.textContent = fmtAxis(a);
+    semiMinorLabelValue.textContent = fmtAxis(b);
+    areaLabelEllipseValue.textContent = fmtResult2(areaDisplay);
   }
 
   // ============================================
@@ -808,7 +817,7 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       areaCm2 = pi.value * aCm * bCm;
       areaDisplay = areaCm2 / areaFactor;
 
-      resultValue = areaDisplay.toFixed(2);
+      resultValue = fmtResult2(areaDisplay);
       resultLabel = 'Area of Ellipse';
       resultSecondary = 'A = π × a × b';
       resultFormula = 'A = π × a × b';
@@ -817,16 +826,16 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       label1 = 'Semi-Major (a)';
       label2 = 'Semi-Minor (b)';
       resultLabelText = 'Area';
-      val1 = `${a} ${displayUnit}`;
-      val2 = `${b} ${displayUnit}`;
-      result = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
+      val1 = `${fmtAxis(a)} ${displayUnit}`;
+      val2 = `${fmtAxis(b)} ${displayUnit}`;
+      result = `${fmtResult2(areaDisplay)} ${displayUnit}²`;
       step1 = `Formula: A = π × a × b`;
-      step2 = `Plug in: A = ${pi.label} × ${a} × ${b}`;
-      step3 = `Calculate: A = ${areaDisplay.toFixed(4)}`;
-      step4 = `Answer: A = ${areaDisplay.toFixed(2)} ${displayUnit}²`;
+      step2 = `Plug in: A = ${pi.label} × ${fmtAxis(a)} × ${fmtAxis(b)}`;
+      step3 = `Calculate: A = ${fmtStep(areaDisplay)}`;
+      step4 = `Answer: A = ${fmtResult2(areaDisplay)} ${displayUnit}²`;
 
-      semiMajorDisplay.textContent = a;
-      semiMinorDisplay.textContent = b;
+      semiMajorDisplay.textContent = fmtAxis(a);
+      semiMinorDisplay.textContent = fmtAxis(b);
       semiMajorUnitDisplay.textContent = displayUnit;
       semiMinorUnitDisplay.textContent = displayUnit;
 
@@ -840,7 +849,7 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       a = aCm / factor;
       areaDisplay = areaVal;
 
-      resultValue = a.toFixed(2);
+      resultValue = fmtAxis(a);
       resultLabel = 'Semi-Major Axis (a)';
       resultSecondary = 'a = A / (π × b)';
       resultFormula = 'a = A / (π × b)';
@@ -849,17 +858,17 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       label1 = 'Area';
       label2 = 'Semi-Minor (b)';
       resultLabelText = 'Semi-Major (a)';
-      val1 = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
-      val2 = `${b} ${displayUnit}`;
-      result = `${a.toFixed(2)} ${displayUnit}`;
+      val1 = `${fmtResult2(areaDisplay)} ${displayUnit}²`;
+      val2 = `${fmtAxis(b)} ${displayUnit}`;
+      result = `${fmtAxis(a)} ${displayUnit}`;
       step1 = `Formula: a = A / (π × b)`;
-      step2 = `Plug in: a = ${areaDisplay.toFixed(2)} / (${pi.label} × ${b})`;
-      step3 = `Calculate: a = ${a.toFixed(4)}`;
-      step4 = `Answer: a = ${a.toFixed(2)} ${displayUnit}`;
+      step2 = `Plug in: a = ${fmtResult2(areaDisplay)} / (${pi.label} × ${fmtAxis(b)})`;
+      step3 = `Calculate: a = ${fmtStep(a)}`;
+      step4 = `Answer: a = ${fmtAxis(a)} ${displayUnit}`;
 
-      areaForMajorDisplay.textContent = areaDisplay.toFixed(2);
+      areaForMajorDisplay.textContent = fmtResult2(areaDisplay);
       areaForMajorUnit.textContent = `${displayUnit}²`;
-      minorForMajorDisplay.textContent = b;
+      minorForMajorDisplay.textContent = fmtAxis(b);
       minorForMajorUnit.textContent = displayUnit;
 
     } else {
@@ -872,7 +881,7 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       b = bCm / factor;
       areaDisplay = areaVal;
 
-      resultValue = b.toFixed(2);
+      resultValue = fmtAxis(b);
       resultLabel = 'Semi-Minor Axis (b)';
       resultSecondary = 'b = A / (π × a)';
       resultFormula = 'b = A / (π × a)';
@@ -881,17 +890,17 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       label1 = 'Area';
       label2 = 'Semi-Major (a)';
       resultLabelText = 'Semi-Minor (b)';
-      val1 = `${areaDisplay.toFixed(2)} ${displayUnit}²`;
-      val2 = `${a} ${displayUnit}`;
-      result = `${b.toFixed(2)} ${displayUnit}`;
+      val1 = `${fmtResult2(areaDisplay)} ${displayUnit}²`;
+      val2 = `${fmtAxis(a)} ${displayUnit}`;
+      result = `${fmtAxis(b)} ${displayUnit}`;
       step1 = `Formula: b = A / (π × a)`;
-      step2 = `Plug in: b = ${areaDisplay.toFixed(2)} / (${pi.label} × ${a})`;
-      step3 = `Calculate: b = ${b.toFixed(4)}`;
-      step4 = `Answer: b = ${b.toFixed(2)} ${displayUnit}`;
+      step2 = `Plug in: b = ${fmtResult2(areaDisplay)} / (${pi.label} × ${fmtAxis(a)})`;
+      step3 = `Calculate: b = ${fmtStep(b)}`;
+      step4 = `Answer: b = ${fmtAxis(b)} ${displayUnit}`;
 
-      areaForMinorDisplay.textContent = areaDisplay.toFixed(2);
+      areaForMinorDisplay.textContent = fmtResult2(areaDisplay);
       areaForMinorUnit.textContent = `${displayUnit}²`;
-      majorForMinorDisplay.textContent = a;
+      majorForMinorDisplay.textContent = fmtAxis(a);
       majorForMinorUnit.textContent = displayUnit;
     }
 
@@ -994,8 +1003,8 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
       const unit = getUnit();
       const maxArea = Math.PI * 15 * 15;
       const formatted = formatArea(maxArea);
-      areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
-      areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
+      areaMajorMaxLabel.textContent = fmtWhole(formatted.value);
+      areaMinorMaxLabel.textContent = fmtWhole(formatted.value);
       updateEllipse();
     });
   });
@@ -1188,8 +1197,8 @@ import RelatedCalculators from '../../components/RelatedCalculators.astro';
   // ============================================
   const maxArea = Math.PI * 15 * 15;
   const formatted = formatArea(maxArea);
-  areaMajorMaxLabel.textContent = formatted.value.toFixed(0);
-  areaMinorMaxLabel.textContent = formatted.value.toFixed(0);
+  areaMajorMaxLabel.textContent = fmtWhole(formatted.value);
+  areaMinorMaxLabel.textContent = fmtWhole(formatted.value);
   updateEllipse();
 });
   </script>
