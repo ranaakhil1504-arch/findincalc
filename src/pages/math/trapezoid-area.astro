@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+
 ---
 
 <Layout title="Trapezoid Calculator - Interactive Math Tool">
@@ -623,7 +625,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
-
+  <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="trapezoid-area" />
     </div>
   </main>
 
@@ -720,6 +725,11 @@ import SEOContent from '../../components/SEOContent.astro';
     ft: { label: 'ft', factor: 30.48, display: 'ft' }
   };
 
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -727,8 +737,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num <= 0) {
@@ -759,6 +769,24 @@ import SEOContent from '../../components/SEOContent.astro';
     if (!Number.isFinite(num)) return;
     slider.max = String(Math.max(defaultMax, num));
     slider.value = String(num);
+  }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+      input.value = String(value * ratio);
+      ['min','max'].forEach(attr => {
+        const n = Number(input.getAttribute(attr));
+        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+      });
+    });
   }
 
   function formatArea(area) {
@@ -928,7 +956,10 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'trap-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       const maxArea = 0.5 * (20 + 20) * 20;
       const formatted = formatArea(maxArea);
       areaHeightMaxLabel.textContent = formatted.value.toFixed(0);
@@ -1124,9 +1155,9 @@ import SEOContent from '../../components/SEOContent.astro';
       const aVal = validatePositive(topBaseInput.value, 'Top Base');
       const bVal = validatePositive(bottomBaseInput.value, 'Bottom Base');
       const hVal = validatePositive(heightInputTrap.value, 'Height');
-      if (!aVal.valid) { alert(aVal.message); topBaseInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); bottomBaseInput.focus(); return; }
-      if (!hVal.valid) { alert(hVal.message); heightInputTrap.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); topBaseInput.focus(); return; }
+      if (!bVal.valid) { showValidationError(bVal.message); bottomBaseInput.focus(); return; }
+      if (!hVal.valid) { showValidationError(hVal.message); heightInputTrap.focus(); return; }
       setSliderValue(topBaseSlider, aVal.value);
       setSliderValue(bottomBaseSlider, bVal.value);
       setSliderValue(heightSliderTrap, hVal.value);
@@ -1159,9 +1190,9 @@ import SEOContent from '../../components/SEOContent.astro';
       const aVal = validatePositive(areaForHeightInput.value, 'Area');
       const bVal = validatePositive(topBaseForHeightInput.value, 'Top Base');
       const cVal = validatePositive(bottomBaseForHeightInput.value, 'Bottom Base');
-      if (!aVal.valid) { alert(aVal.message); areaForHeightInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); topBaseForHeightInput.focus(); return; }
-      if (!cVal.valid) { alert(cVal.message); bottomBaseForHeightInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaForHeightInput.focus(); return; }
+      if (!bVal.valid) { showValidationError(bVal.message); topBaseForHeightInput.focus(); return; }
+      if (!cVal.valid) { showValidationError(cVal.message); bottomBaseForHeightInput.focus(); return; }
       setSliderValue(areaForHeightSlider, aVal.value, 400);
       setSliderValue(topBaseForHeightSlider, bVal.value);
       setSliderValue(bottomBaseForHeightSlider, cVal.value);
@@ -1194,9 +1225,9 @@ import SEOContent from '../../components/SEOContent.astro';
       const aVal = validatePositive(areaForBaseInput.value, 'Area');
       const bVal = validatePositive(heightForBaseInput.value, 'Height');
       const cVal = validatePositive(knownBaseForBaseInput.value, 'Known Base');
-      if (!aVal.valid) { alert(aVal.message); areaForBaseInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); heightForBaseInput.focus(); return; }
-      if (!cVal.valid) { alert(cVal.message); knownBaseForBaseInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaForBaseInput.focus(); return; }
+      if (!bVal.valid) { showValidationError(bVal.message); heightForBaseInput.focus(); return; }
+      if (!cVal.valid) { showValidationError(cVal.message); knownBaseForBaseInput.focus(); return; }
       setSliderValue(areaForBaseSlider, aVal.value, 400);
       setSliderValue(heightForBaseSlider, bVal.value);
       setSliderValue(knownBaseForBaseSlider, cVal.value);

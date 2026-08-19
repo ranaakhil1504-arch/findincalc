@@ -41,6 +41,8 @@ export interface Calculator {
   trending?: boolean;
   /** IDs of related calculators for recommendations */
   relatedCalculators?: string[];
+  /** Whether the calculator is coming soon (not yet implemented) */
+  isComingSoon?: boolean;
 }
 
 export interface CategoryInfo {
@@ -85,6 +87,8 @@ export const CATEGORIES: CategoryInfo[] = [
 
 export const CALCULATORS: Calculator[] = [
   // ============ MATH CATEGORY ============
+
+  // --- Implemented Area Calculators ---
   {
     id: 'circle-area',
     name: 'Circle Area Calculator',
@@ -214,7 +218,95 @@ export const CALCULATORS: Calculator[] = [
     relatedCalculators: ['circle-area']
   },
 
+  // --- Coming Soon: Volume Calculators ---
+  {
+    id: 'sphere-volume',
+    name: 'Sphere Volume Calculator',
+    url: '/math/sphere-volume',
+    category: 'math',
+    icon: '⚽',
+    description: 'Calculate volume of a sphere',
+    formula: 'V = ⁴⁄₃πr³',
+    searchTerms: ['sphere', 'volume', 'radius', 'ball', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['circle-area', 'cylinder-volume'],
+    isComingSoon: true
+  },
+  {
+    id: 'cube-volume',
+    name: 'Cube Volume Calculator',
+    url: '/math/cube-volume',
+    category: 'math',
+    icon: '🧊',
+    description: 'Calculate volume of a cube',
+    formula: 'V = s³',
+    searchTerms: ['cube', 'volume', 'side', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['rectangle-area'],
+    isComingSoon: true
+  },
+  {
+    id: 'cylinder-volume',
+    name: 'Cylinder Volume Calculator',
+    url: '/math/cylinder-volume',
+    category: 'math',
+    icon: '🥫',
+    description: 'Calculate volume of a cylinder',
+    formula: 'V = πr²h',
+    searchTerms: ['cylinder', 'volume', 'radius', 'height', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['circle-area', 'sphere-volume'],
+    isComingSoon: true
+  },
+  {
+    id: 'cone-volume',
+    name: 'Cone Volume Calculator',
+    url: '/math/cone-volume',
+    category: 'math',
+    icon: '🍦',
+    description: 'Calculate volume of a cone',
+    formula: 'V = ⅓πr²h',
+    searchTerms: ['cone', 'volume', 'radius', 'height', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['cylinder-volume', 'pyramid-volume'],
+    isComingSoon: true
+  },
+  {
+    id: 'prism-volume',
+    name: 'Rectangular Prism Volume Calculator',
+    url: '/math/prism-volume',
+    category: 'math',
+    icon: '📦',
+    description: 'Calculate volume of a rectangular prism',
+    formula: 'V = l × w × h',
+    searchTerms: ['prism', 'volume', 'rectangular', 'box', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['cube-volume', 'rectangle-area'],
+    isComingSoon: true
+  },
+  {
+    id: 'pyramid-volume',
+    name: 'Pyramid Volume Calculator',
+    url: '/math/pyramid-volume',
+    category: 'math',
+    icon: '🔺',
+    description: 'Calculate volume of a pyramid',
+    formula: 'V = ⅓Bh',
+    searchTerms: ['pyramid', 'volume', 'base', 'height', 'geometry'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['cone-volume', 'triangle-area'],
+    isComingSoon: true
+  },
+
   // ============ HEALTH CATEGORY ============
+
+  // --- Implemented ---
   {
     id: 'bmi',
     name: 'BMI Calculator',
@@ -238,7 +330,64 @@ export const CALCULATORS: Calculator[] = [
     relatedCalculators: []
   },
 
+  // --- Coming Soon: Health Calculators ---
+  {
+    id: 'bmr',
+    name: 'BMR Calculator',
+    url: '/health/bmr',
+    category: 'health',
+    icon: '🔥',
+    description: 'Calculate your Basal Metabolic Rate',
+    formula: 'BMR = 10 × weight + 6.25 × height - 5 × age + 5',
+    searchTerms: ['bmr', 'basal metabolic rate', 'metabolism', 'calories', 'fitness'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['bmi'],
+    isComingSoon: true
+  },
+  {
+    id: 'body-fat',
+    name: 'Body Fat Calculator',
+    url: '/health/body-fat',
+    category: 'health',
+    icon: '💧',
+    description: 'Estimate your body fat percentage',
+    searchTerms: ['body fat', 'fat percentage', 'fitness', 'health'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['bmi'],
+    isComingSoon: true
+  },
+  {
+    id: 'calorie',
+    name: 'Calorie Calculator',
+    url: '/health/calorie',
+    category: 'health',
+    icon: '🍎',
+    description: 'Calculate your daily calorie needs',
+    searchTerms: ['calorie', 'calories', 'daily calorie', 'food', 'diet'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['bmr'],
+    isComingSoon: true
+  },
+  {
+    id: 'ideal-weight',
+    name: 'Ideal Weight Calculator',
+    url: '/health/ideal-weight',
+    category: 'health',
+    icon: '🎯',
+    description: 'Find your ideal weight range',
+    searchTerms: ['ideal weight', 'healthy weight', 'weight range', 'fitness'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['bmi'],
+    isComingSoon: true
+  },
+
   // ============ FINANCE CATEGORY ============
+
+  // --- Implemented ---
   {
     id: 'loan',
     name: 'Loan Calculator',
@@ -262,6 +411,60 @@ export const CALCULATORS: Calculator[] = [
     featured: true,
     trending: true,
     relatedCalculators: []
+  },
+
+  // --- Coming Soon: Finance Calculators ---
+  {
+    id: 'emi',
+    name: 'EMI Calculator',
+    url: '/finance/emi',
+    category: 'finance',
+    icon: '📈',
+    description: 'Calculate Equated Monthly Installment for loans',
+    searchTerms: ['emi', 'equated monthly installment', 'loan', 'payment'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['loan'],
+    isComingSoon: true
+  },
+  {
+    id: 'mortgage',
+    name: 'Mortgage Calculator',
+    url: '/finance/mortgage',
+    category: 'finance',
+    icon: '🏠',
+    description: 'Calculate home loan payments and amortization',
+    searchTerms: ['mortgage', 'home loan', 'property', 'real estate'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['loan'],
+    isComingSoon: true
+  },
+  {
+    id: 'sip',
+    name: 'SIP Calculator',
+    url: '/finance/sip',
+    category: 'finance',
+    icon: '📊',
+    description: 'Calculate returns on Systematic Investment Plans',
+    searchTerms: ['sip', 'systematic investment plan', 'mutual fund', 'investment'],
+    featured: false,
+    trending: false,
+    relatedCalculators: [],
+    isComingSoon: true
+  },
+  {
+    id: 'credit-card',
+    name: 'Credit Card Calculator',
+    url: '/finance/credit-card',
+    category: 'finance',
+    icon: '💳',
+    description: 'Calculate credit card payments and interest',
+    searchTerms: ['credit card', 'credit card payment', 'interest', 'finance'],
+    featured: false,
+    trending: false,
+    relatedCalculators: ['loan'],
+    isComingSoon: true
   }
 ];
 
@@ -285,23 +488,51 @@ export function getCalculatorByUrl(url: string): Calculator | undefined {
 
 /**
  * Get all calculators in a specific category
+ * By default, returns implemented calculators only (isComingSoon === false)
+ * Set includeComingSoon to true to include coming soon calculators
  */
-export function getCalculatorsByCategory(category: Category): Calculator[] {
-  return CALCULATORS.filter(calc => calc.category === category);
+export function getCalculatorsByCategory(
+  category: Category,
+  includeComingSoon: boolean = false
+): Calculator[] {
+  return CALCULATORS.filter(calc => 
+    calc.category === category && 
+    (includeComingSoon || !calc.isComingSoon)
+  );
+}
+
+/**
+ * Get all coming soon calculators in a specific category
+ */
+export function getComingSoonByCategory(category: Category): Calculator[] {
+  return CALCULATORS.filter(calc => 
+    calc.category === category && 
+    calc.isComingSoon === true
+  );
 }
 
 /**
  * Get the count of calculators in a specific category
+ * By default, counts implemented calculators only
+ * Set includeComingSoon to true to include coming soon calculators
  */
-export function getCategoryCount(category: Category): number {
-  return CALCULATORS.filter(calc => calc.category === category).length;
+export function getCategoryCount(
+  category: Category,
+  includeComingSoon: boolean = false
+): number {
+  return CALCULATORS.filter(calc => 
+    calc.category === category && 
+    (includeComingSoon || !calc.isComingSoon)
+  ).length;
 }
 
 /**
  * Get total number of calculators
+ * By default, counts implemented calculators only
+ * Set includeComingSoon to true to include coming soon calculators
  */
-export function getTotalCalculatorCount(): number {
-  return CALCULATORS.length;
+export function getTotalCalculatorCount(includeComingSoon: boolean = false): number {
+  return CALCULATORS.filter(calc => includeComingSoon || !calc.isComingSoon).length;
 }
 
 /**
@@ -331,6 +562,9 @@ export function searchCalculators(query: string): Calculator[] {
   const searchQuery = query.toLowerCase().trim();
 
   return CALCULATORS.filter(calc => {
+    // Search only implemented calculators, not coming soon
+    if (calc.isComingSoon) return false;
+
     // Search in name
     if (calc.name.toLowerCase().includes(searchQuery)) {
       return true;
@@ -363,7 +597,7 @@ export function getRelatedCalculators(calculatorId: string): Calculator[] {
   const related: Calculator[] = [];
   for (const id of calc.relatedCalculators) {
     const relatedCalc = getCalculatorById(id);
-    if (relatedCalc) {
+    if (relatedCalc && !relatedCalc.isComingSoon) {
       related.push(relatedCalc);
     }
     if (related.length >= 3) break;
@@ -376,6 +610,19 @@ export function getRelatedCalculators(calculatorId: string): Calculator[] {
  * Get all unique categories that have calculators
  */
 export function getActiveCategories(): Category[] {
+  const categories = new Set<Category>();
+  CALCULATORS.forEach(calc => {
+    if (!calc.isComingSoon) {
+      categories.add(calc.category);
+    }
+  });
+  return Array.from(categories);
+}
+
+/**
+ * Get all unique categories that have calculators (including coming soon)
+ */
+export function getAllCategories(): Category[] {
   const categories = new Set<Category>();
   CALCULATORS.forEach(calc => categories.add(calc.category));
   return Array.from(categories);

@@ -1,0 +1,51 @@
+---
+// src/components/RelatedCalculators.astro
+import { getRelatedCalculators } from '../data/calculators';
+
+export interface Props {
+  /** ID of the current calculator to find related calculators for */
+  currentId: string;
+  /** Maximum number of related calculators to show (default: 4) */
+  maxItems?: number;
+}
+
+const { currentId, maxItems = 4 } = Astro.props;
+const relatedCalculators = getRelatedCalculators(currentId).slice(0, maxItems);
+---
+
+{relatedCalculators.length > 0 && (
+  <div class="mt-16">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="text-2xl">🔗</span>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+          You Might Also Like
+        </h2>
+        <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+          Related Tools
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {relatedCalculators.map((calc) => (
+          <a
+            href={calc.url}
+            class="group bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-gray-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 card-hover"
+          >
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">{calc.icon}</span>
+              <div>
+                <h3 class="font-medium text-sm text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                  {calc.name}
+                </h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
+                  {calc.description}
+                </p>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+)}

@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+
 ---
 
 <Layout title="Ellipse Calculator - Interactive Math Tool">
@@ -209,7 +211,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="15"
-                      step="0.5"
+                      step="any"
                       value="8"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -230,7 +232,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="15"
-                      step="0.5"
+                      step="any"
                       value="5"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -285,7 +287,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="706"
-                      step="0.5"
+                      step="any"
                       value="125.66"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -306,7 +308,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="15"
-                      step="0.5"
+                      step="any"
                       value="5"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -361,7 +363,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="706"
-                      step="0.5"
+                      step="any"
                       value="125.66"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -382,7 +384,7 @@ import SEOContent from '../../components/SEOContent.astro';
                       class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       min="1"
                       max="15"
-                      step="0.5"
+                      step="any"
                       value="8"
                     />
                     <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -550,7 +552,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
-
+  <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="ellipse-area" />
     </div>
   </main>
 
@@ -642,6 +647,11 @@ import SEOContent from '../../components/SEOContent.astro';
     ft: { label: 'ft', factor: 30.48, display: 'ft' }
   };
 
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -649,8 +659,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num <= 0) {
@@ -664,6 +674,24 @@ import SEOContent from '../../components/SEOContent.astro';
 
   function getPi() { return piValues[currentPiMode]; }
   function getUnit() { return unitConversions[currentUnit]; }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+      input.value = String(value * ratio);
+      ['min','max'].forEach(attr => {
+        const n = Number(input.getAttribute(attr));
+        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+      });
+    });
+  }
 
   function formatArea(area) {
     let displayArea = area;
@@ -959,7 +987,10 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'ellipse-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       const unit = getUnit();
       const maxArea = Math.PI * 15 * 15;
       const formatted = formatArea(maxArea);
@@ -999,12 +1030,12 @@ import SEOContent from '../../components/SEOContent.astro';
       const bVal = validatePositive(semiMinorInput.value, 'Semi-Minor axis');
 
       if (!aVal.valid) {
-        alert(aVal.message);
+        showValidationError(aVal.message);
         semiMajorInput.focus();
         return;
       }
       if (!bVal.valid) {
-        alert(bVal.message);
+        showValidationError(bVal.message);
         semiMinorInput.focus();
         return;
       }
@@ -1056,12 +1087,12 @@ import SEOContent from '../../components/SEOContent.astro';
       const bVal = validatePositive(minorForMajorInput.value, 'Semi-Minor axis');
 
       if (!aVal.valid) {
-        alert(aVal.message);
+        showValidationError(aVal.message);
         areaForMajorInput.focus();
         return;
       }
       if (!bVal.valid) {
-        alert(bVal.message);
+        showValidationError(bVal.message);
         minorForMajorInput.focus();
         return;
       }
@@ -1108,12 +1139,12 @@ import SEOContent from '../../components/SEOContent.astro';
       const bVal = validatePositive(majorForMinorInput.value, 'Semi-Major axis');
 
       if (!aVal.valid) {
-        alert(aVal.message);
+        showValidationError(aVal.message);
         areaForMinorInput.focus();
         return;
       }
       if (!bVal.valid) {
-        alert(bVal.message);
+        showValidationError(bVal.message);
         majorForMinorInput.focus();
         return;
       }

@@ -3,6 +3,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
 ---
 
 <Layout title="Rectangle Area Calculator - Interactive Math Tool">
@@ -490,6 +491,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
+  <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="rectangle-area" />
 
     </div>
   </main>
@@ -564,6 +569,11 @@ import SEOContent from '../../components/SEOContent.astro';
     ft: { label: 'ft', factor: 30.48, display: 'ft' }
   };
 
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -571,8 +581,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num <= 0) {
@@ -652,6 +662,24 @@ import SEOContent from '../../components/SEOContent.astro';
     lengthLabelValue.textContent = length.toFixed(2);
     widthLabelValue.textContent = width.toFixed(2);
     areaLabelRectValue.textContent = formatted.value.toFixed(2);
+  }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+      input.value = String(value * ratio);
+      ['min','max'].forEach(attr => {
+        const n = Number(input.getAttribute(attr));
+        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+      });
+    });
   }
 
   function formatArea(area) {
@@ -805,7 +833,10 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'rect-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       
       if (currentMode === 'area') updateRectangle();
       else if (currentMode === 'length') updateFindLength();
@@ -871,8 +902,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'area') {
       const lVal = validatePositive(lengthInput.value, 'Length');
       const wVal = validatePositive(widthInput.value, 'Width');
-      if (!lVal.valid) { alert(lVal.message); lengthInput.focus(); return; }
-      if (!wVal.valid) { alert(wVal.message); widthInput.focus(); return; }
+      if (!lVal.valid) { showValidationError(lVal.message); lengthInput.focus(); return; }
+      if (!wVal.valid) { showValidationError(wVal.message); widthInput.focus(); return; }
       setSliderValue(lengthSlider, lVal.value);
       setSliderValue(widthSlider, wVal.value);
       updateRectangle();
@@ -899,8 +930,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'length') {
       const aVal = validatePositive(areaInputLength.value, 'Area');
       const wVal = validatePositive(widthForLengthInput.value, 'Width');
-      if (!aVal.valid) { alert(aVal.message); areaInputLength.focus(); return; }
-      if (!wVal.valid) { alert(wVal.message); widthForLengthInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaInputLength.focus(); return; }
+      if (!wVal.valid) { showValidationError(wVal.message); widthForLengthInput.focus(); return; }
       setSliderValue(areaSliderLength, aVal.value, 400);
       setSliderValue(widthForLengthSlider, wVal.value);
       updateFindLength();
@@ -927,8 +958,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'width') {
       const aVal = validatePositive(areaInputWidth.value, 'Area');
       const lVal = validatePositive(lengthForWidthInput.value, 'Length');
-      if (!aVal.valid) { alert(aVal.message); areaInputWidth.focus(); return; }
-      if (!lVal.valid) { alert(lVal.message); lengthForWidthInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaInputWidth.focus(); return; }
+      if (!lVal.valid) { showValidationError(lVal.message); lengthForWidthInput.focus(); return; }
       setSliderValue(areaSliderWidth, aVal.value, 400);
       setSliderValue(lengthForWidthSlider, lVal.value);
       updateFindWidth();

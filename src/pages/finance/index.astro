@@ -2,11 +2,16 @@
 // src/pages/finance/index.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import { getCalculatorsByCategory, getCategoryCount } from '../../data/calculators';
+import {
+  getCalculatorsByCategory,
+  getCategoryCount,
+  getComingSoonByCategory
+} from '../../data/calculators';
 
 // Get all finance calculators from the central registry
 const financeCalculators = getCalculatorsByCategory('finance');
 const totalFinanceCount = getCategoryCount('finance');
+const comingSoonFinance = getComingSoonByCategory('finance');
 ---
 
 <Layout title="Finance Calculators - Free Online Tools">
@@ -50,32 +55,29 @@ const totalFinanceCount = getCategoryCount('finance');
       </div>
 
       <!-- Coming Soon -->
-      <div class="mt-12">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <span>🚀 Coming Soon</span>
-          <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
-            In Development
-          </span>
-        </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { name: "EMI Calculator", icon: "📈", desc: "Equated Monthly Installment" },
-            { name: "Mortgage Calculator", icon: "🏠", desc: "Home loan payments" },
-            { name: "SIP Calculator", icon: "📊", desc: "Systematic Investment Plan" },
-            { name: "Credit Card Calculator", icon: "💳", desc: "Credit card payments" },
-          ].map((item) => (
-            <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
-              <div class="flex items-center space-x-4">
-                <span class="text-4xl">{item.icon}</span>
-                <div>
-                  <h3 class="font-semibold text-gray-500 dark:text-gray-400">{item.name}</h3>
-                  <p class="text-sm text-gray-400 dark:text-gray-500">{item.desc}</p>
+      {comingSoonFinance.length > 0 && (
+        <div class="mt-12">
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <span>🚀 Coming Soon</span>
+            <span class="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
+              In Development
+            </span>
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {comingSoonFinance.map((calc) => (
+              <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
+                <div class="flex items-center space-x-4">
+                  <span class="text-4xl">{calc.icon}</span>
+                  <div>
+                    <h3 class="font-semibold text-gray-500 dark:text-gray-400">{calc.name}</h3>
+                    <p class="text-sm text-gray-400 dark:text-gray-500">{calc.description}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   </main>
 </Layout>

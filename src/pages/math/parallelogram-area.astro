@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+
 ---
 
 <Layout title="Parallelogram Calculator - Interactive Math Tool">
@@ -547,7 +549,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
-
+ <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="parallelogram-area" />
     </div>
   </main>
 
@@ -636,6 +641,11 @@ import SEOContent from '../../components/SEOContent.astro';
     ft: { label: 'ft', factor: 30.48, display: 'ft' }
   };
 
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -643,8 +653,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num <= 0) {
@@ -675,6 +685,24 @@ import SEOContent from '../../components/SEOContent.astro';
     if (!Number.isFinite(num)) return;
     slider.max = String(Math.max(defaultMax, num));
     slider.value = String(num);
+  }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+      input.value = String(value * ratio);
+      ['min','max'].forEach(attr => {
+        const n = Number(input.getAttribute(attr));
+        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+      });
+    });
   }
 
   function formatArea(area) {
@@ -816,7 +844,10 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'para-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       const maxArea = 20 * 20;
       const formatted = formatArea(maxArea);
       areaBaseMaxLabel.textContent = formatted.value.toFixed(0);
@@ -991,9 +1022,9 @@ import SEOContent from '../../components/SEOContent.astro';
       const bVal = validatePositive(baseInputPara.value, 'Base');
       const hVal = validatePositive(heightInputPara.value, 'Height');
       const sVal = validatePositive(sideInputPara.value, 'Side');
-      if (!bVal.valid) { alert(bVal.message); baseInputPara.focus(); return; }
-      if (!hVal.valid) { alert(hVal.message); heightInputPara.focus(); return; }
-      if (!sVal.valid) { alert(sVal.message); sideInputPara.focus(); return; }
+      if (!bVal.valid) { showValidationError(bVal.message); baseInputPara.focus(); return; }
+      if (!hVal.valid) { showValidationError(hVal.message); heightInputPara.focus(); return; }
+      if (!sVal.valid) { showValidationError(sVal.message); sideInputPara.focus(); return; }
       setSliderValue(baseSliderPara, bVal.value);
       setSliderValue(heightSliderPara, hVal.value);
       setSliderValue(sideSliderPara, sVal.value);
@@ -1021,8 +1052,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'base') {
       const aVal = validatePositive(areaForBaseInput.value, 'Area');
       const hVal = validatePositive(heightForBaseInput.value, 'Height');
-      if (!aVal.valid) { alert(aVal.message); areaForBaseInput.focus(); return; }
-      if (!hVal.valid) { alert(hVal.message); heightForBaseInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaForBaseInput.focus(); return; }
+      if (!hVal.valid) { showValidationError(hVal.message); heightForBaseInput.focus(); return; }
       setSliderValue(areaForBaseSlider, aVal.value, 400);
       setSliderValue(heightForBaseSlider, hVal.value);
       updateParallelogram();
@@ -1049,8 +1080,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (currentMode === 'height') {
       const aVal = validatePositive(areaForHeightInput.value, 'Area');
       const bVal = validatePositive(baseForHeightInput.value, 'Base');
-      if (!aVal.valid) { alert(aVal.message); areaForHeightInput.focus(); return; }
-      if (!bVal.valid) { alert(bVal.message); baseForHeightInput.focus(); return; }
+      if (!aVal.valid) { showValidationError(aVal.message); areaForHeightInput.focus(); return; }
+      if (!bVal.valid) { showValidationError(bVal.message); baseForHeightInput.focus(); return; }
       setSliderValue(areaForHeightSlider, aVal.value, 400);
       setSliderValue(baseForHeightSlider, bVal.value);
       updateParallelogram();

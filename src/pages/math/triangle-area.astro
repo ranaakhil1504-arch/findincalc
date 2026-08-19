@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+
 ---
 
 <Layout title="Triangle Calculator - Interactive Math Tool">
@@ -431,7 +433,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
-
+<!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="triangle-area" />
     </div>
   </main>
 
@@ -454,6 +459,11 @@ import SEOContent from '../../components/SEOContent.astro';
     scalene: '💡 A scalene triangle has all sides different. The longest side is opposite the largest angle!'
   };
 
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -461,8 +471,8 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
     if (num < 0) {
@@ -472,6 +482,32 @@ import SEOContent from '../../components/SEOContent.astro';
       return { valid: false, message: `${name} is too large` };
     }
     return { valid: true, value: num };
+  }
+
+  function setSliderValue(slider, value, defaultMax = 20) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return;
+    slider.min = String(Math.min(Number(slider.min) || 0, num));
+    slider.max = String(Math.max(defaultMax, Number(slider.max) || 0, num));
+    slider.value = String(num);
+  }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    document.querySelectorAll('input[type=number], input[type=range]').forEach(input => {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return;
+      const ratio = /area/i.test(input.id) ? areaRatio : linearRatio;
+      input.value = String(value * ratio);
+      ['min','max'].forEach(attr => {
+        const n = Number(input.getAttribute(attr));
+        if (Number.isFinite(n)) input.setAttribute(attr, String(n * ratio));
+      });
+    });
   }
 
   // ============================================
@@ -761,7 +797,10 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'tri-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'tri-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       updateTriangle();
     });
   });
@@ -1197,14 +1236,14 @@ import SEOContent from '../../components/SEOContent.astro';
     const validation = validatePositive(triInput1.value, 'Value');
     if (!validation.valid) return;
     if (currentType === 'right') {
-      if (currentMode === 'area') { triBaseSlider.value = Math.min(validation.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triBaseSlider, validation.value, 20); }
       else if (currentMode === 'base') { triAreaForBaseSlider.value = validation.value; }
       else if (currentMode === 'height') { triAreaForHeightSlider.value = validation.value; }
     } else if (currentType === 'equilateral') {
-      if (currentMode === 'area') { triSideSlider.value = Math.min(validation.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triSideSlider, validation.value, 20); }
       else { triEqAreaSlider.value = validation.value; }
     } else if (currentType === 'isosceles') {
-      if (currentMode === 'area') { triIsoBaseSlider.value = Math.min(validation.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triIsoBaseSlider, validation.value, 20); }
       else { triIsoAreaSlider.value = validation.value; }
     }
     updateTriangle();
@@ -1214,12 +1253,12 @@ import SEOContent from '../../components/SEOContent.astro';
     const validation = validatePositive(triInput2.value, 'Value');
     if (!validation.valid) return;
     if (currentType === 'right') {
-      if (currentMode === 'area') { triHeightSlider.value = Math.min(validation.value, 20); }
-      else if (currentMode === 'base') { triHeightForBaseSlider.value = Math.min(validation.value, 20); }
-      else if (currentMode === 'height') { triBaseForHeightSlider.value = Math.min(validation.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triHeightSlider, validation.value, 20); }
+      else if (currentMode === 'base') { setSliderValue(triHeightForBaseSlider, validation.value, 20); }
+      else if (currentMode === 'height') { setSliderValue(triBaseForHeightSlider, validation.value, 20); }
     } else if (currentType === 'isosceles') {
-      if (currentMode === 'area') { triIsoHeightSlider.value = Math.min(validation.value, 20); }
-      else { triIsoSideSlider.value = Math.min(validation.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triIsoHeightSlider, validation.value, 20); }
+      else { setSliderValue(triIsoSideSlider, validation.value, 20); }
     }
     updateTriangle();
   });
@@ -1227,18 +1266,18 @@ import SEOContent from '../../components/SEOContent.astro';
   document.getElementById('triCalculateBtn').addEventListener('click', () => {
     const v1 = validatePositive(triInput1.value, 'Value 1');
     const v2 = validatePositive(triInput2.value, 'Value 2');
-    if (!v1.valid) { alert(v1.message); triInput1.focus(); return; }
-    if (triInput2.style.display !== 'none' && !v2.valid) { alert(v2.message); triInput2.focus(); return; }
+    if (!v1.valid) { showValidationError(v1.message); triInput1.focus(); return; }
+    if (triInput2.style.display !== 'none' && !v2.valid) { showValidationError(v2.message); triInput2.focus(); return; }
     if (currentType === 'right') {
-      if (currentMode === 'area') { triBaseSlider.value = Math.min(v1.value, 20); triHeightSlider.value = Math.min(v2.value, 20); }
-      else if (currentMode === 'base') { triAreaForBaseSlider.value = v1.value; triHeightForBaseSlider.value = Math.min(v2.value, 20); }
-      else if (currentMode === 'height') { triAreaForHeightSlider.value = v1.value; triBaseForHeightSlider.value = Math.min(v2.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triBaseSlider, v1.value, 20); setSliderValue(triHeightSlider, v2.value, 20); }
+      else if (currentMode === 'base') { triAreaForBaseSlider.value = v1.value; setSliderValue(triHeightForBaseSlider, v2.value, 20); }
+      else if (currentMode === 'height') { triAreaForHeightSlider.value = v1.value; setSliderValue(triBaseForHeightSlider, v2.value, 20); }
     } else if (currentType === 'equilateral') {
-      if (currentMode === 'area') { triSideSlider.value = Math.min(v1.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triSideSlider, v1.value, 20); }
       else { triEqAreaSlider.value = v1.value; }
     } else if (currentType === 'isosceles') {
-      if (currentMode === 'area') { triIsoBaseSlider.value = Math.min(v1.value, 20); triIsoHeightSlider.value = Math.min(v2.value, 20); }
-      else { triIsoAreaSlider.value = v1.value; triIsoSideSlider.value = Math.min(v2.value, 20); }
+      if (currentMode === 'area') { setSliderValue(triIsoBaseSlider, v1.value, 20); setSliderValue(triIsoHeightSlider, v2.value, 20); }
+      else { triIsoAreaSlider.value = v1.value; setSliderValue(triIsoSideSlider, v2.value, 20); }
     }
     updateTriangle();
     if (window.showToast) {

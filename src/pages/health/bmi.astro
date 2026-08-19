@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+
 ---
 
 <Layout title="BMI Calculator - Body Mass Index Calculator">
@@ -62,7 +64,7 @@ import SEOContent from '../../components/SEOContent.astro';
                   class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   min="20"
                   max="200"
-                  step="0.5"
+                  step="any"
                   value="70"
                 />
                 <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -85,7 +87,7 @@ import SEOContent from '../../components/SEOContent.astro';
                   class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   min="100"
                   max="250"
-                  step="0.5"
+                  step="any"
                   value="175"
                 />
                 <div class="flex justify-between text-xs text-gray-400 mt-1">
@@ -103,7 +105,7 @@ import SEOContent from '../../components/SEOContent.astro';
                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     placeholder="Weight"
                     value="70"
-                    step="0.5"
+                    step="any"
                     min="20"
                   />
                 </div>
@@ -114,7 +116,7 @@ import SEOContent from '../../components/SEOContent.astro';
                     class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     placeholder="Height"
                     value="175"
-                    step="0.5"
+                    step="any"
                     min="100"
                   />
                 </div>
@@ -353,7 +355,10 @@ import SEOContent from '../../components/SEOContent.astro';
         ]}
         note="BMI is a general screening tool and has limitations. It doesn't account for muscle mass (athletes may have high BMI but low body fat), bone density, or body composition. May not be accurate for older adults, pregnant women, or certain ethnic groups. Should be used alongside other health measurements."
       />
-
+ <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="bmi" />
     </div>
   </main>
 
@@ -711,7 +716,7 @@ import SEOContent from '../../components/SEOContent.astro';
         const w = parseFloat(weightInput.value);
         const h = parseFloat(heightInput.value);
         if (!w || w <= 0 || !h || h <= 0) {
-          alert('Please enter valid positive numbers for weight and height.');
+          showValidationError('Please enter valid positive numbers for weight and height.');
           return;
         }
         rawWeight = w;

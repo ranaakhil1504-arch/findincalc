@@ -2,11 +2,17 @@
 // src/pages/math/index.astro
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
-import { getCalculatorsByCategory, getCategoryCount } from '../../data/calculators';
+import {
+  getCalculatorsByCategory,
+  getCategoryCount,
+  getComingSoonByCategory,
+  CALCULATORS
+} from '../../data/calculators';
 
 // Get all math calculators from the central registry
 const mathCalculators = getCalculatorsByCategory('math');
 const totalMathCount = getCategoryCount('math');
+const comingSoonMath = getComingSoonByCategory('math');
 ---
 
 <Layout title="Math Calculators - Geometry, Algebra, and More">
@@ -83,20 +89,13 @@ const totalMathCount = getCategoryCount('math');
           </span>
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            { name: "Sphere Volume", icon: "⚽", desc: "V = ⁴⁄₃πr³" },
-            { name: "Cube Volume", icon: "🧊", desc: "V = s³" },
-            { name: "Cylinder Volume", icon: "🥫", desc: "V = πr²h" },
-            { name: "Cone Volume", icon: "🍦", desc: "V = ⅓πr²h" },
-            { name: "Rectangular Prism", icon: "📦", desc: "V = l × w × h" },
-            { name: "Pyramid Volume", icon: "🔺", desc: "V = ⅓Bh" },
-          ].map((item) => (
+          {comingSoonMath.map((calc) => (
             <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 opacity-60">
               <div class="flex items-center space-x-4">
-                <span class="text-3xl">{item.icon}</span>
+                <span class="text-3xl">{calc.icon}</span>
                 <div>
-                  <h3 class="font-semibold text-gray-500 dark:text-gray-400">{item.name}</h3>
-                  <p class="text-sm text-gray-400 dark:text-gray-500 font-mono">{item.desc}</p>
+                  <h3 class="font-semibold text-gray-500 dark:text-gray-400">{calc.name}</h3>
+                  <p class="text-sm text-gray-400 dark:text-gray-500 font-mono">{calc.formula || calc.description}</p>
                 </div>
               </div>
             </div>

@@ -3,6 +3,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
 ---
 
 <Layout 
@@ -41,6 +42,31 @@ import SEOContent from '../../components/SEOContent.astro';
             
             <!-- Inputs -->
             <div class="space-y-4">
+              <!-- Currency Selection -->
+              <div class="pb-4 border-b border-gray-200 dark:border-gray-700 mb-4">
+                <label for="currencySelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Select Currency
+                </label>
+                <select 
+                  id="currencySelect" 
+                  class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer"
+                >
+                  <option value="USD">🇺🇸 USD ($)</option>
+                  <option value="EUR">🇪🇺 EUR (€)</option>
+                  <option value="GBP">🇬🇧 GBP (£)</option>
+                  <option value="INR">🇮🇳 INR (₹)</option>
+                  <option value="AUD">🇦🇺 AUD (A$)</option>
+                  <option value="CAD">🇨🇦 CAD (C$)</option>
+                  <option value="JPY">🇯🇵 JPY (¥)</option>
+                  <option value="CNY">🇨🇳 CNY (¥)</option>
+                  <option value="BRL">🇧🇷 BRL (R$)</option>
+                  <option value="ZAR">🇿🇦 ZAR (R)</option>
+                  <option value="NGN">🇳🇬 NGN (₦)</option>
+                  <option value="PKR">🇵🇰 PKR (₨)</option>
+                  <option value="BDT">🇧🇩 BDT (৳)</option>
+                </select>
+              </div>
+
               <!-- Loan Amount -->
               <div>
                 <div class="flex justify-between items-center mb-2">
@@ -58,8 +84,8 @@ import SEOContent from '../../components/SEOContent.astro';
                   value="10000"
                 />
                 <div class="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>$1,000</span>
-                  <span>$1,000,000</span>
+                  <span id="minLoanLabel">$1,000</span>
+                  <span id="maxLoanLabel">$1,000,000</span>
                 </div>
                 <input 
                   type="number" 
@@ -242,13 +268,13 @@ import SEOContent from '../../components/SEOContent.astro';
         formula="EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)"
         formulaDescription="P = Loan Amount, r = Monthly Interest Rate, n = Number of Months"
         example={{
-          title: "Example: Calculate EMI for a $10,000 loan at 7% interest for 5 years",
+          title: "Example: Calculate EMI for a 10,000 loan at 7% interest for 5 years",
           steps: [
             "Monthly interest rate: 7% / 12 = 0.00583",
             "Number of months: 5 × 12 = 60",
             "EMI = 10000 × 0.00583 × (1.00583)^60 / ((1.00583)^60 - 1)"
           ],
-          result: "Monthly Payment: $198.01 | Total Interest: $1,880.60 | Total Payment: $11,880.60"
+          result: "Monthly Payment: 198.01 | Total Interest: 1,880.60 | Total Payment: 11,880.60"
         }}
         uses={[
           "Home Loans: Calculate mortgage payments before buying a house",
@@ -272,7 +298,10 @@ import SEOContent from '../../components/SEOContent.astro';
           }
         ]}
       />
-
+     <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="loan" />
     </div>
   </main>
 
@@ -304,6 +333,38 @@ import SEOContent from '../../components/SEOContent.astro';
   const amortizationSection = document.getElementById('amortizationSection');
   const amortizationBody = document.getElementById('amortizationBody');
 
+  // Currency DOM References
+  const currencySelect = document.getElementById('currencySelect');
+  const minLoanLabel = document.getElementById('minLoanLabel');
+  const maxLoanLabel = document.getElementById('maxLoanLabel');
+
+  // ============================================
+  // CURRENCY SETTINGS
+  // ============================================
+  // Map currency codes to their respective locales for proper formatting
+  const currencyMap = {
+    USD: { code: 'USD', locale: 'en-US' },
+    EUR: { code: 'EUR', locale: 'en-IE' }, // Irish English formats Euro with symbol after number? Actually en-IE puts it before. Let's use de-DE for comma decimals or en-IE
+    GBP: { code: 'GBP', locale: 'en-GB' },
+    INR: { code: 'INR', locale: 'en-IN' },
+    AUD: { code: 'AUD', locale: 'en-AU' },
+    CAD: { code: 'CAD', locale: 'en-CA' },
+    JPY: { code: 'JPY', locale: 'ja-JP' },
+    CNY: { code: 'CNY', locale: 'zh-CN' },
+    BRL: { code: 'BRL', locale: 'pt-BR' },
+    ZAR: { code: 'ZAR', locale: 'en-ZA' },
+    NGN: { code: 'NGN', locale: 'en-NG' },
+    PKR: { code: 'PKR', locale: 'en-PK' },
+    BDT: { code: 'BDT', locale: 'en-BD' }
+  };
+
+  let currentCurrency = currencyMap['USD']; // Default to USD
+
+  function showValidationError(message) {
+    if (window.showToast) window.showToast(message, 'error');
+    else window.alert(message);
+  }
+
   // ============================================
   // VALIDATION HELPERS
   // ============================================
@@ -311,12 +372,12 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: `Please enter a ${name}` };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
-    if (num < 0) {
-      return { valid: false, message: `${name} cannot be negative` };
+    if (num <= 0) {
+      return { valid: false, message: `${name} must be greater than 0` };
     }
     if (num > 1e12) {
       return { valid: false, message: `${name} is too large` };
@@ -324,11 +385,30 @@ import SEOContent from '../../components/SEOContent.astro';
     return { valid: true, value: num };
   }
 
+  function setSliderValue(slider, value, defaultMax) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return;
+    if (defaultMax !== undefined) slider.max = String(Math.max(defaultMax, num));
+    slider.value = String(num);
+  }
+
+  // ============================================
+  // DYNAMIC CURRENCY FORMATTER
+  // ============================================
   function formatCurrency(value) {
-    return '$' + Number(value).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
+    const num = Number(value) || 0;
+    try {
+      // Use Intl.NumberFormat for dynamic locale-aware currency formatting
+      return new Intl.NumberFormat(currentCurrency.locale, {
+        style: 'currency',
+        currency: currentCurrency.code,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(num);
+    } catch (e) {
+      // Fallback to simple formatting if locale fails
+      return num.toFixed(2);
+    }
   }
 
   // ============================================
@@ -359,6 +439,10 @@ import SEOContent from '../../components/SEOContent.astro';
     loanAmountDisplay.textContent = principal.toLocaleString();
     interestDisplay.textContent = annualRate;
     termDisplay.textContent = years;
+
+    // Update min/max loan amount labels with new currency format
+    minLoanLabel.textContent = formatCurrency(1000);
+    maxLoanLabel.textContent = formatCurrency(1000000);
 
     // Calculate EMI
     let emi, totalInterestAmount, totalPaymentAmount;
@@ -452,6 +536,12 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // EVENT LISTENERS
   // ============================================
+  // Currency change listener
+  currencySelect.addEventListener('change', () => {
+    currentCurrency = currencyMap[currencySelect.value] || currencyMap['USD'];
+    calculateLoan(); // Recalculate to update all currency formats
+  });
+
   loanAmountSlider.addEventListener('input', () => {
     loanAmountInput.value = loanAmountSlider.value;
     calculateLoan();
@@ -468,21 +558,21 @@ import SEOContent from '../../components/SEOContent.astro';
   loanAmountInput.addEventListener('input', () => {
     const validation = validatePositive(loanAmountInput.value, 'Loan Amount');
     if (validation.valid) {
-      loanAmountSlider.value = validation.value;
+      setSliderValue(loanAmountSlider, validation.value, 1000000);
       calculateLoan();
     }
   });
   interestInput.addEventListener('input', () => {
     const validation = validatePositive(interestInput.value, 'Interest Rate');
-    if (validation.valid) {
-      interestSlider.value = Math.min(validation.value, 30);
+    if (validation.valid && validation.value <= 30) {
+      interestSlider.value = String(validation.value);
       calculateLoan();
     }
   });
   termInput.addEventListener('input', () => {
     const validation = validatePositive(termInput.value, 'Loan Term');
-    if (validation.valid) {
-      termSlider.value = Math.min(validation.value, 30);
+    if (validation.valid && validation.value <= 30) {
+      termSlider.value = String(validation.value);
       calculateLoan();
     }
   });
@@ -492,24 +582,24 @@ import SEOContent from '../../components/SEOContent.astro';
     const rateVal = validatePositive(interestInput.value, 'Interest Rate');
     const termVal = validatePositive(termInput.value, 'Loan Term');
     
-    if (!amountVal.valid) { alert(amountVal.message); loanAmountInput.focus(); return; }
-    if (!rateVal.valid) { alert(rateVal.message); interestInput.focus(); return; }
-    if (!termVal.valid) { alert(termVal.message); termInput.focus(); return; }
+    if (!amountVal.valid) { showValidationError(amountVal.message); loanAmountInput.focus(); return; }
+    if (!rateVal.valid) { showValidationError(rateVal.message); interestInput.focus(); return; }
+    if (!termVal.valid) { showValidationError(termVal.message); termInput.focus(); return; }
     
     if (rateVal.value > 30) {
-      alert('Interest rate should be between 0% and 30%.');
+      showValidationError('Interest rate should be between 0% and 30%.');
       interestInput.focus();
       return;
     }
     if (termVal.value > 30) {
-      alert('Loan term should be between 1 and 30 years.');
+      showValidationError('Loan term should be between 1 and 30 years.');
       termInput.focus();
       return;
     }
     
-    loanAmountSlider.value = amountVal.value;
-    interestSlider.value = rateVal.value;
-    termSlider.value = termVal.value;
+    setSliderValue(loanAmountSlider, amountVal.value, 1000000);
+    setSliderValue(interestSlider, rateVal.value, 30);
+    setSliderValue(termSlider, termVal.value, 30);
     calculateLoan();
     if (window.showToast) {
       window.showToast('✅ Loan calculation updated!', 'success');

@@ -3,6 +3,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
 ---
 
 <Layout title="Circle Area Calculator - Interactive Math Tool">
@@ -111,7 +112,7 @@ import SEOContent from '../../components/SEOContent.astro';
                   font-weight="bold"
                   class="transition-all duration-500 ease-out"
                 >
-                  r = <tspan id="radiusLabelValue">5</tspan> <tspan id="radiusUnitLabel">cm</tspan>
+                  r = <tspan id="radiusLabelValue">5.0000</tspan> <tspan id="radiusUnitLabel">cm</tspan>
                 </text>
                 
                 <text 
@@ -124,7 +125,7 @@ import SEOContent from '../../components/SEOContent.astro';
                   text-anchor="middle"
                   class="transition-all duration-500 ease-out"
                 >
-                  A = <tspan id="areaLabelValue">78.54</tspan> <tspan id="areaUnitLabel">cm²</tspan>
+                  A = <tspan id="areaLabelValue">78.5398</tspan> <tspan id="areaUnitLabel">cm²</tspan>
                 </text>
 
                 <text x="355" y="270" fill="#f59e0b" font-size="12" font-weight="bold">← Radius →</text>
@@ -185,36 +186,23 @@ import SEOContent from '../../components/SEOContent.astro';
               <div id="inputSection">
                 <!-- Find Area Mode (Default) -->
                 <div id="areaModeInputs">
-                  <div>
+                  <div class="mb-3">
                     <div class="flex justify-between items-center mb-2">
                       <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Radius (r) = <span id="radiusDisplay" class="text-emerald-600 font-bold">5</span> <span id="radiusUnitDisplay">cm</span>
+                        Radius (r) = <span id="radiusDisplay" class="text-emerald-600 font-bold">5.0000</span> <span id="radiusUnitDisplay">cm</span>
                       </label>
                       <span id="radiusError" class="text-xs text-red-500 hidden">Please enter a positive number</span>
                     </div>
-                    <input 
-                      type="range" 
-                      id="radiusSlider"
-                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                      min="0.5"
-                      max="20"
-                      step="0.5"
-                      value="5"
-                    />
-                    <div class="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>0.5</span>
-                      <span>20</span>
-                    </div>
                   </div>
-                  <div class="flex flex-col sm:flex-row gap-2 mt-3">
+                  <div class="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="number" 
                       id="radiusInput"
                       class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      placeholder="Enter radius"
+                      placeholder="Enter radius (e.g., 5.5)"
                       value="5"
-                      step="0.5"
-                      min="0.5"
+                      step="any"
+                      min="0"
                     />
                     <button 
                       id="calculateBtn"
@@ -227,36 +215,23 @@ import SEOContent from '../../components/SEOContent.astro';
 
                 <!-- Find Radius Mode -->
                 <div id="radiusModeInputs" class="hidden">
-                  <div>
+                  <div class="mb-3">
                     <div class="flex justify-between items-center mb-2">
                       <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Area (A) = <span id="areaInputDisplay" class="text-emerald-600 font-bold">78.54</span> <span id="areaInputUnitDisplay">cm²</span>
+                        Area (A) = <span id="areaInputDisplay" class="text-emerald-600 font-bold">78.5398</span> <span id="areaInputUnitDisplay">cm²</span>
                       </label>
                       <span id="areaError" class="text-xs text-red-500 hidden">Please enter a positive number</span>
                     </div>
-                    <input 
-                      type="range" 
-                      id="areaSlider"
-                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
-                      min="1"
-                      max="1256"
-                      step="0.5"
-                      value="78.54"
-                    />
-                    <div class="flex justify-between text-xs text-gray-400 mt-1">
-                      <span>1</span>
-                      <span id="areaMaxLabel">1256</span>
-                    </div>
                   </div>
-                  <div class="flex flex-col sm:flex-row gap-2 mt-3">
+                  <div class="flex flex-col sm:flex-row gap-2">
                     <input 
                       type="number" 
                       id="areaInput"
                       class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      placeholder="Enter area"
-                      value="78.54"
-                      step="0.5"
-                      min="1"
+                      placeholder="Enter area (e.g., 78.54)"
+                      value="78.5398"
+                      step="any"
+                      min="0"
                     />
                     <button 
                       id="findRadiusBtn"
@@ -269,16 +244,16 @@ import SEOContent from '../../components/SEOContent.astro';
               </div>
 
               <!-- Result Box -->
-              <div id="resultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+              <div id="resultBox" class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800 mt-4">
                 <div class="flex items-center justify-between">
                   <div>
                     <p class="text-sm text-gray-600 dark:text-gray-400" id="resultLabel">Area of Circle</p>
-                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="resultValue">78.54</p>
+                    <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400" id="resultValue">78.5398</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400" id="resultPiInfo">Using π = 3.14</p>
                   </div>
                   <div class="text-right">
                     <p class="text-sm text-gray-600 dark:text-gray-400" id="resultSecondaryLabel">Radius</p>
-                    <p class="text-xl font-bold text-gray-700 dark:text-gray-300" id="resultSecondary">5 cm</p>
+                    <p class="text-xl font-bold text-gray-700 dark:text-gray-300" id="resultSecondary">5.0000 cm</p>
                   </div>
                 </div>
               </div>
@@ -302,11 +277,11 @@ import SEOContent from '../../components/SEOContent.astro';
               </div>
               <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
                 <span id="formulaSecondaryLabel">Radius</span>
-                <span class="font-mono" id="formulaSecondary">5 cm</span>
+                <span class="font-mono" id="formulaSecondary">5.0000 cm</span>
               </div>
               <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
                 <span id="formulaResultLabel">Area</span>
-                <span class="font-mono" id="formulaResult">78.54 cm²</span>
+                <span class="font-mono" id="formulaResult">78.5398 cm²</span>
               </div>
             </div>
           </div>
@@ -321,15 +296,15 @@ import SEOContent from '../../components/SEOContent.astro';
               </div>
               <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                 <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
-                <span class="text-gray-600 dark:text-gray-400" id="step2">Plug in: A = π × 5²</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Plug in: A = π × 5.0000²</span>
               </div>
               <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                 <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
-                <span class="text-gray-600 dark:text-gray-400" id="step3">Calculate: A = 3.14 × 25</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Calculate: A = 3.141593 × 25.0000</span>
               </div>
               <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
                 <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
-                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Answer: A = 78.54 cm²</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Answer: A = 78.5398 cm²</span>
               </div>
             </div>
           </div>
@@ -394,6 +369,11 @@ import SEOContent from '../../components/SEOContent.astro';
         ]}
       />
 
+       <!-- ============================================ -->
+      <!-- RELATED CALCULATORS                         -->
+      <!-- ============================================ -->
+      <RelatedCalculators currentId="circle-area" />
+
     </div>
   </main>
 
@@ -437,7 +417,6 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // DOM REFERENCES
   // ============================================
-  const radiusSlider = document.getElementById('radiusSlider');
   const radiusInput = document.getElementById('radiusInput');
   const radiusDisplay = document.getElementById('radiusDisplay');
   const radiusUnitDisplay = document.getElementById('radiusUnitDisplay');
@@ -470,8 +449,6 @@ import SEOContent from '../../components/SEOContent.astro';
   const areaInput = document.getElementById('areaInput');
   const areaInputDisplay = document.getElementById('areaInputDisplay');
   const areaInputUnitDisplay = document.getElementById('areaInputUnitDisplay');
-  const areaSlider = document.getElementById('areaSlider');
-  const areaMaxLabel = document.getElementById('areaMaxLabel');
   const areaModeInputs = document.getElementById('areaModeInputs');
   const radiusModeInputs = document.getElementById('radiusModeInputs');
 
@@ -479,24 +456,19 @@ import SEOContent from '../../components/SEOContent.astro';
   // VALIDATION HELPERS
   // ============================================
   function validateRadius(value) {
-    // Empty or null
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: 'Please enter a radius' };
     }
-    const num = parseFloat(value);
-    // Not a number
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
-    // Negative
-    if (num < 0) {
-      return { valid: false, message: 'Radius cannot be negative' };
+    if (num <= 0) {
+      return { valid: false, message: 'Radius must be greater than 0' };
     }
-    // Too large (more than 1e10)
     if (num > 1e10) {
       return { valid: false, message: 'Radius is too large' };
     }
-    // Valid
     return { valid: true, value: num };
   }
 
@@ -504,12 +476,12 @@ import SEOContent from '../../components/SEOContent.astro';
     if (value === '' || value === null || value === undefined) {
       return { valid: false, message: 'Please enter an area' };
     }
-    const num = parseFloat(value);
-    if (isNaN(num)) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) {
       return { valid: false, message: 'Please enter a valid number' };
     }
-    if (num < 0) {
-      return { valid: false, message: 'Area cannot be negative' };
+    if (num <= 0) {
+      return { valid: false, message: 'Area must be greater than 0' };
     }
     if (num > 1e20) {
       return { valid: false, message: 'Area is too large' };
@@ -527,6 +499,22 @@ import SEOContent from '../../components/SEOContent.astro';
 
   function getPiValue() {
     return piValues[currentPiMode];
+  }
+
+  function convertDisplayedValues(oldUnit, newUnit) {
+    if (oldUnit === newUnit) return;
+    const oldFactor = unitConversions[oldUnit].factor;
+    const newFactor = unitConversions[newUnit].factor;
+    const linearRatio = oldFactor / newFactor;
+    const areaRatio = linearRatio * linearRatio;
+    
+    if (currentMode === 'area') {
+      const val = Number(radiusInput.value);
+      if (Number.isFinite(val)) radiusInput.value = String(val * linearRatio);
+    } else {
+      const val = Number(areaInput.value);
+      if (Number.isFinite(val)) areaInput.value = String(val * areaRatio);
+    }
   }
 
   function getUnit() {
@@ -560,7 +548,10 @@ import SEOContent from '../../components/SEOContent.astro';
 
     const areaCm2 = pi.value * radius * radius;
     const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
+    
+    // Limit decimal places to 4
     const formattedArea = displayArea.toFixed(4);
+    const formattedRadius = displayRadius.toFixed(4);
 
     // Auto-scale SVG
     const maxRadius = Math.max(radius, 20);
@@ -571,14 +562,14 @@ import SEOContent from '../../components/SEOContent.astro';
     circleVisual.setAttribute('r', svgRadius);
     radiusLine.setAttribute('x2', center + svgRadius);
 
-    radiusLabelValue.textContent = displayRadius;
+    radiusLabelValue.textContent = formattedRadius;
     radiusUnitLabel.textContent = displayUnit;
     radiusUnitDisplay.textContent = displayUnit;
     areaLabelValue.textContent = formattedArea;
     areaUnitLabel.textContent = areaUnit;
 
     formulaPi.textContent = pi.display;
-    formulaSecondary.textContent = `${displayRadius} ${displayUnit}`;
+    formulaSecondary.textContent = `${formattedRadius} ${displayUnit}`;
     formulaSecondaryLabel.textContent = 'Radius';
     formulaResult.textContent = `${formattedArea} ${areaUnit}`;
     formulaResultLabel.textContent = 'Area';
@@ -586,29 +577,22 @@ import SEOContent from '../../components/SEOContent.astro';
     formulaDescription.textContent = `Area = ${pi.label} × radius²`;
 
     resultValue.textContent = formattedArea;
-    resultSecondary.textContent = `${displayRadius} ${displayUnit}`;
+    resultSecondary.textContent = `${formattedRadius} ${displayUnit}`;
     resultSecondaryLabel.textContent = 'Radius';
     resultLabel.textContent = 'Area of Circle';
     resultPiInfo.textContent = `Using π = ${pi.label}`;
 
     step1.textContent = `Formula: A = ${pi.label} × r²`;
-    step2.textContent = `Plug in: A = ${pi.label} × ${displayRadius}²`;
-    const radiusSquared = (radius * radius).toFixed(2);
+    step2.textContent = `Plug in: A = ${pi.label} × ${formattedRadius}²`;
+    const radiusSquared = (radius * radius).toFixed(4);
     step3.textContent = `Calculate: A = ${pi.value.toFixed(6)} × ${radiusSquared}`;
     step4.textContent = `Answer: A = ${formattedArea} ${areaUnit}`;
 
     piComparison.textContent = piComparisons[currentPiMode];
 
-    radiusSlider.value = Math.min(radius, 20);
-    radiusInput.value = radius;
-    radiusDisplay.textContent = displayRadius;
-
-    const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
-    areaSlider.max = areaSliderMax;
-    areaMaxLabel.textContent = areaSliderMax.toFixed(1);
-    areaSlider.value = Math.min(displayArea, areaSliderMax);
+    radiusDisplay.textContent = formattedRadius;
     areaInput.value = displayArea;
-    areaInputDisplay.textContent = displayArea.toFixed(2);
+    areaInputDisplay.textContent = displayArea.toFixed(4);
     areaInputUnitDisplay.textContent = areaUnit;
   }
 
@@ -624,13 +608,13 @@ import SEOContent from '../../components/SEOContent.astro';
     const radius = Math.sqrt(areaCm2 / pi.value);
     if (radius >= 0) {
       updateCircle(radius);
+      radiusInput.value = radius;
     }
   }
 
   function resetCalculator() {
     currentRadius = 5;
     radiusInput.value = 5;
-    radiusSlider.value = 5;
     radiusError.classList.add('hidden');
     areaError.classList.add('hidden');
     updateCircle(5);
@@ -661,16 +645,13 @@ import SEOContent from '../../components/SEOContent.astro';
     currentMode = 'radius';
     areaModeInputs.classList.add('hidden');
     radiusModeInputs.classList.remove('hidden');
+    
     const pi = getPiValue();
     const areaCm2 = pi.value * currentRadius * currentRadius;
     const { value: displayArea, unit: areaUnit } = formatArea(areaCm2);
-    areaSlider.value = displayArea;
     areaInput.value = displayArea;
-    areaInputDisplay.textContent = displayArea.toFixed(2);
+    areaInputDisplay.textContent = displayArea.toFixed(4);
     areaInputUnitDisplay.textContent = areaUnit;
-    const areaSliderMax = currentUnit === 'm' ? 1256 / 10000 : currentUnit === 'in' ? 1256 / 6.4516 : currentUnit === 'ft' ? 1256 / 929.0304 : 1256;
-    areaSlider.max = areaSliderMax;
-    areaMaxLabel.textContent = areaSliderMax.toFixed(1);
   });
 
   // ============================================
@@ -691,7 +672,7 @@ import SEOContent from '../../components/SEOContent.astro';
         updateCircle(currentRadius);
       } else {
         const areaVal = parseFloat(areaInput.value);
-        if (areaVal >= 0) {
+        if (!isNaN(areaVal) && areaVal >= 0) {
           updateFromArea(areaVal);
         }
       }
@@ -707,13 +688,17 @@ import SEOContent from '../../components/SEOContent.astro';
         b.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
       });
       btn.className = 'unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
-      currentUnit = btn.dataset.unit;
+      const oldUnit = currentUnit;
+      const newUnit = btn.dataset.unit;
+      convertDisplayedValues(oldUnit, newUnit);
+      currentUnit = newUnit;
       
       if (currentMode === 'area') {
+        currentRadius = Number(radiusInput.value);
         updateCircle(currentRadius);
       } else {
         const areaVal = parseFloat(areaInput.value);
-        if (areaVal >= 0) {
+        if (!isNaN(areaVal) && areaVal >= 0) {
           updateFromArea(areaVal);
         }
       }
@@ -723,19 +708,7 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // AREA MODE EVENTS
   // ============================================
-  radiusSlider.addEventListener('input', () => {
-    const radius = parseFloat(radiusSlider.value);
-    const validation = validateRadius(radius);
-    if (!validation.valid) {
-      radiusError.textContent = validation.message;
-      radiusError.classList.remove('hidden');
-      return;
-    }
-    radiusError.classList.add('hidden');
-    updateCircle(validation.value);
-    updateFunFact();
-  });
-
+  // THE FIX: Calculate continuously but don't overwrite the input box while typing
   radiusInput.addEventListener('input', () => {
     const validation = validateRadius(radiusInput.value);
     if (!validation.valid) {
@@ -744,7 +717,6 @@ import SEOContent from '../../components/SEOContent.astro';
       return;
     }
     radiusError.classList.add('hidden');
-    radiusSlider.value = Math.min(validation.value, 20);
     updateCircle(validation.value);
     updateFunFact();
   });
@@ -758,7 +730,6 @@ import SEOContent from '../../components/SEOContent.astro';
       return;
     }
     radiusError.classList.add('hidden');
-    radiusSlider.value = Math.min(validation.value, 20);
     updateCircle(validation.value);
     updateFunFact();
     if (window.showToast) {
@@ -775,21 +746,7 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // RADIUS MODE EVENTS
   // ============================================
-  areaSlider.addEventListener('input', () => {
-    const areaVal = parseFloat(areaSlider.value);
-    const validation = validateArea(areaVal);
-    if (!validation.valid) {
-      areaError.textContent = validation.message;
-      areaError.classList.remove('hidden');
-      return;
-    }
-    areaError.classList.add('hidden');
-    areaInput.value = areaVal;
-    areaInputDisplay.textContent = areaVal.toFixed(2);
-    updateFromArea(areaVal);
-    updateFunFact();
-  });
-
+  // THE FIX: Calculate continuously but don't overwrite the input box while typing
   areaInput.addEventListener('input', () => {
     const validation = validateArea(areaInput.value);
     if (!validation.valid) {
@@ -798,8 +755,7 @@ import SEOContent from '../../components/SEOContent.astro';
       return;
     }
     areaError.classList.add('hidden');
-    areaSlider.value = validation.value;
-    areaInputDisplay.textContent = validation.value.toFixed(2);
+    areaInputDisplay.textContent = validation.value.toFixed(4);
     updateFromArea(validation.value);
     updateFunFact();
   });
@@ -813,8 +769,7 @@ import SEOContent from '../../components/SEOContent.astro';
       return;
     }
     areaError.classList.add('hidden');
-    areaSlider.value = validation.value;
-    areaInputDisplay.textContent = validation.value.toFixed(2);
+    areaInputDisplay.textContent = validation.value.toFixed(4);
     updateFromArea(validation.value);
     updateFunFact();
     if (window.showToast) {
@@ -831,14 +786,12 @@ import SEOContent from '../../components/SEOContent.astro';
   // ============================================
   // RESET BUTTON
   // ============================================
-  // Add reset button dynamically
   const resetBtn = document.createElement('button');
   resetBtn.id = 'resetBtn';
   resetBtn.className = 'btn-secondary w-full mt-3 text-center';
   resetBtn.textContent = '🔄 Reset Calculator';
   resetBtn.addEventListener('click', resetCalculator);
   
-  // Insert reset button after the result box
   const resultBox = document.getElementById('resultBox');
   if (resultBox) {
     resultBox.parentNode.insertBefore(resetBtn, resultBox.nextSibling);
