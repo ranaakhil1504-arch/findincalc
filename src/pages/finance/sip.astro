@@ -1,0 +1,631 @@
+---
+// src/pages/finance/sip.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+---
+
+<Layout title="SIP Calculator - Systematic Investment Plan Calculator">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">📊</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          SIP Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate your mutual fund investment returns with Systematic Investment Plans
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modeSIP"
+                  class="sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📈 Calculate Returns
+                </button>
+                <button 
+                  id="modeTarget"
+                  class="sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  🎯 Find Monthly SIP
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Monthly Investment -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Monthly Investment = <span id="monthlyDisplay" class="text-emerald-600 font-bold">10,000</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="monthlySlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="500"
+                  max="1000000"
+                  step="any"
+                  value="10000"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>$500</span>
+                  <span>$1,000,000</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="monthlyInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Monthly Investment"
+                  value="10000"
+                  step="any"
+                  min="500"
+                />
+              </div>
+
+              <!-- Investment Period -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Investment Period = <span id="periodDisplay" class="text-emerald-600 font-bold">10</span> years
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="periodSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="1"
+                  max="40"
+                  step="1"
+                  value="10"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>1 year</span>
+                  <span>40 years</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="periodInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Period (years)"
+                  value="10"
+                  step="1"
+                  min="1"
+                  max="40"
+                />
+              </div>
+
+              <!-- Expected Return -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Expected Return = <span id="returnDisplay" class="text-emerald-600 font-bold">12</span>%
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="returnSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="1"
+                  max="30"
+                  step="any"
+                  value="12"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>1%</span>
+                  <span>30%</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="returnInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Expected Return %"
+                  value="12"
+                  step="any"
+                  min="1"
+                  max="30"
+                />
+              </div>
+
+              <button 
+                id="sipCalculateBtn"
+                class="btn-primary w-full text-center"
+              >
+                Calculate SIP Returns
+              </button>
+            </div>
+
+            <!-- SIP Result Box -->
+            <div id="sipResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <div class="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Total Invested</p>
+                  <p class="text-2xl font-bold text-blue-600 dark:text-blue-400" id="totalInvested">$0</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Estimated Returns</p>
+                  <p class="text-2xl font-bold text-amber-600 dark:text-amber-400" id="estimatedReturns">$0</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-600 dark:text-gray-400">Total Value</p>
+                  <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400" id="totalValue">$0</p>
+                </div>
+              </div>
+
+              <!-- Additional Info -->
+              <div class="mt-4 grid grid-cols-2 gap-3">
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Total Months</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="totalMonths">120</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Return on Investment</p>
+                  <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" id="roi">150%</p>
+                </div>
+              </div>
+
+              <!-- Wealth Gained Bar -->
+              <div class="mt-4">
+                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  <span>Invested</span>
+                  <span>Returns</span>
+                </div>
+                <div class="w-full h-4 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div id="wealthBar" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-500" style="width: 50%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span id="investedPercent">50%</span>
+                  <span id="returnsPercent">50%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> SIP calculations are estimates based on assumed returns. Actual market returns may vary. Past performance does not guarantee future results.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- SIP Formula -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 SIP Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-xl font-mono text-gray-800 dark:text-gray-200">FV = P × ((1+r)ⁿ - 1) / r × (1+r)</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">P = Monthly Investment, r = Monthly Return, n = Months</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Monthly Investment</span>
+                <span class="font-mono" id="formulaMonthly">$10,000</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Time Period</span>
+                <span class="font-mono" id="formulaPeriod">10 years</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Expected Return</span>
+                <span class="font-mono" id="formulaReturn">12% p.a.</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>Future Value</span>
+                <span class="font-mono" id="formulaFV">$0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SIP Summary -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📋 Investment Summary</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Monthly SIP</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryMonthly">$10,000</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Investment Period</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryPeriod">10 years</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Expected Return</span>
+                <span class="font-bold text-gray-900 dark:text-white" id="summaryReturn">12% p.a.</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Total Invested</span>
+                <span class="font-bold text-blue-600 dark:text-blue-400" id="summaryInvested">$0</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span class="text-gray-600 dark:text-gray-400">Total Returns</span>
+                <span class="font-bold text-amber-600 dark:text-amber-400" id="summaryReturns">$0</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>Final Value</span>
+                <span class="font-mono" id="summaryFinal">$0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Monthly SIP: $10,000 for 10 years</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Expected return: 12% p.a. (1% monthly)</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Power of compounding: $1,200,000 invested → $2,300,000</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Total value: $2,300,000 (Returns: $1,100,000)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Content -->
+      <SEOContent 
+        title="What is a SIP Calculator?"
+        description="A SIP (Systematic Investment Plan) calculator helps you estimate the future value of your mutual fund investments through regular monthly contributions."
+        formula="FV = P × ((1+r)ⁿ - 1) / r × (1+r)"
+        formulaDescription="P = Monthly Investment, r = Monthly Return, n = Number of Months"
+        example={{
+          title: "Example: Calculate SIP returns for $10,000 monthly for 10 years at 12% annual return",
+          steps: [
+            "Monthly return: 12% / 12 = 1%",
+            "Months: 10 × 12 = 120",
+            "FV = 10,000 × ((1.01)^120 - 1) / 0.01 × 1.01"
+          ],
+          result: "Total invested: $1,200,000 | Returns: $1,100,000 | Final value: $2,300,000"
+        }}
+        uses={[
+          "Mutual Fund Investments: Plan your monthly SIP contributions",
+          "Retirement Planning: Calculate retirement corpus through SIP",
+          "Wealth Management: Understand the power of compounding",
+          "Goal Planning: Estimate returns for specific financial goals"
+        ]}
+        faqs={[
+          {
+            question: "What is SIP?",
+            answer: "SIP (Systematic Investment Plan) is a method of investing a fixed amount regularly in mutual funds. It helps in rupee cost averaging and long-term wealth creation."
+          },
+          {
+            question: "Is SIP returns guaranteed?",
+            answer: "No, SIP returns depend on market performance and are not guaranteed. The calculator provides estimates based on assumed returns."
+          },
+          {
+            question: "What is the advantage of SIP?",
+            answer: "SIP allows you to invest small amounts regularly, benefit from rupee cost averaging, and harness the power of compounding over time."
+          }
+        ]}
+        note="SIP calculations are estimates. Actual market returns may vary. Consult a financial advisor for investment decisions."
+      />
+
+      <!-- Related Calculators -->
+      <RelatedCalculators currentId="sip" />
+    </div>
+  </main>
+
+  <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentMode = 'sip';
+      let rawMonthly = 10000;
+      let rawPeriod = 10;
+      let rawReturn = 12;
+
+      // ============================================
+      // VALIDATION HELPERS
+      // ============================================
+      function validatePositive(value, name, maxVal) {
+        const result = validatePositiveNumber(value, name, maxVal);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
+      }
+
+      function setSliderValue(slider, value, defaultMax) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) return;
+        if (defaultMax !== undefined) slider.max = String(Math.max(defaultMax, num));
+        slider.value = String(num);
+      }
+
+      function formatCurrency(value) {
+        return '$' + formatNumber(value, { 
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+          useGrouping: true
+        });
+      }
+
+      function formatCurrencyShort(value) {
+        return '$' + formatNumber(value, { 
+          maximumFractionDigits: 0,
+          useGrouping: true
+        });
+      }
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const monthlySlider = document.getElementById('monthlySlider');
+      const periodSlider = document.getElementById('periodSlider');
+      const returnSlider = document.getElementById('returnSlider');
+      const monthlyInput = document.getElementById('monthlyInput');
+      const periodInput = document.getElementById('periodInput');
+      const returnInput = document.getElementById('returnInput');
+      const monthlyDisplay = document.getElementById('monthlyDisplay');
+      const periodDisplay = document.getElementById('periodDisplay');
+      const returnDisplay = document.getElementById('returnDisplay');
+      
+      const totalInvested = document.getElementById('totalInvested');
+      const estimatedReturns = document.getElementById('estimatedReturns');
+      const totalValue = document.getElementById('totalValue');
+      const totalMonths = document.getElementById('totalMonths');
+      const roi = document.getElementById('roi');
+      const wealthBar = document.getElementById('wealthBar');
+      const investedPercent = document.getElementById('investedPercent');
+      const returnsPercent = document.getElementById('returnsPercent');
+      
+      const formulaMonthly = document.getElementById('formulaMonthly');
+      const formulaPeriod = document.getElementById('formulaPeriod');
+      const formulaReturn = document.getElementById('formulaReturn');
+      const formulaFV = document.getElementById('formulaFV');
+      
+      const summaryMonthly = document.getElementById('summaryMonthly');
+      const summaryPeriod = document.getElementById('summaryPeriod');
+      const summaryReturn = document.getElementById('summaryReturn');
+      const summaryInvested = document.getElementById('summaryInvested');
+      const summaryReturns = document.getElementById('summaryReturns');
+      const summaryFinal = document.getElementById('summaryFinal');
+      
+      const sipResultBox = document.getElementById('sipResultBox');
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
+      }
+
+      // ============================================
+      // CALCULATE SIP
+      // ============================================
+      function calculateSIP(syncInputs = true) {
+        const monthly = rawMonthly;
+        const period = rawPeriod;
+        const annualReturn = rawReturn;
+
+        const months = period * 12;
+        const monthlyReturn = annualReturn / 100 / 12;
+
+        // Calculate future value
+        let futureValue;
+        if (monthlyReturn === 0 || annualReturn === 0) {
+          futureValue = monthly * months;
+        } else {
+          futureValue = monthly * ((Math.pow(1 + monthlyReturn, months) - 1) / monthlyReturn) * (1 + monthlyReturn);
+        }
+
+        const totalInvestedAmount = monthly * months;
+        const totalReturns = futureValue - totalInvestedAmount;
+        const roiPercent = totalInvestedAmount > 0 ? (totalReturns / totalInvestedAmount) * 100 : 0;
+
+        // Calculate percentages for wealth bar
+        const total = totalInvestedAmount + totalReturns;
+        const investedPct = total > 0 ? (totalInvestedAmount / total) * 100 : 0;
+        const returnsPct = total > 0 ? (totalReturns / total) * 100 : 0;
+
+        // Update displays
+        monthlyDisplay.textContent = formatCurrencyShort(monthly);
+        periodDisplay.textContent = formatNumber(period, { maximumFractionDigits: 0 });
+        returnDisplay.textContent = formatNumber(annualReturn, { maximumFractionDigits: 1 });
+
+        // Update results
+        totalInvested.textContent = formatCurrency(totalInvestedAmount);
+        estimatedReturns.textContent = formatCurrency(totalReturns);
+        totalValue.textContent = formatCurrency(futureValue);
+        totalMonths.textContent = formatNumber(months, { maximumFractionDigits: 0 });
+        roi.textContent = formatNumber(roiPercent, { maximumFractionDigits: 1 }) + '%';
+
+        // Update wealth bar
+        wealthBar.style.width = `${Math.min(investedPct + returnsPct, 100)}%`;
+        investedPercent.textContent = formatNumber(investedPct, { maximumFractionDigits: 1 }) + '%';
+        returnsPercent.textContent = formatNumber(returnsPct, { maximumFractionDigits: 1 }) + '%';
+
+        // Update formula
+        formulaMonthly.textContent = formatCurrency(monthly);
+        formulaPeriod.textContent = formatNumber(period, { maximumFractionDigits: 0 }) + ' years';
+        formulaReturn.textContent = formatNumber(annualReturn, { maximumFractionDigits: 1 }) + '% p.a.';
+        formulaFV.textContent = formatCurrency(futureValue);
+
+        // Update summary
+        summaryMonthly.textContent = formatCurrency(monthly);
+        summaryPeriod.textContent = formatNumber(period, { maximumFractionDigits: 0 }) + ' years';
+        summaryReturn.textContent = formatNumber(annualReturn, { maximumFractionDigits: 1 }) + '% p.a.';
+        summaryInvested.textContent = formatCurrency(totalInvestedAmount);
+        summaryReturns.textContent = formatCurrency(totalReturns);
+        summaryFinal.textContent = formatCurrency(futureValue);
+
+        // Update steps
+        const monthlyReturnPercent = monthlyReturn * 100;
+        step1.textContent = `Monthly SIP: ${formatCurrency(monthly)} for ${formatNumber(period, { maximumFractionDigits: 0 })} years`;
+        step2.textContent = `Expected return: ${formatNumber(annualReturn, { maximumFractionDigits: 1 })}% p.a. (${formatNumber(monthlyReturnPercent, { maximumFractionDigits: 2 })}% monthly)`;
+        step3.textContent = `Power of compounding: ${formatCurrency(totalInvestedAmount)} invested → ${formatCurrency(futureValue)}`;
+        step4.textContent = `Total value: ${formatCurrency(futureValue)} (Returns: ${formatCurrency(totalReturns)})`;
+
+        // Show results
+        if (monthly > 0) {
+          sipResultBox.classList.remove('hidden');
+        } else {
+          sipResultBox.classList.add('hidden');
+        }
+
+        // Sync inputs
+        if (syncInputs) {
+          monthlySlider.value = monthly;
+          periodSlider.value = period;
+          returnSlider.value = annualReturn;
+          monthlyInput.value = monthly;
+          periodInput.value = period;
+          returnInput.value = annualReturn;
+        }
+      }
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      document.getElementById('modeSIP').addEventListener('click', () => {
+        document.querySelectorAll('.sip-mode-btn').forEach(b => {
+          b.className = 'sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeSIP').className = 'sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'sip';
+        calculateSIP();
+      });
+
+      document.getElementById('modeTarget').addEventListener('click', () => {
+        document.querySelectorAll('.sip-mode-btn').forEach(b => {
+          b.className = 'sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modeTarget').className = 'sip-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'target';
+        calculateSIP();
+      });
+
+      // ============================================
+      // SLIDER EVENTS
+      // ============================================
+      monthlySlider.addEventListener('input', () => {
+        rawMonthly = parseFloat(monthlySlider.value);
+        calculateSIP();
+      });
+      periodSlider.addEventListener('input', () => {
+        rawPeriod = parseFloat(periodSlider.value);
+        calculateSIP();
+      });
+      returnSlider.addEventListener('input', () => {
+        rawReturn = parseFloat(returnSlider.value);
+        calculateSIP();
+      });
+
+      // ============================================
+      // INPUT EVENTS
+      // ============================================
+      monthlyInput.addEventListener('input', () => {
+        const validation = validatePositive(monthlyInput.value, 'Monthly Investment', 1000000);
+        if (validation.valid) {
+          rawMonthly = validation.value;
+          calculateSIP(false);
+        }
+      });
+
+      periodInput.addEventListener('input', () => {
+        const validation = validatePositive(periodInput.value, 'Period', 40);
+        if (validation.valid && validation.value <= 40) {
+          rawPeriod = validation.value;
+          calculateSIP(false);
+        }
+      });
+
+      returnInput.addEventListener('input', () => {
+        const validation = validatePositive(returnInput.value, 'Return', 30);
+        if (validation.valid && validation.value <= 30) {
+          rawReturn = validation.value;
+          calculateSIP(false);
+        }
+      });
+
+      // ============================================
+      // CALCULATE BUTTON
+      // ============================================
+      document.getElementById('sipCalculateBtn').addEventListener('click', () => {
+        const monthlyResult = validatePositive(monthlyInput.value, 'Monthly Investment', 1000000);
+        const periodResult = validatePositive(periodInput.value, 'Period', 40);
+        const returnResult = validatePositive(returnInput.value, 'Return', 30);
+
+        if (!monthlyResult.valid) {
+          showValidationError(monthlyResult.message);
+          monthlyInput.focus();
+          return;
+        }
+        if (!periodResult.valid || periodResult.value > 40) {
+          showValidationError('Period should be between 1 and 40 years.');
+          periodInput.focus();
+          return;
+        }
+        if (!returnResult.valid || returnResult.value > 30) {
+          showValidationError('Return should be between 1% and 30%.');
+          returnInput.focus();
+          return;
+        }
+
+        rawMonthly = monthlyResult.value;
+        rawPeriod = periodResult.value;
+        rawReturn = returnResult.value;
+
+        calculateSIP();
+
+        if (window.showToast) {
+          window.showToast('✅ SIP calculation updated!', 'success');
+        }
+      });
+
+      // ============================================
+      // KEYBOARD SHORTCUTS
+      // ============================================
+      monthlyInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('sipCalculateBtn').click();
+      });
+      periodInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('sipCalculateBtn').click();
+      });
+      returnInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('sipCalculateBtn').click();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      calculateSIP();
+    });
+  </script>
+</Layout>

@@ -88,7 +88,7 @@ export const CATEGORIES: CategoryInfo[] = [
 export const CALCULATORS: Calculator[] = [
   // ============ MATH CATEGORY ============
 
-  // --- Implemented Area Calculators ---
+  // --- Area Calculators ---
   {
     id: 'circle-area',
     name: 'Circle Area Calculator',
@@ -218,7 +218,7 @@ export const CALCULATORS: Calculator[] = [
     relatedCalculators: ['circle-area']
   },
 
-  // --- Coming Soon: Volume Calculators ---
+  // --- Volume Calculators (Coming Soon) ---
   {
     id: 'sphere-volume',
     name: 'Sphere Volume Calculator',
@@ -306,7 +306,7 @@ export const CALCULATORS: Calculator[] = [
 
   // ============ HEALTH CATEGORY ============
 
-  // --- Implemented ---
+  // --- Implemented Health Calculators ---
   {
     id: 'bmi',
     name: 'BMI Calculator',
@@ -327,10 +327,8 @@ export const CALCULATORS: Calculator[] = [
     ],
     featured: true,
     trending: true,
-    relatedCalculators: []
+    relatedCalculators: ['bmr', 'body-fat']
   },
-
-  // --- Coming Soon: Health Calculators ---
   {
     id: 'bmr',
     name: 'BMR Calculator',
@@ -339,24 +337,16 @@ export const CALCULATORS: Calculator[] = [
     icon: '🔥',
     description: 'Calculate your Basal Metabolic Rate',
     formula: 'BMR = 10 × weight + 6.25 × height - 5 × age + 5',
-    searchTerms: ['bmr', 'basal metabolic rate', 'metabolism', 'calories', 'fitness'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['bmi'],
-    isComingSoon: true
-  },
-  {
-    id: 'body-fat',
-    name: 'Body Fat Calculator',
-    url: '/health/body-fat',
-    category: 'health',
-    icon: '💧',
-    description: 'Estimate your body fat percentage',
-    searchTerms: ['body fat', 'fat percentage', 'fitness', 'health'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['bmi'],
-    isComingSoon: true
+    searchTerms: [
+      'bmr',
+      'basal metabolic rate',
+      'metabolism',
+      'calories',
+      'fitness'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['bmi', 'calorie']
   },
   {
     id: 'calorie',
@@ -365,11 +355,18 @@ export const CALCULATORS: Calculator[] = [
     category: 'health',
     icon: '🍎',
     description: 'Calculate your daily calorie needs',
-    searchTerms: ['calorie', 'calories', 'daily calorie', 'food', 'diet'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['bmr'],
-    isComingSoon: true
+    formula: 'TDEE = BMR × Activity Factor',
+    searchTerms: [
+      'calorie',
+      'calories',
+      'daily calorie',
+      'food',
+      'diet',
+      'tdee'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['bmr', 'ideal-weight']
   },
   {
     id: 'ideal-weight',
@@ -378,16 +375,40 @@ export const CALCULATORS: Calculator[] = [
     category: 'health',
     icon: '🎯',
     description: 'Find your ideal weight range',
-    searchTerms: ['ideal weight', 'healthy weight', 'weight range', 'fitness'],
+    formula: 'Devine: 50 + 0.9 × (height - 152.4)',
+    searchTerms: [
+      'ideal weight',
+      'healthy weight',
+      'weight range',
+      'fitness'
+    ],
     featured: false,
     trending: false,
-    relatedCalculators: ['bmi'],
-    isComingSoon: true
+    relatedCalculators: ['bmi', 'body-fat']
+  },
+  {
+    id: 'body-fat',
+    name: 'Body Fat Calculator',
+    url: '/health/body-fat',
+    category: 'health',
+    icon: '💧',
+    description: 'Estimate your body fat percentage',
+    formula: 'Navy Method',
+    searchTerms: [
+      'body fat',
+      'fat percentage',
+      'fitness',
+      'health',
+      'navy method'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['bmi', 'ideal-weight']
   },
 
   // ============ FINANCE CATEGORY ============
 
-  // --- Implemented ---
+  // --- Implemented Finance Calculators ---
   {
     id: 'loan',
     name: 'Loan Calculator',
@@ -410,10 +431,8 @@ export const CALCULATORS: Calculator[] = [
     ],
     featured: true,
     trending: true,
-    relatedCalculators: []
+    relatedCalculators: ['emi', 'mortgage']
   },
-
-  // --- Coming Soon: Finance Calculators ---
   {
     id: 'emi',
     name: 'EMI Calculator',
@@ -421,11 +440,17 @@ export const CALCULATORS: Calculator[] = [
     category: 'finance',
     icon: '📈',
     description: 'Calculate Equated Monthly Installment for loans',
-    searchTerms: ['emi', 'equated monthly installment', 'loan', 'payment'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['loan'],
-    isComingSoon: true
+    formula: 'EMI = P × r × (1+r)ⁿ / ((1+r)ⁿ - 1)',
+    searchTerms: [
+      'emi',
+      'equated monthly installment',
+      'loan',
+      'payment',
+      'finance'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['loan', 'mortgage']
   },
   {
     id: 'mortgage',
@@ -433,12 +458,19 @@ export const CALCULATORS: Calculator[] = [
     url: '/finance/mortgage',
     category: 'finance',
     icon: '🏠',
-    description: 'Calculate home loan payments and amortization',
-    searchTerms: ['mortgage', 'home loan', 'property', 'real estate'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['loan'],
-    isComingSoon: true
+    description: 'Calculate home loan payments including taxes, insurance, and PMI',
+    formula: 'M = P [ i(1+i)^n ] / [ (1+i)^n - 1 ]',
+    searchTerms: [
+      'mortgage',
+      'home loan',
+      'property',
+      'real estate',
+      'housing',
+      'finance'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['loan', 'emi']
   },
   {
     id: 'sip',
@@ -447,11 +479,18 @@ export const CALCULATORS: Calculator[] = [
     category: 'finance',
     icon: '📊',
     description: 'Calculate returns on Systematic Investment Plans',
-    searchTerms: ['sip', 'systematic investment plan', 'mutual fund', 'investment'],
-    featured: false,
-    trending: false,
-    relatedCalculators: [],
-    isComingSoon: true
+    formula: 'FV = P × ((1+r)ⁿ - 1) / r × (1+r)',
+    searchTerms: [
+      'sip',
+      'systematic investment plan',
+      'mutual fund',
+      'investment',
+      'finance',
+      'wealth'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: []
   },
   {
     id: 'credit-card',
@@ -459,12 +498,19 @@ export const CALCULATORS: Calculator[] = [
     url: '/finance/credit-card',
     category: 'finance',
     icon: '💳',
-    description: 'Calculate credit card payments and interest',
-    searchTerms: ['credit card', 'credit card payment', 'interest', 'finance'],
-    featured: false,
-    trending: false,
-    relatedCalculators: ['loan'],
-    isComingSoon: true
+    description: 'Calculate credit card payments, interest, and payoff time',
+    formula: 'Monthly Interest = Balance × (APR / 12)',
+    searchTerms: [
+      'credit card',
+      'credit card payment',
+      'interest',
+      'debt',
+      'finance',
+      'payoff'
+    ],
+    featured: true,
+    trending: true,
+    relatedCalculators: ['loan']
   }
 ];
 

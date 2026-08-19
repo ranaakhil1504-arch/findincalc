@@ -1,0 +1,721 @@
+---
+// src/pages/finance/credit-card.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+---
+
+<Layout title="Credit Card Calculator - Payoff & Interest Calculator">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">💳</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Credit Card Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate your credit card payments, interest, and payoff timeline
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Mode Toggle -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Mode
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="modePayoff"
+                  class="cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  📅 Payoff Timeline
+                </button>
+                <button 
+                  id="modePayment"
+                  class="cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  💰 Find Payment
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Balance -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Current Balance = <span id="balanceDisplay" class="text-emerald-600 font-bold">5,000</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="balanceSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="100"
+                  max="100000"
+                  step="any"
+                  value="5000"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>$100</span>
+                  <span>$100,000</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="balanceInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Balance"
+                  value="5000"
+                  step="any"
+                  min="100"
+                />
+              </div>
+
+              <!-- Interest Rate -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    APR = <span id="rateDisplay" class="text-emerald-600 font-bold">18</span>%
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="rateSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="5"
+                  max="35"
+                  step="any"
+                  value="18"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>5%</span>
+                  <span>35%</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="rateInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="APR %"
+                  value="18"
+                  step="any"
+                  min="5"
+                  max="35"
+                />
+              </div>
+
+              <!-- Minimum Payment -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Minimum Payment = <span id="minPaymentDisplay" class="text-emerald-600 font-bold">150</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="minPaymentSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="10"
+                  max="5000"
+                  step="any"
+                  value="150"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>$10</span>
+                  <span>$5,000</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="minPaymentInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Minimum Payment"
+                  value="150"
+                  step="any"
+                  min="10"
+                />
+              </div>
+
+              <!-- Monthly Payment (for Payoff Timeline mode) -->
+              <div id="monthlyPaymentInput">
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Monthly Payment = <span id="monthlyPayDisplay" class="text-emerald-600 font-bold">300</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="monthlyPaySlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="10"
+                  max="10000"
+                  step="any"
+                  value="300"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>$10</span>
+                  <span>$10,000</span>
+                </div>
+                <input 
+                  type="number" 
+                  id="monthlyPayInput"
+                  class="w-full mt-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  placeholder="Monthly Payment"
+                  value="300"
+                  step="any"
+                  min="10"
+                />
+              </div>
+
+              <button 
+                id="ccCalculateBtn"
+                class="btn-primary w-full text-center"
+              >
+                Calculate
+              </button>
+            </div>
+
+            <!-- Credit Card Result Box -->
+            <div id="ccResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <!-- Main Result -->
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400" id="ccResultLabel">Payoff Time</p>
+                <p class="text-4xl font-bold text-emerald-600 dark:text-emerald-400" id="ccResultValue">3 years 2 months</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400" id="ccResultSub">38 months</p>
+              </div>
+
+              <!-- Breakdown -->
+              <div class="mt-4 grid grid-cols-3 gap-3">
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Total Interest</p>
+                  <p class="text-sm font-bold text-amber-600 dark:text-amber-400" id="ccTotalInterest">$2,500</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Total Payment</p>
+                  <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" id="ccTotalPayment">$7,500</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Total Months</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="ccTotalMonths">38</p>
+                </div>
+              </div>
+
+              <!-- Warning if paying only minimum -->
+              <div id="ccWarning" class="mt-3 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hidden">
+                <p class="text-xs text-red-600 dark:text-red-400 text-center">
+                  ⚠️ Paying only the minimum will take very long to pay off and cost significantly more in interest.
+                </p>
+              </div>
+
+              <!-- Pro Tip -->
+              <div id="ccProTip" class="mt-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <p class="text-xs text-blue-600 dark:text-blue-400 text-center" id="ccProTipText">
+                  💡 Increasing your monthly payment by $50 could save you $200 in interest.
+                </p>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> Credit card calculations are estimates. Actual rates, fees, and terms may vary. Consult your credit card issuer for accurate information.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 How It Works</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-sm font-mono text-gray-800 dark:text-gray-200">Monthly Interest = Balance × (APR / 12)</p>
+              <p class="text-sm font-mono text-gray-800 dark:text-gray-200 mt-2">Payment → Principal + Interest</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Balance</span>
+                <span class="font-mono" id="ccFormulaBalance">$5,000</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>APR</span>
+                <span class="font-mono" id="ccFormulaRate">18%</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Monthly Payment</span>
+                <span class="font-mono" id="ccFormulaPayment">$300</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>Payoff Time</span>
+                <span class="font-mono" id="ccFormulaResult">38 months</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Credit Card Tips -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">💡 Tips to Pay Off Faster</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold">1.</span>
+                <span class="text-gray-600 dark:text-gray-400">Pay more than the minimum each month</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold">2.</span>
+                <span class="text-gray-600 dark:text-gray-400">Consider a balance transfer to a lower APR card</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold">3.</span>
+                <span class="text-gray-600 dark:text-gray-400">Stop using the card while paying it off</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold">4.</span>
+                <span class="text-gray-600 dark:text-gray-400">Make bi-weekly payments to reduce interest</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ccStep1">Balance: $5,000 at 18% APR</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ccStep2">Monthly payment: $300</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="ccStep3">Interest: $75 first month, decreasing</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="ccStep4">Payoff: 38 months, $2,500 interest</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Content -->
+      <SEOContent 
+        title="What is a Credit Card Calculator?"
+        description="A credit card calculator helps you estimate how long it will take to pay off your balance and how much interest you'll pay based on your monthly payment."
+        formula="Monthly Interest = Balance × (APR / 12)"
+        formulaDescription="Balance decreases as payments are made, reducing interest over time"
+        example={{
+          title: "Example: Pay off $5,000 credit card debt at 18% APR with $300 monthly payment",
+          steps: [
+            "Monthly interest: $5,000 × 1.5% = $75",
+            "Principal payment: $300 - $75 = $225",
+            "New balance: $5,000 - $225 = $4,775"
+          ],
+          result: "Payoff time: 38 months | Total interest: $2,500"
+        }}
+        uses={[
+          "Debt Management: Plan your credit card payoff strategy",
+          "Budget Planning: Understand monthly payment requirements",
+          "Financial Goals: Set realistic debt-free targets",
+          "Interest Comparison: See the cost of different payment amounts"
+        ]}
+        faqs={[
+          {
+            question: "How does credit card interest work?",
+            answer: "Interest is charged on your average daily balance each month. The APR (Annual Percentage Rate) is divided by 12 to get the monthly rate."
+          },
+          {
+            question: "Should I pay more than the minimum?",
+            answer: "Yes! Paying more than the minimum significantly reduces the interest you pay and the time to become debt-free."
+          },
+          {
+            question: "What is the minimum payment?",
+            answer: "Minimum payment is typically 2-4% of your balance or a fixed amount ($25-$35), whichever is higher."
+          }
+        ]}
+        note="Credit card calculations are estimates. Actual rates, fees, and terms may vary. Consult your credit card issuer for accurate information."
+      />
+
+      <!-- Related Calculators -->
+      <RelatedCalculators currentId="credit-card" />
+    </div>
+  </main>
+
+  <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentMode = 'payoff';
+      let rawBalance = 5000;
+      let rawRate = 18;
+      let rawMinPayment = 150;
+      let rawMonthlyPayment = 300;
+
+      // ============================================
+      // VALIDATION HELPERS
+      // ============================================
+      function validatePositive(value, name, maxVal) {
+        const result = validatePositiveNumber(value, name, maxVal);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
+      }
+
+      function setSliderValue(slider, value, defaultMax) {
+        const num = Number(value);
+        if (!Number.isFinite(num)) return;
+        if (defaultMax !== undefined) slider.max = String(Math.max(defaultMax, num));
+        slider.value = String(num);
+      }
+
+      function formatCurrency(value) {
+        return '$' + formatNumber(value, { 
+          maximumFractionDigits: 2,
+          minimumFractionDigits: 2,
+          useGrouping: true
+        });
+      }
+
+      function formatCurrencyShort(value) {
+        return '$' + formatNumber(value, { 
+          maximumFractionDigits: 0,
+          useGrouping: true
+        });
+      }
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const balanceSlider = document.getElementById('balanceSlider');
+      const rateSlider = document.getElementById('rateSlider');
+      const minPaymentSlider = document.getElementById('minPaymentSlider');
+      const monthlyPaySlider = document.getElementById('monthlyPaySlider');
+      const balanceInput = document.getElementById('balanceInput');
+      const rateInput = document.getElementById('rateInput');
+      const minPaymentInput = document.getElementById('minPaymentInput');
+      const monthlyPayInput = document.getElementById('monthlyPayInput');
+      const balanceDisplay = document.getElementById('balanceDisplay');
+      const rateDisplay = document.getElementById('rateDisplay');
+      const minPaymentDisplay = document.getElementById('minPaymentDisplay');
+      const monthlyPayDisplay = document.getElementById('monthlyPayDisplay');
+      
+      const monthlyPaymentInput = document.getElementById('monthlyPaymentInput');
+      const ccResultBox = document.getElementById('ccResultBox');
+      const ccResultLabel = document.getElementById('ccResultLabel');
+      const ccResultValue = document.getElementById('ccResultValue');
+      const ccResultSub = document.getElementById('ccResultSub');
+      const ccTotalInterest = document.getElementById('ccTotalInterest');
+      const ccTotalPayment = document.getElementById('ccTotalPayment');
+      const ccTotalMonths = document.getElementById('ccTotalMonths');
+      const ccWarning = document.getElementById('ccWarning');
+      const ccProTip = document.getElementById('ccProTip');
+      const ccProTipText = document.getElementById('ccProTipText');
+      
+      const ccFormulaBalance = document.getElementById('ccFormulaBalance');
+      const ccFormulaRate = document.getElementById('ccFormulaRate');
+      const ccFormulaPayment = document.getElementById('ccFormulaPayment');
+      const ccFormulaResult = document.getElementById('ccFormulaResult');
+      
+      const ccStep1 = document.getElementById('ccStep1');
+      const ccStep2 = document.getElementById('ccStep2');
+      const ccStep3 = document.getElementById('ccStep3');
+      const ccStep4 = document.getElementById('ccStep4');
+
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
+      }
+
+      // ============================================
+      // CALCULATE CREDIT CARD
+      // ============================================
+      function calculateCreditCard(syncInputs = true) {
+        const balance = rawBalance;
+        const rate = rawRate;
+        const minPayment = rawMinPayment;
+        const monthlyPayment = currentMode === 'payoff' ? rawMonthlyPayment : minPayment;
+
+        const monthlyRate = rate / 100 / 12;
+        let remainingBalance = balance;
+        let totalInterest = 0;
+        let months = 0;
+        let payment = monthlyPayment;
+
+        // Simulate payments month by month
+        while (remainingBalance > 0 && months < 600) {
+          months++;
+          const interest = remainingBalance * monthlyRate;
+          totalInterest += interest;
+          
+          let paymentAmount = Math.min(payment, remainingBalance + interest);
+          remainingBalance = remainingBalance + interest - paymentAmount;
+          
+          // If payment is less than interest, break (debt growing)
+          if (paymentAmount <= interest && remainingBalance > 0) {
+            break;
+          }
+        }
+
+        // Check if debt was paid off
+        const paidOff = remainingBalance <= 0;
+        const totalPayment = balance + totalInterest;
+
+        // Determine if paying only minimum
+        const isMinimumOnly = currentMode === 'payoff' && monthlyPayment <= minPayment;
+
+        // Format results
+        const years = Math.floor(months / 12);
+        const remainingMonths = months % 12;
+        let timeString = '';
+        if (years > 0) {
+          timeString += `${years} year${years > 1 ? 's' : ''}`;
+          if (remainingMonths > 0) {
+            timeString += ` ${remainingMonths} month${remainingMonths > 1 ? 's' : ''}`;
+          }
+        } else {
+          timeString = `${months} month${months > 1 ? 's' : ''}`;
+        }
+
+        // Update displays
+        balanceDisplay.textContent = formatCurrencyShort(balance);
+        rateDisplay.textContent = formatNumber(rate, { maximumFractionDigits: 1 });
+        minPaymentDisplay.textContent = formatCurrencyShort(minPayment);
+        monthlyPayDisplay.textContent = formatCurrencyShort(monthlyPayment);
+
+        // Update formula
+        ccFormulaBalance.textContent = formatCurrency(balance);
+        ccFormulaRate.textContent = formatNumber(rate, { maximumFractionDigits: 1 }) + '%';
+        ccFormulaPayment.textContent = formatCurrency(monthlyPayment);
+        ccFormulaResult.textContent = paidOff ? `${months} months` : 'Never (pay more)';
+
+        // Update results
+        if (paidOff) {
+          ccResultBox.classList.remove('hidden');
+          ccResultLabel.textContent = 'Payoff Time';
+          ccResultValue.textContent = timeString;
+          ccResultSub.textContent = `${months} months`;
+          ccTotalInterest.textContent = formatCurrency(totalInterest);
+          ccTotalPayment.textContent = formatCurrency(totalPayment);
+          ccTotalMonths.textContent = months;
+
+          // Show warning if paying minimum only
+          if (isMinimumOnly) {
+            ccWarning.classList.remove('hidden');
+          } else {
+            ccWarning.classList.add('hidden');
+          }
+
+          // Pro tip
+          const extraPayment = monthlyPayment * 1.15;
+          const extraMonthlyRate = rate / 100 / 12;
+          let extraRemaining = balance;
+          let extraTotalInterest = 0;
+          let extraMonths = 0;
+          while (extraRemaining > 0 && extraMonths < 600) {
+            extraMonths++;
+            const interest = extraRemaining * extraMonthlyRate;
+            extraTotalInterest += interest;
+            const paymentAmount = Math.min(extraPayment, extraRemaining + interest);
+            extraRemaining = extraRemaining + interest - paymentAmount;
+          }
+          if (extraRemaining <= 0 && extraMonths < months) {
+            const savings = totalInterest - extraTotalInterest;
+            ccProTipText.textContent = `💡 Increasing your monthly payment by $${formatNumber(monthlyPayment * 0.15, { maximumFractionDigits: 0 })} could save you $${formatCurrencyShort(savings)} in interest.`;
+          } else {
+            ccProTipText.textContent = '💡 Pay as much as you can above the minimum to reduce interest costs.';
+          }
+        } else {
+          ccResultBox.classList.remove('hidden');
+          ccResultLabel.textContent = '⚠️ Debt Growing';
+          ccResultValue.textContent = 'Never';
+          ccResultSub.textContent = 'Payment is too low';
+          ccTotalInterest.textContent = formatCurrency(totalInterest);
+          ccTotalPayment.textContent = formatCurrency(totalPayment);
+          ccTotalMonths.textContent = '∞';
+          ccWarning.classList.remove('hidden');
+          ccProTipText.textContent = '⚠️ Your payment is less than the interest. Increase your monthly payment to start reducing the balance.';
+        }
+
+        // Update steps
+        const monthlyRatePercent = monthlyRate * 100;
+        const firstMonthInterest = balance * monthlyRate;
+        ccStep1.textContent = `Balance: ${formatCurrency(balance)} at ${formatNumber(rate, { maximumFractionDigits: 1 })}% APR`;
+        ccStep2.textContent = `Monthly payment: ${formatCurrency(monthlyPayment)}${isMinimumOnly ? ' (minimum payment)' : ''}`;
+        ccStep3.textContent = `First month interest: ${formatCurrency(firstMonthInterest)}`;
+        ccStep4.textContent = paidOff ? `Payoff: ${timeString}, ${formatCurrency(totalInterest)} interest` : 'Payment is too low to pay off the debt';
+
+        // Sync inputs
+        if (syncInputs) {
+          balanceSlider.value = balance;
+          rateSlider.value = rate;
+          minPaymentSlider.value = minPayment;
+          monthlyPaySlider.value = monthlyPayment;
+          balanceInput.value = balance;
+          rateInput.value = rate;
+          minPaymentInput.value = minPayment;
+          monthlyPayInput.value = monthlyPayment;
+        }
+      }
+
+      // ============================================
+      // MODE TOGGLE
+      // ============================================
+      document.getElementById('modePayoff').addEventListener('click', () => {
+        document.querySelectorAll('.cc-mode-btn').forEach(b => {
+          b.className = 'cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modePayoff').className = 'cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'payoff';
+        monthlyPaymentInput.style.display = 'block';
+        document.querySelector('label[for="monthlyPaySlider"]')?.previousElementSibling?.textContent?.includes('Monthly Payment');
+        calculateCreditCard();
+      });
+
+      document.getElementById('modePayment').addEventListener('click', () => {
+        document.querySelectorAll('.cc-mode-btn').forEach(b => {
+          b.className = 'cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('modePayment').className = 'cc-mode-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentMode = 'payment';
+        monthlyPaymentInput.style.display = 'none';
+        calculateCreditCard();
+      });
+
+      // ============================================
+      // SLIDER EVENTS
+      // ============================================
+      balanceSlider.addEventListener('input', () => {
+        rawBalance = parseFloat(balanceSlider.value);
+        calculateCreditCard();
+      });
+      rateSlider.addEventListener('input', () => {
+        rawRate = parseFloat(rateSlider.value);
+        calculateCreditCard();
+      });
+      minPaymentSlider.addEventListener('input', () => {
+        rawMinPayment = parseFloat(minPaymentSlider.value);
+        calculateCreditCard();
+      });
+      monthlyPaySlider.addEventListener('input', () => {
+        rawMonthlyPayment = parseFloat(monthlyPaySlider.value);
+        calculateCreditCard();
+      });
+
+      // ============================================
+      // INPUT EVENTS
+      // ============================================
+      balanceInput.addEventListener('input', () => {
+        const validation = validatePositive(balanceInput.value, 'Balance', 100000);
+        if (validation.valid) {
+          rawBalance = validation.value;
+          calculateCreditCard(false);
+        }
+      });
+
+      rateInput.addEventListener('input', () => {
+        const validation = validatePositive(rateInput.value, 'APR', 35);
+        if (validation.valid && validation.value <= 35) {
+          rawRate = validation.value;
+          calculateCreditCard(false);
+        }
+      });
+
+      minPaymentInput.addEventListener('input', () => {
+        const validation = validatePositive(minPaymentInput.value, 'Minimum Payment', 5000);
+        if (validation.valid) {
+          rawMinPayment = validation.value;
+          calculateCreditCard(false);
+        }
+      });
+
+      monthlyPayInput.addEventListener('input', () => {
+        const validation = validatePositive(monthlyPayInput.value, 'Monthly Payment', 10000);
+        if (validation.valid) {
+          rawMonthlyPayment = validation.value;
+          calculateCreditCard(false);
+        }
+      });
+
+      // ============================================
+      // CALCULATE BUTTON
+      // ============================================
+      document.getElementById('ccCalculateBtn').addEventListener('click', () => {
+        const balanceResult = validatePositive(balanceInput.value, 'Balance', 100000);
+        const rateResult = validatePositive(rateInput.value, 'APR', 35);
+        const minPaymentResult = validatePositive(minPaymentInput.value, 'Minimum Payment', 5000);
+        const monthlyPayResult = validatePositive(monthlyPayInput.value, 'Monthly Payment', 10000);
+
+        if (!balanceResult.valid) {
+          showValidationError(balanceResult.message);
+          balanceInput.focus();
+          return;
+        }
+        if (!rateResult.valid || rateResult.value > 35) {
+          showValidationError('APR should be between 5% and 35%.');
+          rateInput.focus();
+          return;
+        }
+        if (!minPaymentResult.valid) {
+          showValidationError(minPaymentResult.message);
+          minPaymentInput.focus();
+          return;
+        }
+        if (currentMode === 'payoff' && !monthlyPayResult.valid) {
+          showValidationError(monthlyPayResult.message);
+          monthlyPayInput.focus();
+          return;
+        }
+
+        rawBalance = balanceResult.value;
+        rawRate = rateResult.value;
+        rawMinPayment = minPaymentResult.value;
+        if (currentMode === 'payoff') {
+          rawMonthlyPayment = monthlyPayResult.value;
+        }
+
+        calculateCreditCard();
+
+        if (window.showToast) {
+          window.showToast('✅ Credit card calculation updated!', 'success');
+        }
+      });
+
+      // ============================================
+      // KEYBOARD SHORTCUTS
+      // ============================================
+      balanceInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('ccCalculateBtn').click();
+      });
+      rateInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('ccCalculateBtn').click();
+      });
+      minPaymentInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('ccCalculateBtn').click();
+      });
+      monthlyPayInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('ccCalculateBtn').click();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      calculateCreditCard();
+    });
+  </script>
+</Layout>

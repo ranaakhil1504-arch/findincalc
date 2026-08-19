@@ -1,0 +1,716 @@
+---
+// src/pages/health/ideal-weight.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+---
+
+<Layout title="Ideal Weight Calculator - Find Your Healthy Weight Range">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">🎯</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Ideal Weight Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Find your ideal weight range based on height, gender, and body frame
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Unit Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Unit System
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="unitMetric"
+                  class="iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  Metric (cm/kg)
+                </button>
+                <button 
+                  id="unitImperial"
+                  class="iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  Imperial (ft/lbs)
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Height -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Height = <span id="heightDisplay" class="text-emerald-600 font-bold">175</span> <span id="heightUnit">cm</span>
+                    <span id="heightFeetInches" class="text-gray-400 font-normal text-xs ml-1"></span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="heightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="120"
+                  max="220"
+                  step="any"
+                  value="175"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>120 cm</span>
+                  <span id="heightMaxLabel">220 cm</span>
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Gender
+                </label>
+                <div class="flex gap-3">
+                  <button 
+                    id="genderMale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    👨 Male
+                  </button>
+                  <button 
+                    id="genderFemale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    👩 Female
+                  </button>
+                </div>
+              </div>
+
+              <!-- Frame Size -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Body Frame Size
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button 
+                    id="frameSmall"
+                    class="frame-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🟢 Small
+                  </button>
+                  <button 
+                    id="frameMedium"
+                    class="frame-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    🟡 Medium
+                  </button>
+                  <button 
+                    id="frameLarge"
+                    class="frame-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🔴 Large
+                  </button>
+                </div>
+              </div>
+
+              <!-- Formula Selector -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Formula
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button 
+                    id="formulaDevine"
+                    class="formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    Devine
+                  </button>
+                  <button 
+                    id="formulaRobinson"
+                    class="formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    Robinson
+                  </button>
+                  <button 
+                    id="formulaMiller"
+                    class="formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    Miller
+                  </button>
+                  <button 
+                    id="formulaHamwi"
+                    class="formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    Hamwi
+                  </button>
+                </div>
+              </div>
+
+              <!-- Input Fields -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="heightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Height"
+                    value="175"
+                    step="any"
+                    min="120"
+                  />
+                </div>
+                <button 
+                  id="iwCalculateBtn"
+                  class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                >
+                  Calculate
+                </button>
+              </div>
+            </div>
+
+            <!-- Ideal Weight Result Box -->
+            <div id="iwResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <!-- Main Result -->
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Your Ideal Weight</p>
+                <p class="text-5xl font-bold text-emerald-600 dark:text-emerald-400" id="iwResultValue">70.0</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400" id="iwResultUnit">kg</p>
+              </div>
+
+              <!-- Weight Range -->
+              <div class="mt-4 grid grid-cols-3 gap-3">
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Healthy Range</p>
+                  <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" id="iwRange">58.5 – 78.0</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500" id="iwRangeUnit">kg</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Formula Used</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="iwFormula">Devine</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500">Method</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">BMI at Ideal</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="iwBmi">22.9</p>
+                  <p class="text-xs text-gray-400 dark:text-gray-500">kg/m²</p>
+                </div>
+              </div>
+
+              <!-- Frame Adjustment Note -->
+              <div class="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <p class="text-xs text-gray-600 dark:text-gray-300 text-center" id="iwFrameNote">
+                  🟡 Medium frame: ±10% adjustment applied
+                </p>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> Ideal weight formulas are estimates. Individual body composition varies. Consult a healthcare professional for personalized advice.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Formula Comparison -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📊 Formula Comparison</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300"><strong>Devine</strong> (Most Common)</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="devineWeight">70.0 kg</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300"><strong>Robinson</strong></span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="robinsonWeight">72.5 kg</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300"><strong>Miller</strong></span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="millerWeight">68.0 kg</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300"><strong>Hamwi</strong></span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="hamwiWeight">71.5 kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-xl font-mono text-gray-800 dark:text-gray-200" id="iwFormulaDisplay">Devine: 50 + 0.9 × (height - 152.4)</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">For males (females use 45.5 kg base)</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Height</span>
+                <span class="font-mono" id="iwFormulaHeight">175 cm</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Gender</span>
+                <span class="font-mono" id="iwFormulaGender">Male</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Frame</span>
+                <span class="font-mono" id="iwFormulaFrame">Medium</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>Ideal Weight</span>
+                <span class="font-mono" id="iwFormulaResult">70.0 kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Formula: 50 + 0.9 × (height - 152.4)</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Plug in: 50 + 0.9 × (175 - 152.4)</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Calculate: 50 + 0.9 × 22.6 = 70.3</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Result: Ideal Weight = 70.3 kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Content -->
+      <SEOContent 
+        title="What is an Ideal Weight Calculator?"
+        description="An ideal weight calculator helps you estimate your healthy weight range based on height, gender, and body frame size using established medical formulas."
+        formula="Devine: 50 + 0.9 × (height - 152.4)"
+        formulaDescription="For men (women use 45.5 kg base)"
+        example={{
+          title: "Example: Calculate ideal weight for a 175 cm tall male",
+          steps: [
+            "Devine formula: 50 + 0.9 × (175 - 152.4)",
+            "50 + 0.9 × 22.6 = 70.3 kg",
+            "Medium frame: ±10% = 63.3 - 77.3 kg"
+          ],
+          result: "Ideal weight: 70.3 kg (63.3 - 77.3 kg range)"
+        }}
+        uses={[
+          "Health Assessment: Understand your healthy weight range",
+          "Fitness Goals: Set realistic weight targets",
+          "Medical Context: Used by healthcare professionals",
+          "Weight Management: Track progress toward ideal weight"
+        ]}
+        faqs={[
+          {
+            question: "Which formula is most accurate?",
+            answer: "The Devine formula is most commonly used in medical settings. However, all formulas are estimates and should be used as guidelines."
+          },
+          {
+            question: "Does frame size matter?",
+            answer: "Yes! People with larger frames naturally weigh more at the same height. The calculator adjusts for frame size."
+          },
+          {
+            question: "Is ideal weight the same as healthy weight?",
+            answer: "Ideal weight is an estimate based on formulas. A healthy weight range (BMI 18.5-24.9) is a broader, more accepted guideline."
+          }
+        ]}
+        note="Ideal weight formulas are estimates. Individual body composition varies significantly. Use these as general guidelines."
+      />
+
+      <!-- Related Calculators -->
+      <RelatedCalculators currentId="ideal-weight" />
+    </div>
+  </main>
+
+  <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'metric';
+      let currentGender = 'male';
+      let currentFrame = 'medium';
+      let currentFormula = 'devine';
+      let rawHeight = 175;
+
+      // Frame adjustments
+      const frameAdjustments = {
+        small: { label: 'Small', emoji: '🟢', adjustment: 0.9, description: '-10% adjustment' },
+        medium: { label: 'Medium', emoji: '🟡', adjustment: 1.0, description: '±0% adjustment' },
+        large: { label: 'Large', emoji: '🔴', adjustment: 1.1, description: '+10% adjustment' }
+      };
+
+      // Formula definitions
+      const formulaDefinitions = {
+        devine: {
+          label: 'Devine',
+          description: 'Most common medical formula',
+          male: (heightCm) => 50 + 0.9 * (heightCm - 152.4),
+          female: (heightCm) => 45.5 + 0.9 * (heightCm - 152.4)
+        },
+        robinson: {
+          label: 'Robinson',
+          description: 'Alternative formula',
+          male: (heightCm) => 52 + 1.9 * ((heightCm - 152.4) / 2.54),
+          female: (heightCm) => 49 + 1.7 * ((heightCm - 152.4) / 2.54)
+        },
+        miller: {
+          label: 'Miller',
+          description: 'Simplified formula',
+          male: (heightCm) => 56.2 + 1.41 * ((heightCm - 152.4) / 2.54),
+          female: (heightCm) => 53.1 + 1.36 * ((heightCm - 152.4) / 2.54)
+        },
+        hamwi: {
+          label: 'Hamwi',
+          description: 'Traditional formula',
+          male: (heightCm) => 48 + 2.7 * ((heightCm - 152.4) / 2.54),
+          female: (heightCm) => 45.5 + 2.2 * ((heightCm - 152.4) / 2.54)
+        }
+      };
+
+      // ============================================
+      // VALIDATION HELPERS
+      // ============================================
+      function validatePositive(value, name, maxVal) {
+        const result = validatePositiveNumber(value, name, maxVal);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
+      }
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const heightSlider = document.getElementById('heightSlider');
+      const heightInput = document.getElementById('heightInput');
+      const heightDisplay = document.getElementById('heightDisplay');
+      const heightUnit = document.getElementById('heightUnit');
+      const heightMaxLabel = document.getElementById('heightMaxLabel');
+      const heightFeetInches = document.getElementById('heightFeetInches');
+      
+      const iwResultValue = document.getElementById('iwResultValue');
+      const iwResultUnit = document.getElementById('iwResultUnit');
+      const iwResultBox = document.getElementById('iwResultBox');
+      const iwRange = document.getElementById('iwRange');
+      const iwRangeUnit = document.getElementById('iwRangeUnit');
+      const iwFormula = document.getElementById('iwFormula');
+      const iwBmi = document.getElementById('iwBmi');
+      const iwFrameNote = document.getElementById('iwFrameNote');
+      
+      const iwFormulaDisplay = document.getElementById('iwFormulaDisplay');
+      const iwFormulaHeight = document.getElementById('iwFormulaHeight');
+      const iwFormulaGender = document.getElementById('iwFormulaGender');
+      const iwFormulaFrame = document.getElementById('iwFormulaFrame');
+      const iwFormulaResult = document.getElementById('iwFormulaResult');
+      
+      const devineWeight = document.getElementById('devineWeight');
+      const robinsonWeight = document.getElementById('robinsonWeight');
+      const millerWeight = document.getElementById('millerWeight');
+      const hamwiWeight = document.getElementById('hamwiWeight');
+      
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
+      }
+
+      // ============================================
+      // UNIT CONVERSIONS
+      // ============================================
+      const unitConversions = {
+        metric: {
+          heightLabel: 'cm',
+          weightLabel: 'kg',
+          heightMax: '220 cm',
+          heightMin: 120,
+          heightMaxNum: 220,
+          heightInputMax: 220,
+          heightInputMin: 120,
+          heightFactor: 1,
+          weightFactor: 1,
+          convertHeight: (h) => h,
+          convertWeight: (w) => w
+        },
+        imperial: {
+          heightLabel: 'ft',
+          weightLabel: 'lbs',
+          heightMax: '7.2 ft',
+          heightMin: 47,
+          heightMaxNum: 86,
+          heightInputMax: 86,
+          heightInputMin: 47,
+          heightFactor: 2.54,
+          weightFactor: 0.453592,
+          convertHeight: (h) => h / 2.54,
+          convertWeight: (w) => w / 0.453592
+        }
+      };
+
+      // ============================================
+      // UPDATE IDEAL WEIGHT
+      // ============================================
+      function updateIdealWeight(syncInputs = true) {
+        const unit = unitConversions[currentUnit];
+        let height = rawHeight;
+
+        // Get height in cm for calculation
+        const heightCm = unit === unitConversions.metric ? height : height * 2.54;
+
+        // Get the selected formula
+        const formula = formulaDefinitions[currentFormula];
+        const frame = frameAdjustments[currentFrame];
+
+        // Calculate ideal weight based on gender
+        let idealWeight;
+        if (currentGender === 'male') {
+          idealWeight = formula.male(heightCm);
+        } else {
+          idealWeight = formula.female(heightCm);
+        }
+
+        // Apply frame adjustment
+        const adjustedWeight = idealWeight * frame.adjustment;
+
+        // Calculate healthy range (BMI 18.5-24.9)
+        const heightM = heightCm / 100;
+        const minWeight = 18.5 * heightM * heightM;
+        const maxWeight = 24.9 * heightM * heightM;
+
+        // Calculate BMI at ideal weight
+        const bmiAtIdeal = adjustedWeight / (heightM * heightM);
+
+        // Format values
+        const weightDisplayUnit = unit.weightLabel;
+        const formattedWeight = formatNumber(adjustedWeight, { maximumFractionDigits: 1 });
+        const formattedMin = formatNumber(minWeight, { maximumFractionDigits: 1 });
+        const formattedMax = formatNumber(maxWeight, { maximumFractionDigits: 1 });
+        const formattedBmi = formatNumber(bmiAtIdeal, { maximumFractionDigits: 1 });
+
+        // Update displays
+        heightDisplay.textContent = formatNumber(height, { maximumFractionDigits: 1 });
+        heightUnit.textContent = unit.heightLabel;
+
+        // Show result
+        iwResultBox.classList.remove('hidden');
+        iwResultValue.textContent = formattedWeight;
+        iwResultUnit.textContent = weightDisplayUnit;
+        iwRange.textContent = `${formattedMin} – ${formattedMax}`;
+        iwRangeUnit.textContent = weightDisplayUnit;
+        iwFormula.textContent = formula.label;
+        iwBmi.textContent = formattedBmi;
+        iwFrameNote.textContent = `${frame.emoji} ${frame.label} frame: ${frame.description}`;
+
+        // Update formula card
+        const genderLabel = currentGender === 'male' ? 'Male' : 'Female';
+        const formulaDisplayText = currentGender === 'male' 
+          ? `${formula.label}: ${formula.male(heightCm).toFixed(1)} kg base`
+          : `${formula.label}: ${formula.female(heightCm).toFixed(1)} kg base`;
+        iwFormulaDisplay.textContent = formulaDisplayText;
+        iwFormulaHeight.textContent = `${formatNumber(height, { maximumFractionDigits: 1 })} ${unit.heightLabel}`;
+        iwFormulaGender.textContent = genderLabel;
+        iwFormulaFrame.textContent = frame.label;
+        iwFormulaResult.textContent = `${formattedWeight} ${weightDisplayUnit}`;
+
+        // Update formula comparison
+        const allFormulas = ['devine', 'robinson', 'miller', 'hamwi'];
+        const formulaElements = [devineWeight, robinsonWeight, millerWeight, hamwiWeight];
+        
+        allFormulas.forEach((f, index) => {
+          const fDef = formulaDefinitions[f];
+          let weight;
+          if (currentGender === 'male') {
+            weight = fDef.male(heightCm);
+          } else {
+            weight = fDef.female(heightCm);
+          }
+          const adjusted = weight * frame.adjustment;
+          formulaElements[index].textContent = `${formatNumber(adjusted, { maximumFractionDigits: 1 })} ${weightDisplayUnit}`;
+        });
+
+        // Update steps
+        const formulaStep = currentGender === 'male' 
+          ? `${formula.label}: ${formula.male(heightCm).toFixed(1)} + adjustment`
+          : `${formula.label}: ${formula.female(heightCm).toFixed(1)} + adjustment`;
+        step1.textContent = `Formula: ${formulaStep}`;
+        step2.textContent = `Plug in: ${formula.male(heightCm).toFixed(1)} × ${frame.adjustment.toFixed(1)} (${frame.label} frame)`;
+        step3.textContent = `Calculate: ${formattedWeight} ${weightDisplayUnit}`;
+        step4.textContent = `Result: Ideal Weight = ${formattedWeight} ${weightDisplayUnit} (Range: ${formattedMin} – ${formattedMax} ${weightDisplayUnit})`;
+
+        // Update sliders
+        if (syncInputs) {
+          heightSlider.value = height;
+          heightInput.value = height;
+        }
+      }
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.getElementById('unitMetric').addEventListener('click', () => {
+        document.querySelectorAll('.iw-unit-btn').forEach(b => {
+          b.className = 'iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitMetric').className = 'iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'metric';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+        }
+        currentUnit = newUnit;
+        updateIdealWeight();
+      });
+
+      document.getElementById('unitImperial').addEventListener('click', () => {
+        document.querySelectorAll('.iw-unit-btn').forEach(b => {
+          b.className = 'iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitImperial').className = 'iw-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'imperial';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+        }
+        currentUnit = newUnit;
+        updateIdealWeight();
+      });
+
+      // ============================================
+      // GENDER TOGGLE
+      // ============================================
+      document.getElementById('genderMale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderMale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'male';
+        updateIdealWeight();
+      });
+
+      document.getElementById('genderFemale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderFemale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'female';
+        updateIdealWeight();
+      });
+
+      // ============================================
+      // FRAME TOGGLE
+      // ============================================
+      document.querySelectorAll('.frame-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.frame-btn').forEach(b => {
+            b.className = 'frame-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'frame-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          const id = btn.id.replace('frame', '').toLowerCase();
+          currentFrame = id;
+          updateIdealWeight();
+        });
+      });
+
+      // ============================================
+      // FORMULA TOGGLE
+      // ============================================
+      document.querySelectorAll('.formula-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.formula-btn').forEach(b => {
+            b.className = 'formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'formula-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          const id = btn.id.replace('formula', '').toLowerCase();
+          currentFormula = id;
+          updateIdealWeight();
+        });
+      });
+
+      // ============================================
+      // SLIDER EVENTS
+      // ============================================
+      heightSlider.addEventListener('input', () => {
+        rawHeight = parseFloat(heightSlider.value);
+        updateIdealWeight();
+      });
+
+      // ============================================
+      // INPUT EVENTS
+      // ============================================
+      heightInput.addEventListener('input', () => {
+        const validation = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightInputMax);
+        if (validation.valid) {
+          rawHeight = validation.value;
+          updateIdealWeight(false);
+        }
+      });
+
+      // ============================================
+      // CALCULATE BUTTON
+      // ============================================
+      document.getElementById('iwCalculateBtn').addEventListener('click', () => {
+        const heightResult = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightInputMax);
+
+        if (!heightResult.valid) {
+          showValidationError(heightResult.message);
+          heightInput.focus();
+          return;
+        }
+
+        rawHeight = heightResult.value;
+        heightSlider.value = rawHeight;
+        updateIdealWeight();
+
+        if (window.showToast) {
+          window.showToast('✅ Ideal weight calculated!', 'success');
+        }
+      });
+
+      // ============================================
+      // KEYBOARD SHORTCUTS: ENTER KEY
+      // ============================================
+      heightInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('iwCalculateBtn').click();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      updateIdealWeight();
+    });
+  </script>
+</Layout>

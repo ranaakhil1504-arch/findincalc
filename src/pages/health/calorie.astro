@@ -1,0 +1,807 @@
+---
+// src/pages/health/calorie.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+---
+
+<Layout title="Calorie Calculator - Daily Calorie Needs Calculator">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">🍎</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Calorie Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Calculate your daily calorie needs for weight maintenance, loss, or gain
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Unit Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Unit System
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="unitMetric"
+                  class="cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  Metric (kg/cm)
+                </button>
+                <button 
+                  id="unitImperial"
+                  class="cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  Imperial (lbs/in)
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Weight -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Weight = <span id="weightDisplay" class="text-emerald-600 font-bold">70</span> <span id="weightUnit">kg</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="weightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="20"
+                  max="300"
+                  step="any"
+                  value="70"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>20</span>
+                  <span id="weightMaxLabel">300 kg</span>
+                </div>
+              </div>
+
+              <!-- Height -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Height = <span id="heightDisplay" class="text-emerald-600 font-bold">175</span> <span id="heightUnit">cm</span>
+                    <span id="heightFeetInches" class="text-gray-400 font-normal text-xs ml-1"></span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="heightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="100"
+                  max="250"
+                  step="any"
+                  value="175"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>100</span>
+                  <span id="heightMaxLabel">250 cm</span>
+                </div>
+              </div>
+
+              <!-- Age -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Age = <span id="ageDisplay" class="text-emerald-600 font-bold">30</span> years
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="ageSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="10"
+                  max="100"
+                  step="1"
+                  value="30"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>10</span>
+                  <span>100</span>
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Gender
+                </label>
+                <div class="flex gap-3">
+                  <button 
+                    id="genderMale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    👨 Male
+                  </button>
+                  <button 
+                    id="genderFemale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    👩 Female
+                  </button>
+                </div>
+              </div>
+
+              <!-- Activity Level -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Activity Level
+                </label>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <button 
+                    id="activitySedentary"
+                    class="activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    🛋️ Sedentary
+                  </button>
+                  <button 
+                    id="activityLight"
+                    class="activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🚶 Light
+                  </button>
+                  <button 
+                    id="activityModerate"
+                    class="activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🏃 Moderate
+                  </button>
+                  <button 
+                    id="activityHeavy"
+                    class="activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    💪 Heavy
+                  </button>
+                </div>
+              </div>
+
+              <!-- Goal -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Goal
+                </label>
+                <div class="grid grid-cols-3 gap-2">
+                  <button 
+                    id="goalLose"
+                    class="goal-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🔽 Lose Weight
+                  </button>
+                  <button 
+                    id="goalMaintain"
+                    class="goal-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    ⚖️ Maintain
+                  </button>
+                  <button 
+                    id="goalGain"
+                    class="goal-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    🔼 Gain Weight
+                  </button>
+                </div>
+              </div>
+
+              <!-- Input Fields -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="weightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Weight"
+                    value="70"
+                    step="any"
+                    min="20"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="heightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Height"
+                    value="175"
+                    step="any"
+                    min="100"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="ageInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Age"
+                    value="30"
+                    step="1"
+                    min="10"
+                    max="100"
+                  />
+                </div>
+                <button 
+                  id="calCalculateBtn"
+                  class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                >
+                  Calculate
+                </button>
+              </div>
+            </div>
+
+            <!-- Calorie Result Box -->
+            <div id="calResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <!-- Main Result -->
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Daily Calorie Needs</p>
+                <p class="text-5xl font-bold text-emerald-600 dark:text-emerald-400" id="calResultValue">2,100</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">calories per day</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" id="calGoalLabel">⚖️ Maintain weight</p>
+              </div>
+
+              <!-- Macro Breakdown -->
+              <div class="mt-4 grid grid-cols-3 gap-3">
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <div class="w-full h-2 rounded-full bg-blue-500 mb-2" id="proteinBar" style="width: 30%"></div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Protein</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="proteinCal">150g</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <div class="w-full h-2 rounded-full bg-amber-500 mb-2" id="carbsBar" style="width: 50%"></div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Carbs</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="carbsCal">250g</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <div class="w-full h-2 rounded-full bg-emerald-500 mb-2" id="fatsBar" style="width: 20%"></div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Fats</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="fatsCal">70g</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> Calorie needs are estimates. Consult a healthcare professional for personalized dietary advice.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Activity Level Guide -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📊 Activity Levels</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">🛋️ Sedentary</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">Little or no exercise</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">🚶 Light</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">1-3 days/week</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">🏃 Moderate</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">3-5 days/week</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">💪 Heavy</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400">6-7 days/week</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Formula Card -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Formula</h3>
+            <div class="bg-gray-100 dark:bg-gray-700 rounded-xl p-4 text-center">
+              <p class="text-xl font-mono text-gray-800 dark:text-gray-200">TDEE = BMR × Activity Factor</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Total Daily Energy Expenditure</p>
+            </div>
+            <div class="mt-4 space-y-2 text-sm text-gray-600 dark:text-gray-400">
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>BMR</span>
+                <span class="font-mono" id="calBmr">1,500 cal</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Activity Level</span>
+                <span class="font-mono" id="calActivity">Moderate</span>
+              </div>
+              <div class="flex justify-between border-b border-gray-100 dark:border-gray-700 pb-2">
+                <span>Activity Factor</span>
+                <span class="font-mono" id="calFactor">1.55</span>
+              </div>
+              <div class="flex justify-between font-bold text-emerald-600 dark:text-emerald-400 pt-1">
+                <span>TDEE</span>
+                <span class="font-mono" id="calTdee">2,325 cal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Calculate BMR using Mifflin-St Jeor formula</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">BMR = 1,500 cal/day</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Apply activity factor: 1,500 × 1.55 = 2,325</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Result: TDEE = 2,325 cal/day</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Content -->
+      <SEOContent 
+        title="What is a Calorie Calculator?"
+        description="A calorie calculator helps you determine your daily calorie needs for weight maintenance, loss, or gain. Based on your BMR and activity level."
+        formula="TDEE = BMR × Activity Factor"
+        formulaDescription="Total Daily Energy Expenditure = Basal Metabolic Rate × Activity Multiplier"
+        example={{
+          title: "Example: Calculate daily calories for a 30-year-old male, 70 kg, 175 cm, moderately active",
+          steps: [
+            "BMR = 10 × 70 + 6.25 × 175 - 5 × 30 + 5 = 1,500 cal",
+            "TDEE = 1,500 × 1.55 = 2,325 cal",
+            "Goal: Maintain weight → 2,325 cal/day"
+          ],
+          result: "Daily calorie needs: 2,325 calories"
+        }}
+        uses={[
+          "Weight Management: Plan calories for weight loss or gain",
+          "Fitness: Optimize nutrition for workout performance",
+          "Health: Understand your energy needs"
+        ]}
+        faqs={[
+          {
+            question: "What is TDEE?",
+            answer: "TDEE (Total Daily Energy Expenditure) is the total calories you burn in a day, including exercise and daily activities."
+          },
+          {
+            question: "How much should I eat to lose weight?",
+            answer: "Typically, a deficit of 500 calories per day leads to about 0.5 kg (1 lb) of weight loss per week. The calculator shows your maintenance calories - subtract 500 for weight loss."
+          }
+        ]}
+        note="Calorie needs vary by individual. Use this as a starting point and adjust based on your actual results."
+      />
+
+      <!-- Related Calculators -->
+      <RelatedCalculators currentId="calorie" />
+    </div>
+  </main>
+
+  <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'metric';
+      let currentGender = 'male';
+      let currentActivity = 'moderate';
+      let currentGoal = 'maintain';
+      let rawWeight = 70;
+      let rawHeight = 175;
+      let rawAge = 30;
+
+      // Activity multipliers
+      const activityMultipliers = {
+        sedentary: { label: 'Sedentary', value: 1.2, icon: '🛋️' },
+        light: { label: 'Light', value: 1.375, icon: '🚶' },
+        moderate: { label: 'Moderate', value: 1.55, icon: '🏃' },
+        heavy: { label: 'Heavy', value: 1.725, icon: '💪' }
+      };
+
+      // Goal adjustments
+      const goalAdjustments = {
+        lose: { label: '🔽 Lose Weight', factor: 0.8, description: 'Calorie deficit for weight loss' },
+        maintain: { label: '⚖️ Maintain', factor: 1.0, description: 'Maintain current weight' },
+        gain: { label: '🔼 Gain Weight', factor: 1.2, description: 'Calorie surplus for weight gain' }
+      };
+
+      // ============================================
+      // VALIDATION HELPERS
+      // ============================================
+      function validatePositive(value, name, maxVal) {
+        const result = validatePositiveNumber(value, name, maxVal);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
+      }
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const weightSlider = document.getElementById('weightSlider');
+      const heightSlider = document.getElementById('heightSlider');
+      const ageSlider = document.getElementById('ageSlider');
+      const weightInput = document.getElementById('weightInput');
+      const heightInput = document.getElementById('heightInput');
+      const ageInput = document.getElementById('ageInput');
+      const weightDisplay = document.getElementById('weightDisplay');
+      const heightDisplay = document.getElementById('heightDisplay');
+      const ageDisplay = document.getElementById('ageDisplay');
+      const weightUnit = document.getElementById('weightUnit');
+      const heightUnit = document.getElementById('heightUnit');
+      const weightMaxLabel = document.getElementById('weightMaxLabel');
+      const heightMaxLabel = document.getElementById('heightMaxLabel');
+      const heightFeetInches = document.getElementById('heightFeetInches');
+      
+      const calResultValue = document.getElementById('calResultValue');
+      const calResultBox = document.getElementById('calResultBox');
+      const calGoalLabel = document.getElementById('calGoalLabel');
+      const calBmr = document.getElementById('calBmr');
+      const calActivity = document.getElementById('calActivity');
+      const calFactor = document.getElementById('calFactor');
+      const calTdee = document.getElementById('calTdee');
+      
+      const proteinCal = document.getElementById('proteinCal');
+      const carbsCal = document.getElementById('carbsCal');
+      const fatsCal = document.getElementById('fatsCal');
+      const proteinBar = document.getElementById('proteinBar');
+      const carbsBar = document.getElementById('carbsBar');
+      const fatsBar = document.getElementById('fatsBar');
+      
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
+      }
+
+      // ============================================
+      // UNIT CONVERSIONS
+      // ============================================
+      const unitConversions = {
+        metric: {
+          weightLabel: 'kg',
+          heightLabel: 'cm',
+          weightMax: '300 kg',
+          heightMax: '250 cm',
+          weightMin: 20,
+          weightMaxNum: 300,
+          heightMin: 100,
+          heightMaxNum: 250,
+          weightInputMax: 300,
+          heightInputMax: 250,
+          weightInputMin: 20,
+          heightInputMin: 100,
+          ageMin: 10,
+          ageMax: 100,
+          convertWeight: (w) => w,
+          convertHeight: (h) => h,
+          weightFactor: 1,
+          heightFactor: 1
+        },
+        imperial: {
+          weightLabel: 'lbs',
+          heightLabel: 'in',
+          weightMax: '660 lbs',
+          heightMax: '98 in',
+          weightMin: 44,
+          weightMaxNum: 660,
+          heightMin: 39,
+          heightMaxNum: 98,
+          weightInputMax: 660,
+          heightInputMax: 98,
+          weightInputMin: 44,
+          heightInputMin: 39,
+          ageMin: 10,
+          ageMax: 100,
+          convertWeight: (w) => w / 0.453592,
+          convertHeight: (h) => h / 2.54,
+          weightFactor: 0.453592,
+          heightFactor: 2.54
+        }
+      };
+
+      // ============================================
+      // UPDATE CALORIE
+      // ============================================
+      function updateCalorie(syncInputs = true) {
+        const unit = unitConversions[currentUnit];
+        let weight = rawWeight;
+        let height = rawHeight;
+        let age = rawAge;
+        let gender = currentGender;
+
+        // Get values in metric for calculation
+        const weightKg = unit === unitConversions.metric ? weight : weight * 0.453592;
+        const heightCm = unit === unitConversions.metric ? height : height * 2.54;
+
+        // Calculate BMR
+        let bmr;
+        if (gender === 'male') {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+        } else {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+        }
+
+        // Apply activity multiplier
+        const activity = activityMultipliers[currentActivity];
+        const tdee = bmr * activity.value;
+
+        // Apply goal adjustment
+        const goal = goalAdjustments[currentGoal];
+        const finalCalories = tdee * goal.factor;
+
+        const formattedCalories = formatNumber(finalCalories, { maximumFractionDigits: 0, useGrouping: true });
+        const formattedBmr = formatNumber(bmr, { maximumFractionDigits: 0, useGrouping: true });
+        const formattedTdee = formatNumber(tdee, { maximumFractionDigits: 0, useGrouping: true });
+
+        // Update displays
+        weightDisplay.textContent = formatNumber(weight, { maximumFractionDigits: 1 });
+        heightDisplay.textContent = formatNumber(height, { maximumFractionDigits: 1 });
+        ageDisplay.textContent = formatNumber(age, { maximumFractionDigits: 0 });
+
+        // Show result
+        calResultBox.classList.remove('hidden');
+        calResultValue.textContent = formattedCalories;
+        calGoalLabel.textContent = goal.description;
+
+        // Update formula card
+        calBmr.textContent = `${formattedBmr} cal`;
+        calActivity.textContent = activity.label;
+        calFactor.textContent = activity.value.toFixed(2);
+        calTdee.textContent = `${formattedTdee} cal`;
+
+        // Calculate macros (protein: 30%, carbs: 50%, fats: 20%)
+        const proteinG = (finalCalories * 0.30) / 4;
+        const carbsG = (finalCalories * 0.50) / 4;
+        const fatsG = (finalCalories * 0.20) / 9;
+
+        proteinCal.textContent = `${formatNumber(proteinG, { maximumFractionDigits: 0 })}g`;
+        carbsCal.textContent = `${formatNumber(carbsG, { maximumFractionDigits: 0 })}g`;
+        fatsCal.textContent = `${formatNumber(fatsG, { maximumFractionDigits: 0 })}g`;
+
+        // Update macro bars (max width for visual)
+        const maxMacro = Math.max(proteinG, carbsG, fatsG);
+        proteinBar.style.width = `${(proteinG / maxMacro) * 100}%`;
+        carbsBar.style.width = `${(carbsG / maxMacro) * 100}%`;
+        fatsBar.style.width = `${(fatsG / maxMacro) * 100}%`;
+
+        // Update steps
+        const genderSign = gender === 'male' ? '+5' : '-161';
+        step1.textContent = `Calculate BMR using Mifflin-St Jeor formula`;
+        step2.textContent = `BMR = 10 × ${formatNumber(weight, { maximumFractionDigits: 1 })} + 6.25 × ${formatNumber(height, { maximumFractionDigits: 1 })} - 5 × ${formatNumber(age, { maximumFractionDigits: 0 })} ${genderSign} = ${formattedBmr} cal/day`;
+        step3.textContent = `Apply activity factor (${activity.label}): ${formattedBmr} × ${activity.value} = ${formattedTdee}`;
+        step4.textContent = `Result: ${goal.label} → ${formattedCalories} cal/day`;
+
+        // Update sliders
+        if (syncInputs) {
+          weightSlider.value = weight;
+          heightSlider.value = height;
+          ageSlider.value = age;
+          weightInput.value = weight;
+          heightInput.value = height;
+          ageInput.value = age;
+        }
+      }
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.getElementById('unitMetric').addEventListener('click', () => {
+        document.querySelectorAll('.cal-unit-btn').forEach(b => {
+          b.className = 'cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitMetric').className = 'cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'metric';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawWeight = rawWeight * old.weightFactor / nu.weightFactor;
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+        }
+        currentUnit = newUnit;
+        updateCalorie();
+      });
+
+      document.getElementById('unitImperial').addEventListener('click', () => {
+        document.querySelectorAll('.cal-unit-btn').forEach(b => {
+          b.className = 'cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitImperial').className = 'cal-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'imperial';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawWeight = rawWeight * old.weightFactor / nu.weightFactor;
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+        }
+        currentUnit = newUnit;
+        updateCalorie();
+      });
+
+      // ============================================
+      // GENDER TOGGLE
+      // ============================================
+      document.getElementById('genderMale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderMale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'male';
+        updateCalorie();
+      });
+
+      document.getElementById('genderFemale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderFemale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'female';
+        updateCalorie();
+      });
+
+      // ============================================
+      // ACTIVITY TOGGLE
+      // ============================================
+      document.querySelectorAll('.activity-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.activity-btn').forEach(b => {
+            b.className = 'activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'activity-btn px-3 py-2 rounded-lg text-xs font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          const id = btn.id.replace('activity', '').toLowerCase();
+          currentActivity = id;
+          updateCalorie();
+        });
+      });
+
+      // ============================================
+      // GOAL TOGGLE
+      // ============================================
+      document.querySelectorAll('.goal-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.goal-btn').forEach(b => {
+            b.className = 'goal-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'goal-btn px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          const id = btn.id.replace('goal', '').toLowerCase();
+          currentGoal = id;
+          updateCalorie();
+        });
+      });
+
+      // ============================================
+      // SLIDER EVENTS
+      // ============================================
+      weightSlider.addEventListener('input', () => {
+        rawWeight = parseFloat(weightSlider.value);
+        updateCalorie();
+      });
+      heightSlider.addEventListener('input', () => {
+        rawHeight = parseFloat(heightSlider.value);
+        updateCalorie();
+      });
+      ageSlider.addEventListener('input', () => {
+        rawAge = parseFloat(ageSlider.value);
+        updateCalorie();
+      });
+
+      // ============================================
+      // INPUT EVENTS
+      // ============================================
+      weightInput.addEventListener('input', () => {
+        const validation = validatePositive(weightInput.value, 'Weight', unitConversions[currentUnit].weightInputMax);
+        if (validation.valid) {
+          rawWeight = validation.value;
+          updateCalorie(false);
+        }
+      });
+
+      heightInput.addEventListener('input', () => {
+        const validation = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightInputMax);
+        if (validation.valid) {
+          rawHeight = validation.value;
+          updateCalorie(false);
+        }
+      });
+
+      ageInput.addEventListener('input', () => {
+        const validation = validatePositive(ageInput.value, 'Age', 120);
+        if (validation.valid && validation.value >= 10 && validation.value <= 120) {
+          rawAge = validation.value;
+          updateCalorie(false);
+        }
+      });
+
+      // ============================================
+      // CALCULATE BUTTON
+      // ============================================
+      document.getElementById('calCalculateBtn').addEventListener('click', () => {
+        const weightResult = validatePositive(weightInput.value, 'Weight', unitConversions[currentUnit].weightInputMax);
+        const heightResult = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightInputMax);
+        const ageResult = validatePositive(ageInput.value, 'Age', 120);
+
+        if (!weightResult.valid) {
+          showValidationError(weightResult.message);
+          weightInput.focus();
+          return;
+        }
+        if (!heightResult.valid) {
+          showValidationError(heightResult.message);
+          heightInput.focus();
+          return;
+        }
+        if (!ageResult.valid || ageResult.value < 10 || ageResult.value > 120) {
+          showValidationError('Age must be between 10 and 120.');
+          ageInput.focus();
+          return;
+        }
+
+        rawWeight = weightResult.value;
+        rawHeight = heightResult.value;
+        rawAge = ageResult.value;
+
+        weightSlider.value = rawWeight;
+        heightSlider.value = rawHeight;
+        ageSlider.value = rawAge;
+
+        updateCalorie();
+
+        if (window.showToast) {
+          window.showToast('✅ Calorie calculation updated!', 'success');
+        }
+      });
+
+      // ============================================
+      // KEYBOARD SHORTCUTS: ENTER KEY
+      // ============================================
+      weightInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('calCalculateBtn').click();
+      });
+      heightInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('calCalculateBtn').click();
+      });
+      ageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('calCalculateBtn').click();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      updateCalorie();
+    });
+  </script>
+</Layout>

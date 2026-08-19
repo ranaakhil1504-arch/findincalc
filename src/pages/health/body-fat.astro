@@ -1,0 +1,1090 @@
+---
+// src/pages/health/body-fat.astro
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import SEOContent from '../../components/SEOContent.astro';
+import RelatedCalculators from '../../components/RelatedCalculators.astro';
+---
+
+<Layout title="Body Fat Calculator - Estimate Your Body Fat Percentage">
+  <Navbar />
+
+  <main class="pt-8 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Header -->
+      <div class="text-center mb-8 fade-in fade-in-delay-1">
+        <span class="text-5xl">💧</span>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+          Body Fat Calculator
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          Estimate your body fat percentage using multiple measurement methods
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Left: Calculator -->
+        <div class="lg:col-span-3">
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
+            
+            <!-- Method Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Method
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="methodNavy"
+                  class="bf-method-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  🎯 Navy Method
+                </button>
+                <button 
+                  id="methodBMI"
+                  class="bf-method-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  📊 BMI Method
+                </button>
+              </div>
+            </div>
+
+            <!-- Unit Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 min-w-[100px]">
+                Unit System
+              </label>
+              <div class="flex flex-wrap gap-2">
+                <button 
+                  id="unitMetric"
+                  class="bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                >
+                  Metric (kg/cm)
+                </button>
+                <button 
+                  id="unitImperial"
+                  class="bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  Imperial (lbs/in)
+                </button>
+              </div>
+            </div>
+
+            <!-- Inputs -->
+            <div class="space-y-4">
+              <!-- Weight -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Weight = <span id="weightDisplay" class="text-emerald-600 font-bold">70</span> <span id="weightUnit">kg</span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="weightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="20"
+                  max="300"
+                  step="any"
+                  value="70"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>20</span>
+                  <span id="weightMaxLabel">300 kg</span>
+                </div>
+              </div>
+
+              <!-- Height -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Height = <span id="heightDisplay" class="text-emerald-600 font-bold">175</span> <span id="heightUnit">cm</span>
+                    <span id="heightFeetInches" class="text-gray-400 font-normal text-xs ml-1"></span>
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="heightSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="100"
+                  max="250"
+                  step="any"
+                  value="175"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>100 cm</span>
+                  <span id="heightMaxLabel">250 cm</span>
+                </div>
+              </div>
+
+              <!-- Age -->
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Age = <span id="ageDisplay" class="text-emerald-600 font-bold">30</span> years
+                  </label>
+                </div>
+                <input 
+                  type="range" 
+                  id="ageSlider"
+                  class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                  min="10"
+                  max="100"
+                  step="1"
+                  value="30"
+                />
+                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                  <span>10</span>
+                  <span>100</span>
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div>
+                <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+                  Gender
+                </label>
+                <div class="flex gap-3">
+                  <button 
+                    id="genderMale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  >
+                    👨 Male
+                  </button>
+                  <button 
+                    id="genderFemale"
+                    class="gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  >
+                    👩 Female
+                  </button>
+                </div>
+              </div>
+
+              <!-- Navy Method: Waist & Neck -->
+              <div id="navyInputs">
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Waist Circumference = <span id="waistDisplay" class="text-emerald-600 font-bold">85</span> <span id="waistUnit">cm</span>
+                    </label>
+                  </div>
+                  <input 
+                    type="range" 
+                    id="waistSlider"
+                    class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    min="50"
+                    max="200"
+                    step="any"
+                    value="85"
+                  />
+                  <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>50</span>
+                    <span>200 cm</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Neck Circumference = <span id="neckDisplay" class="text-emerald-600 font-bold">38</span> <span id="neckUnit">cm</span>
+                    </label>
+                  </div>
+                  <input 
+                    type="range" 
+                    id="neckSlider"
+                    class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                    min="20"
+                    max="60"
+                    step="any"
+                    value="38"
+                  />
+                  <div class="flex justify-between text-xs text-gray-400 mt-1">
+                    <span>20</span>
+                    <span>60 cm</span>
+                  </div>
+                </div>
+
+                <!-- Hip (female only) -->
+                <div id="hipInput" class="hidden">
+                  <div>
+                    <div class="flex justify-between items-center mb-2">
+                      <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Hip Circumference = <span id="hipDisplay" class="text-emerald-600 font-bold">95</span> <span id="hipUnit">cm</span>
+                      </label>
+                    </div>
+                    <input 
+                      type="range" 
+                      id="hipSlider"
+                      class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      min="50"
+                      max="200"
+                      step="any"
+                      value="95"
+                    />
+                    <div class="flex justify-between text-xs text-gray-400 mt-1">
+                      <span>50</span>
+                      <span>200 cm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input Fields -->
+              <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="weightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Weight"
+                    value="70"
+                    step="any"
+                    min="20"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="heightInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Height"
+                    value="175"
+                    step="any"
+                    min="100"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="ageInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Age"
+                    value="30"
+                    step="1"
+                    min="10"
+                    max="100"
+                  />
+                </div>
+                <button 
+                  id="bfCalculateBtn"
+                  class="btn-primary px-8 py-2.5 whitespace-nowrap"
+                >
+                  Calculate
+                </button>
+              </div>
+
+              <!-- Navy-specific inputs row -->
+              <div id="navyInputRow" class="flex flex-col sm:flex-row gap-3">
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="waistInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Waist (cm)"
+                    value="85"
+                    step="any"
+                    min="50"
+                  />
+                </div>
+                <div class="flex-1">
+                  <input 
+                    type="number" 
+                    id="neckInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Neck (cm)"
+                    value="38"
+                    step="any"
+                    min="20"
+                  />
+                </div>
+                <div class="flex-1" id="hipInputWrapper">
+                  <input 
+                    type="number" 
+                    id="hipInput"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Hip (cm)"
+                    value="95"
+                    step="any"
+                    min="50"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Body Fat Result Box -->
+            <div id="bfResultBox" class="mt-6 rounded-xl p-4 border border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 hidden">
+              <!-- Main Result -->
+              <div class="text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400">Estimated Body Fat</p>
+                <p class="text-5xl font-bold text-emerald-600 dark:text-emerald-400" id="bfResultValue">18.5</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">% body fat</p>
+              </div>
+
+              <!-- Category -->
+              <div class="mt-3 text-center">
+                <span id="bfCategory" class="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                  ✅ Healthy
+                </span>
+              </div>
+
+              <!-- Details Grid -->
+              <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Fat Mass</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="fatMass">12.5 kg</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Lean Mass</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="leanMass">57.5 kg</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Method</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="bfMethod">Navy</p>
+                </div>
+                <div class="p-3 rounded-lg bg-white/50 dark:bg-gray-700/50 text-center">
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Category</p>
+                  <p class="text-sm font-bold text-gray-700 dark:text-gray-300" id="bfCategoryShort">Good</p>
+                </div>
+              </div>
+
+              <!-- Category Description -->
+              <div class="mt-3 p-3 rounded-lg bg-white/50 dark:bg-gray-700/50">
+                <p class="text-xs text-gray-600 dark:text-gray-300 text-center" id="bfDescription">
+                  Your body fat percentage is in the healthy range for your age and gender.
+                </p>
+              </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                ⚠️ <span class="font-medium">Disclaimer:</span> Body fat estimates are approximations. Methods like DEXA, hydrostatic weighing, or Bod Pod provide more accurate results. Consult a healthcare professional for accurate assessment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Information -->
+        <div class="lg:col-span-2 space-y-4">
+          <!-- Body Fat Categories -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📊 Body Fat Categories (Men)</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <span class="text-gray-700 dark:text-gray-300">💪 Athlete</span>
+                <span class="text-xs text-blue-600 dark:text-blue-400">6-13%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <span class="text-gray-700 dark:text-gray-300">✅ Healthy</span>
+                <span class="text-xs text-green-600 dark:text-green-400">14-17%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                <span class="text-gray-700 dark:text-gray-300">⚠️ Average</span>
+                <span class="text-xs text-yellow-600 dark:text-yellow-400">18-24%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800">
+                <span class="text-gray-700 dark:text-gray-300">🔶 Above Average</span>
+                <span class="text-xs text-orange-600 dark:text-orange-400">25-30%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                <span class="text-gray-700 dark:text-gray-300">🔴 Obese</span>
+                <span class="text-xs text-red-600 dark:text-red-400">30%+</span>
+              </div>
+            </div>
+            <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+              <p>💡 Women have higher essential fat: Athlete 14-20%, Healthy 21-24%, Average 25-31%</p>
+            </div>
+          </div>
+
+          <!-- Method Comparison -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📐 Method Comparison</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">🎯 Navy Method</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="navyResult">18.5%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-gray-700 dark:text-gray-300">📊 BMI Method</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400" id="bmiResult">19.2%</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <span class="text-gray-700 dark:text-gray-300">📈 Average</span>
+                <span class="text-xs font-bold text-amber-600 dark:text-amber-400" id="avgResult">18.9%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step-by-Step -->
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+            <h3 class="font-bold text-gray-900 dark:text-white mb-3">📝 Step-by-Step</h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">1.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step1">Using Navy Method formula</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">2.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step2">Measurements: Weight, Height, Waist, Neck</span>
+              </div>
+              <div class="flex items-start gap-3 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                <span class="text-emerald-500 font-bold min-w-[24px]">3.</span>
+                <span class="text-gray-600 dark:text-gray-400" id="step3">Calculated body fat: 18.5%</span>
+              </div>
+              <div class="flex items-start gap-3 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                <span class="text-emerald-600 dark:text-emerald-400 font-bold min-w-[24px]">✓</span>
+                <span class="font-bold text-emerald-600 dark:text-emerald-400" id="step4">Category: Healthy range</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO Content -->
+      <SEOContent 
+        title="What is a Body Fat Calculator?"
+        description="A body fat calculator estimates your body fat percentage using various methods including the Navy method and BMI-based estimation."
+        formula="Navy Method: 495 / (1.0324 - 0.19077 × log10(waist - neck) + 0.15456 × log10(height)) - 450"
+        formulaDescription="U.S. Navy Circumference Method"
+        example={{
+          title: "Example: Calculate body fat for a 30-year-old male, 70 kg, 175 cm, 85 cm waist, 38 cm neck",
+          steps: [
+            "Navy Method formula applied",
+            "Body fat = 18.5%",
+            "Category: Healthy (14-17% for athletes, 18-24% for average)"
+          ],
+          result: "Body Fat: 18.5% (Healthy range)"
+        }}
+        uses={[
+          "Fitness Assessment: Track body composition changes",
+          "Health Monitoring: Identify potential health risks",
+          "Weight Management: Set realistic body composition goals",
+          "Athletic Performance: Optimize body composition for sports"
+        ]}
+        faqs={[
+          {
+            question: "What is a healthy body fat percentage?",
+            answer: "For men: 14-17% is healthy, 6-13% is athletic. For women: 21-24% is healthy, 14-20% is athletic."
+          },
+          {
+            question: "Which method is most accurate?",
+            answer: "The Navy method is considered reasonably accurate for most people (±3-4%). For true accuracy, DEXA or hydrostatic weighing is recommended."
+          },
+          {
+            question: "Why does body fat matter more than weight?",
+            answer: "Body fat percentage gives you a clearer picture of your health and fitness than weight alone. Two people at the same weight can have very different body compositions."
+          }
+        ]}
+        note="Body fat estimates are approximations. Individual results may vary. Consult a healthcare professional for accurate body composition assessment."
+      />
+
+      <!-- Related Calculators -->
+      <RelatedCalculators currentId="body-fat" />
+    </div>
+  </main>
+
+  <script>
+    import { validatePositiveNumber } from '../../lib/calculator/validation';
+    import { formatNumber, formatResult, formatDecimal } from '../../lib/calculator/formatting';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      // ============================================
+      // STATE
+      // ============================================
+      let currentUnit = 'metric';
+      let currentMethod = 'navy';
+      let currentGender = 'male';
+      let rawWeight = 70;
+      let rawHeight = 175;
+      let rawAge = 30;
+      let rawWaist = 85;
+      let rawNeck = 38;
+      let rawHip = 95;
+
+      // ============================================
+      // VALIDATION HELPERS
+      // ============================================
+      function validatePositive(value, name, maxVal) {
+        const result = validatePositiveNumber(value, name, maxVal);
+        if (!result.valid) {
+          return { valid: false, message: result.message };
+        }
+        return { valid: true, value: result.value };
+      }
+
+      // ============================================
+      // DOM REFERENCES
+      // ============================================
+      const weightSlider = document.getElementById('weightSlider');
+      const heightSlider = document.getElementById('heightSlider');
+      const ageSlider = document.getElementById('ageSlider');
+      const waistSlider = document.getElementById('waistSlider');
+      const neckSlider = document.getElementById('neckSlider');
+      const hipSlider = document.getElementById('hipSlider');
+      
+      const weightInput = document.getElementById('weightInput');
+      const heightInput = document.getElementById('heightInput');
+      const ageInput = document.getElementById('ageInput');
+      const waistInput = document.getElementById('waistInput');
+      const neckInput = document.getElementById('neckInput');
+      const hipInput = document.getElementById('hipInput');
+      
+      const weightDisplay = document.getElementById('weightDisplay');
+      const heightDisplay = document.getElementById('heightDisplay');
+      const ageDisplay = document.getElementById('ageDisplay');
+      const waistDisplay = document.getElementById('waistDisplay');
+      const neckDisplay = document.getElementById('neckDisplay');
+      const hipDisplay = document.getElementById('hipDisplay');
+      
+      const weightUnit = document.getElementById('weightUnit');
+      const heightUnit = document.getElementById('heightUnit');
+      const waistUnit = document.getElementById('waistUnit');
+      const neckUnit = document.getElementById('neckUnit');
+      const hipUnit = document.getElementById('hipUnit');
+      const weightMaxLabel = document.getElementById('weightMaxLabel');
+      const heightMaxLabel = document.getElementById('heightMaxLabel');
+      const heightFeetInches = document.getElementById('heightFeetInches');
+      const hipInputWrapper = document.getElementById('hipInputWrapper');
+      const hipInputDiv = document.getElementById('hipInput');
+      const navyInputRow = document.getElementById('navyInputRow');
+      
+      const bfResultValue = document.getElementById('bfResultValue');
+      const bfResultBox = document.getElementById('bfResultBox');
+      const bfCategory = document.getElementById('bfCategory');
+      const bfCategoryShort = document.getElementById('bfCategoryShort');
+      const bfDescription = document.getElementById('bfDescription');
+      const bfMethod = document.getElementById('bfMethod');
+      const fatMass = document.getElementById('fatMass');
+      const leanMass = document.getElementById('leanMass');
+      
+      const navyResult = document.getElementById('navyResult');
+      const bmiResult = document.getElementById('bmiResult');
+      const avgResult = document.getElementById('avgResult');
+      
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      const step3 = document.getElementById('step3');
+      const step4 = document.getElementById('step4');
+
+      function showValidationError(message) {
+        if (window.showToast) window.showToast(message, 'error');
+        else window.alert(message);
+      }
+
+      // ============================================
+      // UNIT CONVERSIONS
+      // ============================================
+      const unitConversions = {
+        metric: {
+          weightLabel: 'kg',
+          heightLabel: 'cm',
+          waistLabel: 'cm',
+          neckLabel: 'cm',
+          hipLabel: 'cm',
+          weightMax: '300 kg',
+          heightMax: '250 cm',
+          weightMin: 20,
+          weightMaxNum: 300,
+          heightMin: 100,
+          heightMaxNum: 250,
+          waistMin: 50,
+          waistMax: 200,
+          neckMin: 20,
+          neckMax: 60,
+          hipMin: 50,
+          hipMax: 200,
+          weightFactor: 1,
+          heightFactor: 1,
+          waistFactor: 1,
+          neckFactor: 1,
+          hipFactor: 1
+        },
+        imperial: {
+          weightLabel: 'lbs',
+          heightLabel: 'in',
+          waistLabel: 'in',
+          neckLabel: 'in',
+          hipLabel: 'in',
+          weightMax: '660 lbs',
+          heightMax: '98 in',
+          weightMin: 44,
+          weightMaxNum: 660,
+          heightMin: 39,
+          heightMaxNum: 98,
+          waistMin: 20,
+          waistMax: 78,
+          neckMin: 8,
+          neckMax: 24,
+          hipMin: 20,
+          hipMax: 78,
+          weightFactor: 0.453592,
+          heightFactor: 2.54,
+          waistFactor: 2.54,
+          neckFactor: 2.54,
+          hipFactor: 2.54
+        }
+      };
+
+      // ============================================
+      // BODY FAT CALCULATIONS
+      // ============================================
+      function calculateBodyFatNavy(weightKg, heightCm, waistCm, neckCm, hipCm, gender) {
+        // U.S. Navy Method
+        const heightInches = heightCm / 2.54;
+        const waistInches = waistCm / 2.54;
+        const neckInches = neckCm / 2.54;
+        const hipInches = hipCm / 2.54;
+
+        let bodyFat;
+        if (gender === 'male') {
+          bodyFat = 495 / (1.0324 - 0.19077 * Math.log10(waistInches - neckInches) + 0.15456 * Math.log10(heightInches)) - 450;
+        } else {
+          bodyFat = 495 / (1.29579 - 0.35004 * Math.log10(waistInches + hipInches - neckInches) + 0.22100 * Math.log10(heightInches)) - 450;
+        }
+
+        return Math.max(2, Math.min(80, bodyFat));
+      }
+
+      function calculateBodyFatBMI(weightKg, heightCm, age, gender) {
+        const heightM = heightCm / 100;
+        const bmi = weightKg / (heightM * heightM);
+        
+        let bodyFat;
+        if (gender === 'male') {
+          bodyFat = 1.20 * bmi + 0.23 * age - 16.2;
+        } else {
+          bodyFat = 1.20 * bmi + 0.23 * age - 5.4;
+        }
+        
+        return Math.max(2, Math.min(80, bodyFat));
+      }
+
+      function getBodyFatCategory(bf, gender, age) {
+        const isMale = gender === 'male';
+        const isYoung = age < 40;
+        const isOld = age >= 60;
+
+        // Age-adjusted categories
+        let athleteLow, athleteHigh, healthyLow, healthyHigh, avgLow, avgHigh, obeseLow;
+
+        if (isMale) {
+          if (isYoung) {
+            athleteLow = 6; athleteHigh = 13;
+            healthyLow = 14; healthyHigh = 17;
+            avgLow = 18; avgHigh = 24;
+            obeseLow = 25;
+          } else if (isOld) {
+            athleteLow = 10; athleteHigh = 17;
+            healthyLow = 18; healthyHigh = 21;
+            avgLow = 22; avgHigh = 28;
+            obeseLow = 29;
+          } else {
+            athleteLow = 8; athleteHigh = 15;
+            healthyLow = 16; healthyHigh = 19;
+            avgLow = 20; avgHigh = 26;
+            obeseLow = 27;
+          }
+        } else {
+          if (isYoung) {
+            athleteLow = 14; athleteHigh = 20;
+            healthyLow = 21; healthyHigh = 24;
+            avgLow = 25; avgHigh = 31;
+            obeseLow = 32;
+          } else if (isOld) {
+            athleteLow = 18; athleteHigh = 24;
+            healthyLow = 25; healthyHigh = 28;
+            avgLow = 29; avgHigh = 35;
+            obeseLow = 36;
+          } else {
+            athleteLow = 16; athleteHigh = 22;
+            healthyLow = 23; healthyHigh = 26;
+            avgLow = 27; avgHigh = 33;
+            obeseLow = 34;
+          }
+        }
+
+        if (bf <= athleteHigh) {
+          return { category: 'Athlete', emoji: '💪', color: 'blue', label: 'Athletic', description: 'Your body fat is in the athletic range. Great for performance!' };
+        } else if (bf <= healthyHigh) {
+          return { category: 'Healthy', emoji: '✅', color: 'green', label: 'Healthy', description: 'Your body fat is in the healthy range. Keep up the good work!' };
+        } else if (bf <= avgHigh) {
+          return { category: 'Average', emoji: '⚠️', color: 'yellow', label: 'Average', description: 'Your body fat is in the average range. Consider a balanced diet and exercise.' };
+        } else if (bf < obeseLow) {
+          return { category: 'Above Average', emoji: '🔶', color: 'orange', label: 'Above Average', description: 'Your body fat is above average. Consider lifestyle changes.' };
+        } else {
+          return { category: 'Obese', emoji: '🔴', color: 'red', label: 'Obese', description: 'Your body fat is in the obese range. Consult a healthcare professional.' };
+        }
+      }
+
+      // ============================================
+      // UPDATE BODY FAT
+      // ============================================
+      function updateBodyFat(syncInputs = true) {
+        const unit = unitConversions[currentUnit];
+        
+        // Get metric values
+        const weightKg = currentUnit === 'metric' ? rawWeight : rawWeight * 0.453592;
+        const heightCm = currentUnit === 'metric' ? rawHeight : rawHeight * 2.54;
+        const waistCm = currentUnit === 'metric' ? rawWaist : rawWaist * 2.54;
+        const neckCm = currentUnit === 'metric' ? rawNeck : rawNeck * 2.54;
+        const hipCm = currentUnit === 'metric' ? rawHip : rawHip * 2.54;
+        const age = rawAge;
+        const gender = currentGender;
+
+        // Calculate body fat using both methods
+        let bfNavy = calculateBodyFatNavy(weightKg, heightCm, waistCm, neckCm, hipCm, gender);
+        let bfBMI = calculateBodyFatBMI(weightKg, heightCm, age, gender);
+
+        // Use selected method
+        let bf = currentMethod === 'navy' ? bfNavy : bfBMI;
+        let methodLabel = currentMethod === 'navy' ? 'Navy' : 'BMI';
+
+        // Get category
+        const category = getBodyFatCategory(bf, gender, age);
+        const categoryColors = {
+          blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+          green: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+          yellow: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+          orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+          red: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
+        };
+
+        // Calculate fat mass and lean mass
+        const fatMassKg = (bf / 100) * weightKg;
+        const leanMassKg = weightKg - fatMassKg;
+
+        // Format values
+        const formattedBf = formatNumber(bf, { maximumFractionDigits: 1 });
+        const formattedFatMass = formatNumber(fatMassKg, { maximumFractionDigits: 1 });
+        const formattedLeanMass = formatNumber(leanMassKg, { maximumFractionDigits: 1 });
+        const formattedNavy = formatNumber(bfNavy, { maximumFractionDigits: 1 });
+        const formattedBMI = formatNumber(bfBMI, { maximumFractionDigits: 1 });
+        const formattedAvg = formatNumber((bfNavy + bfBMI) / 2, { maximumFractionDigits: 1 });
+
+        // Update weight displays
+        const displayWeight = currentUnit === 'metric' ? rawWeight : rawWeight;
+        const displayHeight = currentUnit === 'metric' ? rawHeight : rawHeight;
+        const displayWaist = currentUnit === 'metric' ? rawWaist : rawWaist;
+        const displayNeck = currentUnit === 'metric' ? rawNeck : rawNeck;
+        const displayHip = currentUnit === 'metric' ? rawHip : rawHip;
+
+        weightDisplay.textContent = formatNumber(displayWeight, { maximumFractionDigits: 1 });
+        heightDisplay.textContent = formatNumber(displayHeight, { maximumFractionDigits: 1 });
+        ageDisplay.textContent = formatNumber(age, { maximumFractionDigits: 0 });
+        waistDisplay.textContent = formatNumber(displayWaist, { maximumFractionDigits: 1 });
+        neckDisplay.textContent = formatNumber(displayNeck, { maximumFractionDigits: 1 });
+        hipDisplay.textContent = formatNumber(displayHip, { maximumFractionDigits: 1 });
+
+        weightUnit.textContent = unit.weightLabel;
+        heightUnit.textContent = unit.heightLabel;
+        waistUnit.textContent = unit.waistLabel;
+        neckUnit.textContent = unit.neckLabel;
+        hipUnit.textContent = unit.hipLabel;
+
+        // Show result
+        bfResultBox.classList.remove('hidden');
+        bfResultValue.textContent = formattedBf;
+        bfCategory.className = `inline-block px-4 py-1.5 rounded-full text-sm font-medium ${categoryColors[category.color]}`;
+        bfCategory.textContent = `${category.emoji} ${category.label}`;
+        bfCategoryShort.textContent = category.label;
+        bfDescription.textContent = category.description;
+        bfMethod.textContent = methodLabel;
+        fatMass.textContent = `${formattedFatMass} ${unit.weightLabel}`;
+        leanMass.textContent = `${formattedLeanMass} ${unit.weightLabel}`;
+
+        // Method comparison
+        navyResult.textContent = `${formattedNavy}%`;
+        bmiResult.textContent = `${formattedBMI}%`;
+        avgResult.textContent = `${formattedAvg}%`;
+
+        // Update steps
+        step1.textContent = `Using ${methodLabel} Method formula`;
+        step2.textContent = `Measurements: Weight ${formatNumber(displayWeight, { maximumFractionDigits: 1 })} ${unit.weightLabel}, Height ${formatNumber(displayHeight, { maximumFractionDigits: 1 })} ${unit.heightLabel}`;
+        step3.textContent = `Calculated body fat: ${formattedBf}%`;
+        step4.textContent = `Category: ${category.label} - ${category.description}`;
+
+        // Show/hide hip input for females
+        if (gender === 'female') {
+          hipInputWrapper.style.display = 'block';
+          hipInputDiv.style.display = 'block';
+        } else {
+          hipInputWrapper.style.display = 'none';
+          hipInputDiv.style.display = 'none';
+        }
+
+        // Sync inputs
+        if (syncInputs) {
+          weightSlider.value = displayWeight;
+          heightSlider.value = displayHeight;
+          ageSlider.value = age;
+          waistSlider.value = displayWaist;
+          neckSlider.value = displayNeck;
+          hipSlider.value = displayHip;
+          weightInput.value = displayWeight;
+          heightInput.value = displayHeight;
+          ageInput.value = age;
+          waistInput.value = displayWaist;
+          neckInput.value = displayNeck;
+          hipInput.value = displayHip;
+        }
+      }
+
+      // ============================================
+      // METHOD TOGGLE
+      // ============================================
+      document.querySelectorAll('.bf-method-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.bf-method-btn').forEach(b => {
+            b.className = 'bf-method-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+          });
+          btn.className = 'bf-method-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+          
+          const id = btn.id.replace('method', '').toLowerCase();
+          currentMethod = id;
+          updateBodyFat();
+        });
+      });
+
+      // ============================================
+      // UNIT TOGGLE
+      // ============================================
+      document.getElementById('unitMetric').addEventListener('click', () => {
+        document.querySelectorAll('.bf-unit-btn').forEach(b => {
+          b.className = 'bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitMetric').className = 'bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'metric';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawWeight = rawWeight * old.weightFactor / nu.weightFactor;
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+          rawWaist = rawWaist * old.waistFactor / nu.waistFactor;
+          rawNeck = rawNeck * old.neckFactor / nu.neckFactor;
+          rawHip = rawHip * old.hipFactor / nu.hipFactor;
+        }
+        currentUnit = newUnit;
+        updateBodyFat();
+      });
+
+      document.getElementById('unitImperial').addEventListener('click', () => {
+        document.querySelectorAll('.bf-unit-btn').forEach(b => {
+          b.className = 'bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('unitImperial').className = 'bf-unit-btn px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        
+        const oldUnit = currentUnit;
+        const newUnit = 'imperial';
+        if (oldUnit !== newUnit) {
+          const old = unitConversions[oldUnit];
+          const nu = unitConversions[newUnit];
+          rawWeight = rawWeight * old.weightFactor / nu.weightFactor;
+          rawHeight = rawHeight * old.heightFactor / nu.heightFactor;
+          rawWaist = rawWaist * old.waistFactor / nu.waistFactor;
+          rawNeck = rawNeck * old.neckFactor / nu.neckFactor;
+          rawHip = rawHip * old.hipFactor / nu.hipFactor;
+        }
+        currentUnit = newUnit;
+        updateBodyFat();
+      });
+
+      // ============================================
+      // GENDER TOGGLE
+      // ============================================
+      document.getElementById('genderMale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderMale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'male';
+        updateBodyFat();
+      });
+
+      document.getElementById('genderFemale').addEventListener('click', () => {
+        document.querySelectorAll('.gender-btn').forEach(b => {
+          b.className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+        });
+        document.getElementById('genderFemale').className = 'gender-btn flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-lg shadow-emerald-500/25';
+        currentGender = 'female';
+        updateBodyFat();
+      });
+
+      // ============================================
+      // SLIDER EVENTS
+      // ============================================
+      weightSlider.addEventListener('input', () => {
+        rawWeight = parseFloat(weightSlider.value);
+        updateBodyFat();
+      });
+      heightSlider.addEventListener('input', () => {
+        rawHeight = parseFloat(heightSlider.value);
+        updateBodyFat();
+      });
+      ageSlider.addEventListener('input', () => {
+        rawAge = parseFloat(ageSlider.value);
+        updateBodyFat();
+      });
+      waistSlider.addEventListener('input', () => {
+        rawWaist = parseFloat(waistSlider.value);
+        updateBodyFat();
+      });
+      neckSlider.addEventListener('input', () => {
+        rawNeck = parseFloat(neckSlider.value);
+        updateBodyFat();
+      });
+      hipSlider.addEventListener('input', () => {
+        rawHip = parseFloat(hipSlider.value);
+        updateBodyFat();
+      });
+
+      // ============================================
+      // INPUT EVENTS
+      // ============================================
+      weightInput.addEventListener('input', () => {
+        const validation = validatePositive(weightInput.value, 'Weight', unitConversions[currentUnit].weightMaxNum);
+        if (validation.valid) {
+          rawWeight = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      heightInput.addEventListener('input', () => {
+        const validation = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightMaxNum);
+        if (validation.valid) {
+          rawHeight = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      ageInput.addEventListener('input', () => {
+        const validation = validatePositive(ageInput.value, 'Age', 120);
+        if (validation.valid && validation.value >= 10 && validation.value <= 120) {
+          rawAge = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      waistInput.addEventListener('input', () => {
+        const validation = validatePositive(waistInput.value, 'Waist', unitConversions[currentUnit].waistMax);
+        if (validation.valid) {
+          rawWaist = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      neckInput.addEventListener('input', () => {
+        const validation = validatePositive(neckInput.value, 'Neck', unitConversions[currentUnit].neckMax);
+        if (validation.valid) {
+          rawNeck = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      hipInput.addEventListener('input', () => {
+        const validation = validatePositive(hipInput.value, 'Hip', unitConversions[currentUnit].hipMax);
+        if (validation.valid) {
+          rawHip = validation.value;
+          updateBodyFat(false);
+        }
+      });
+
+      // ============================================
+      // CALCULATE BUTTON
+      // ============================================
+      document.getElementById('bfCalculateBtn').addEventListener('click', () => {
+        const weightResult = validatePositive(weightInput.value, 'Weight', unitConversions[currentUnit].weightMaxNum);
+        const heightResult = validatePositive(heightInput.value, 'Height', unitConversions[currentUnit].heightMaxNum);
+        const ageResult = validatePositive(ageInput.value, 'Age', 120);
+        const waistResult = validatePositive(waistInput.value, 'Waist', unitConversions[currentUnit].waistMax);
+        const neckResult = validatePositive(neckInput.value, 'Neck', unitConversions[currentUnit].neckMax);
+        const hipResult = validatePositive(hipInput.value, 'Hip', unitConversions[currentUnit].hipMax);
+
+        if (!weightResult.valid) {
+          showValidationError(weightResult.message);
+          weightInput.focus();
+          return;
+        }
+        if (!heightResult.valid) {
+          showValidationError(heightResult.message);
+          heightInput.focus();
+          return;
+        }
+        if (!ageResult.valid || ageResult.value < 10 || ageResult.value > 120) {
+          showValidationError('Age must be between 10 and 120.');
+          ageInput.focus();
+          return;
+        }
+        if (!waistResult.valid) {
+          showValidationError(waistResult.message);
+          waistInput.focus();
+          return;
+        }
+        if (!neckResult.valid) {
+          showValidationError(neckResult.message);
+          neckInput.focus();
+          return;
+        }
+        if (currentGender === 'female' && !hipResult.valid) {
+          showValidationError(hipResult.message);
+          hipInput.focus();
+          return;
+        }
+
+        rawWeight = weightResult.value;
+        rawHeight = heightResult.value;
+        rawAge = ageResult.value;
+        rawWaist = waistResult.value;
+        rawNeck = neckResult.value;
+        if (currentGender === 'female') {
+          rawHip = hipResult.value;
+        }
+
+        weightSlider.value = rawWeight;
+        heightSlider.value = rawHeight;
+        ageSlider.value = rawAge;
+        waistSlider.value = rawWaist;
+        neckSlider.value = rawNeck;
+        if (currentGender === 'female') {
+          hipSlider.value = rawHip;
+        }
+
+        updateBodyFat();
+
+        if (window.showToast) {
+          window.showToast('✅ Body fat calculated!', 'success');
+        }
+      });
+
+      // ============================================
+      // KEYBOARD SHORTCUTS: ENTER KEY
+      // ============================================
+      weightInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+      heightInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+      ageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+      waistInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+      neckInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+      hipInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('bfCalculateBtn').click();
+      });
+
+      // ============================================
+      // INITIALIZE
+      // ============================================
+      // Initially hide hip input for male
+      hipInputWrapper.style.display = 'none';
+      hipInputDiv.style.display = 'none';
+      updateBodyFat();
+    });
+  </script>
+</Layout>
